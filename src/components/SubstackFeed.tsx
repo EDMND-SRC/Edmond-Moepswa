@@ -39,14 +39,14 @@ export const SubstackFeed = () => {
   return (
     <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 font-sans border-t border-white/5">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-20">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base uppercase">
+        <div className="mb-20 text-center md:text-left">
+          <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
             // Latest Writing
           </span>
-          <h2 className="text-4xl md:text-6xl lg:text-[80px] font-medium leading-[1.05] tracking-tighter text-white mt-8">
+          <h2 className="text-4xl md:text-6xl lg:text-[80px] font-bold leading-[1.05] tracking-tighter text-white mt-8">
             Thoughts on design & products
           </h2>
-          <p className="text-[#a3a3a3] mt-8 max-w-xl text-lg md:text-xl leading-relaxed">
+          <p className="text-[#a3a3a3] mt-12 max-w-xl text-lg md:text-xl leading-relaxed mx-auto md:mx-0">
             Weekly insights on building better digital experiences, delivered via Substack.
           </p>
         </div>

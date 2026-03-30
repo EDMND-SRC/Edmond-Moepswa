@@ -1120,17 +1120,14 @@ export default function App() {
       {/* Calculator Section */}
       <section id="calculator-section" className="bg-[#0a0a0a] border-t border-white/10 py-16 md:py-28 px-4 md:px-16 w-full">
         <div className="max-w-[1800px] mx-auto mb-12 md:mb-20">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
+          <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
             // Project Estimate Calculator
           </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter">
+            Get a premium website within your budget
+          </h2>
         </div>
         <div className="max-w-7xl mx-auto w-full">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white">
-              Get a premium website within your budget
-            </h2>
-          </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden">
           {/* LEFT COLUMN */}
           <div className="bg-[#0D0D0D] p-8 lg:p-12 divide-y divide-[#1E1E1E]">
@@ -1338,14 +1335,14 @@ export default function App() {
       {/* Free Resources / Gumroad Lead Magnets */}
       <section className="bg-[#111111] py-24 px-6 md:px-10 font-sans">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-20">
-            <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base uppercase">
+          <div className="mb-20 text-center md:text-left">
+            <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
               // Free Resources
             </span>
-            <h2 className="text-4xl md:text-6xl lg:text-[80px] font-medium leading-[1.05] tracking-tighter text-white mt-8">
+            <h2 className="text-4xl md:text-6xl lg:text-[80px] font-bold leading-[1.05] tracking-tighter text-white mt-8">
               Download free guides
             </h2>
-            <p className="text-[#a3a3a3] mt-8 max-w-xl text-lg md:text-xl leading-relaxed">
+            <p className="text-[#a3a3a3] mt-12 max-w-xl text-lg md:text-xl leading-relaxed mx-auto md:mx-0">
               Practical resources to help you build a better digital presence. Completely free — no strings attached.
             </p>
           </div>
@@ -1408,33 +1405,37 @@ export default function App() {
           {/* Contact Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 pb-16 border-b border-white/5">
             <div>
-              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs uppercase mb-8 block">// Contact</span>
-              <ul className="space-y-6 text-[#a3a3a3]">
-                <li className="flex gap-3 items-start">
-                  <span className="text-[#FF4D2E] mt-0.5">📞</span>
+              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-12">
+                // Contact
+              </span>
+              <ul className="space-y-8 text-[#a3a3a3]">
+                <li className="flex gap-4 items-start">
+                  <span className="text-[#FF4D2E] text-xl mt-1">📞</span>
                   <div>
-                    <p className="text-white font-medium">Phone & WhatsApp</p>
-                    <a href="https://wa.me/26778692888" target="_blank" rel="noopener noreferrer" className="hover:text-[#FF4D2E] transition-colors">+267 78 692 888</a>
+                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Phone & WhatsApp</p>
+                    <a href="https://wa.me/26778692888" target="_blank" rel="noopener noreferrer" className="text-xl hover:text-[#FF4D2E] transition-colors tracking-tight font-medium">+267 78 692 888</a>
                   </div>
                 </li>
-                <li className="flex gap-3 items-start">
-                  <span className="text-[#FF4D2E] mt-0.5">✉️</span>
+                <li className="flex gap-4 items-start">
+                  <span className="text-[#FF4D2E] text-xl mt-1">✉️</span>
                   <div>
-                    <p className="text-white font-medium">Email</p>
-                    <a href="mailto:edmond.moepswa@gmail.com" className="hover:text-[#FF4D2E] transition-colors">edmond.moepswa@gmail.com</a>
+                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Email</p>
+                    <a href="mailto:edmond.moepswa@gmail.com" className="text-xl hover:text-[#FF4D2E] transition-colors tracking-tight font-medium">edmond.moepswa@gmail.com</a>
                   </div>
                 </li>
-                <li className="flex gap-3 items-start">
-                  <span className="text-[#FF4D2E] mt-0.5">📍</span>
+                <li className="flex gap-4 items-start">
+                  <span className="text-[#FF4D2E] text-xl mt-1">📍</span>
                   <div>
-                    <p className="text-white font-medium">Location</p>
-                    <span>Gaborone, Botswana</span>
+                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Location</p>
+                    <span className="text-xl tracking-tight font-medium">Gaborone, Botswana</span>
                   </div>
                 </li>
               </ul>
             </div>
             <div>
-              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs uppercase mb-8 block">// Quick Links</span>
+              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-12">
+                // Quick Links
+              </span>
               <ul className="space-y-6 text-[#a3a3a3]">
                 <li><Link href="/refund-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Refund & Dispute Policy</Link></li>
                 <li><Link href="/cancellation-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Cancellation Policy</Link></li>
