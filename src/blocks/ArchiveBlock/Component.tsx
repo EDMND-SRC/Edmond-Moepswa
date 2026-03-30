@@ -16,25 +16,22 @@ export const ArchiveBlock: React.FC<
 
   const limit = limitFromProps || 3
 
-  let posts: Project[] = []
-
-  if (populateBy === 'collection') {
-    const payload = await getPayload({ config: configPromise })
-
-    const fetchedPosts = await payload.find({
+  let projects: Project[] = []
+...
+    const fetchedProjects = await payload.find({
       collection: 'projects',
       depth: 1,
       limit,
     })
 
-    posts = fetchedPosts.docs
+    projects = fetchedProjects.docs
   } else {
     if (selectedDocs?.length) {
-      const filteredSelectedPosts = selectedDocs.map((post: any) => {
+      const filteredSelectedProjects = selectedDocs.map((post: any) => {
         if (typeof post.value === 'object') return post.value
       }) as Project[]
 
-      posts = filteredSelectedPosts
+      projects = filteredSelectedProjects
     }
   }
 
@@ -45,7 +42,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive posts={posts as any} />
+      <CollectionArchive projects={projects as any} />
     </div>
   )
 }

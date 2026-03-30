@@ -7,7 +7,7 @@ import React, { Fragment } from 'react'
 
 import { Media } from '@/components/Media'
 
-export type CardPostData = {
+export type CardData = {
   slug?: string | null
   title?: string | null
   meta?: {

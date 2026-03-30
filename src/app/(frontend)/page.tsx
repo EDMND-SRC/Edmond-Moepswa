@@ -1338,10 +1338,16 @@ export default function App() {
       {/* Free Resources / Gumroad Lead Magnets */}
       <section className="bg-[#111111] py-24 px-6 md:px-10 font-sans">
         <div className="max-w-5xl mx-auto">
-          <div className="mb-14">
-            <span className="text-[#FF4D2E] text-xs font-bold uppercase tracking-[0.2em]">Free Resources</span>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 tracking-tight">Download free guides</h2>
-            <p className="text-[#a3a3a3] mt-5 max-w-xl text-lg leading-relaxed">Practical resources to help you build a better digital presence. Completely free — no strings attached.</p>
+          <div className="mb-20">
+            <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base uppercase">
+              // Free Resources
+            </span>
+            <h2 className="text-4xl md:text-6xl lg:text-[80px] font-medium leading-[1.05] tracking-tighter text-white mt-8">
+              Download free guides
+            </h2>
+            <p className="text-[#a3a3a3] mt-8 max-w-xl text-lg md:text-xl leading-relaxed">
+              Practical resources to help you build a better digital presence. Completely free — no strings attached.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -1402,8 +1408,8 @@ export default function App() {
           {/* Contact Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 pb-16 border-b border-white/5">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-6">Contact</h2>
-              <ul className="space-y-4 text-[#a3a3a3]">
+              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs uppercase mb-8 block">// Contact</span>
+              <ul className="space-y-6 text-[#a3a3a3]">
                 <li className="flex gap-3 items-start">
                   <span className="text-[#FF4D2E] mt-0.5">📞</span>
                   <div>
@@ -1428,8 +1434,8 @@ export default function App() {
               </ul>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white mb-6">Quick Links</h2>
-              <ul className="space-y-4 text-[#a3a3a3]">
+              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs uppercase mb-8 block">// Quick Links</span>
+              <ul className="space-y-6 text-[#a3a3a3]">
                 <li><Link href="/refund-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Refund & Dispute Policy</Link></li>
                 <li><Link href="/cancellation-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Cancellation Policy</Link></li>
                 <li><Link href="/terms-and-conditions" className="hover:text-[#FF4D2E] transition-colors font-medium">Terms & Conditions</Link></li>
