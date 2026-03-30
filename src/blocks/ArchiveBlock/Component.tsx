@@ -17,7 +17,10 @@ export const ArchiveBlock: React.FC<
   const limit = limitFromProps || 3
 
   let projects: Project[] = []
-...
+
+  if (populateBy === 'collection') {
+    const payload = await getPayload({ config: configPromise })
+
     const fetchedProjects = await payload.find({
       collection: 'projects',
       depth: 1,
@@ -42,7 +45,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive projects={projects as any} />
+      <CollectionArchive docs={projects as any} />
     </div>
   )
 }
