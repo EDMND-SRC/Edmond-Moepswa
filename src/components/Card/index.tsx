@@ -21,7 +21,7 @@ export type CardData = {
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: CardPostData
+  doc?: CardData
   relationTo?: string
   showCategories?: boolean
   title?: string
