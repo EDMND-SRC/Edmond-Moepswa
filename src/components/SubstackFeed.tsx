@@ -37,18 +37,12 @@ export const SubstackFeed = () => {
   if (posts.length === 0) return null;
 
   return (
-    <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 font-sans border-t border-white/5">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-20 text-center md:text-left">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
-            // Latest Writing
-          </span>
-          <h2 className="text-4xl md:text-6xl lg:text-[80px] font-bold leading-[1.05] tracking-tighter text-white mt-8">
-            Thoughts on design & products
-          </h2>
-          <p className="text-[#a3a3a3] mt-12 max-w-xl text-lg md:text-xl leading-relaxed mx-auto md:mx-0">
-            Weekly insights on building better digital experiences, delivered via Substack.
-          </p>
+    <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 border-t border-white/5">
+      <div className="max-w-5xl mx-auto text-center md:text-left">
+        <div className="mb-14">
+          <span className="text-[#FF4D2E] text-xs font-bold uppercase tracking-[0.2em]">// Latest Writing</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white mt-6 tracking-tight">Thoughts on design & products</h2>
+          <p className="text-[#a3a3a3] mt-6 max-w-xl text-lg leading-relaxed mx-auto md:mx-0">Weekly insights on building better digital experiences, delivered via Substack.</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -68,7 +62,7 @@ export const SubstackFeed = () => {
               <div className="mb-4 text-xs text-[#666] font-medium uppercase tracking-widest">
                 {new Date(post.pubDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </div>
-              <h3 className="text-white font-bold text-xl mb-4 leading-tight group-hover:text-[#FF4D2E] transition-colors">{post.title}</h3>
+              <h3 className="text-white font-medium text-xl mb-4 leading-tight group-hover:text-[#FF4D2E] transition-colors">{post.title}</h3>
               <p className="text-[#a3a3a3] text-sm flex-1 leading-relaxed line-clamp-3">{post.contentSnippet}</p>
               <div className="mt-8 flex items-center gap-2 text-[#FF4D2E] text-sm font-bold group-hover:gap-3 transition-all">
                 Read on Substack <span className="text-lg">→</span>

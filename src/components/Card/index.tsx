@@ -7,7 +7,7 @@ import React, { Fragment } from 'react'
 
 import { Media } from '@/components/Media'
 
-export type CardData = {
+export type CardPostData = {
   slug?: string | null
   title?: string | null
   meta?: {
@@ -21,7 +21,7 @@ export type CardData = {
 export const Card: React.FC<{
   alignItems?: 'center'
   className?: string
-  doc?: CardData
+  doc?: CardPostData
   relationTo?: string
   showCategories?: boolean
   title?: string

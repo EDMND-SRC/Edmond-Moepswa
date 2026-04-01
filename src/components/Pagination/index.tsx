@@ -51,7 +51,7 @@ export const Pagination: React.FC<{
               {/* @ts-ignore */}
               <PaginationLink
                 onClick={() => {
-                  router.push(`/posts/page/${page - 1}`)
+                  router.push(`/projects/page/${page - 1}`)
                 }}
               >
                 {page - 1}

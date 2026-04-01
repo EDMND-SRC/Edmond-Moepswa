@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Instagram, Linkedin, Calendar, Sparkles, TrendingUp, ArrowUp, ChevronDown, Plus } from 'lucide-react';
+import { Instagram, Linkedin, Calendar, Sparkles, TrendingUp, ArrowUp, ChevronDown, Plus, Phone, Mail, MapPin } from 'lucide-react';
 import { motion, useScroll, useTransform, useInView, useMotionValue, animate, AnimatePresence, useSpring } from 'motion/react';
 import Cal, { getCalApi } from "@calcom/embed-react";
 import LogoMarquee from '@/components/ui/logo-marquee';
@@ -798,9 +798,9 @@ const CalSection = () => {
 
 const Footer = () => {
   return (
-    <footer className="relative min-h-[80vh] bg-[#e5e5e5] text-[#1a1a1a] overflow-hidden flex flex-col justify-end p-6 md:p-10 pb-32 md:pb-32">
+    <footer className="relative min-h-screen bg-[#e5e5e5] text-[#1a1a1a] overflow-hidden flex flex-col justify-end p-6 md:p-10 pb-32 md:pb-32">
       {/* Background Portrait (Flipped horizontally) */}
-      <img 
+      <img
         src="/01-edmond-portrait.png"
         alt="Edmond Moepswa Portrait"
         className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
@@ -831,20 +831,50 @@ const Footer = () => {
       </div>
 
       {/* Footer Content */}
-      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mix-blend-difference text-white">
-        <div className="flex flex-col gap-3 text-sm font-medium mb-12 md:mb-0">
-          <a href="#" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
-            <Linkedin className="w-4 h-4" />
-            Linkedin
-          </a>
-          <a href="#" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
-            <XIcon className="w-4 h-4" />
-            X
-          </a>
-          <a href="#" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
-            <Instagram className="w-4 h-4" />
-            Instagram
-          </a>
+      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mix-blend-difference text-white gap-12">
+        <div className="flex flex-col md:flex-row gap-12 md:gap-24 items-end mb-12 md:mb-0">
+          {/* Social Links */}
+          <div className="flex flex-col gap-3 text-sm font-medium">
+            <span className="text-[#a3a3a3] text-[10px] uppercase tracking-widest mb-2 opacity-50">Social</span>
+            <a href="https://linkedin.com/in/edmond-moepswa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+              <Linkedin className="w-4 h-4" />
+              Linkedin
+            </a>
+            <a href="https://x.com/edmondmoepswa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+              <XIcon className="w-4 h-4" />
+              X
+            </a>
+            <a href="https://instagram.com/edmondmoepswa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+              <Instagram className="w-4 h-4" />
+              Instagram
+            </a>
+          </div>
+
+          {/* Contact Details */}
+          <div className="flex flex-col gap-3 text-sm font-medium">
+            <span className="text-[#a3a3a3] text-[10px] uppercase tracking-widest mb-2 opacity-50">Contact</span>
+            <a href="https://wa.me/26778692888" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+              <Phone className="w-4 h-4" />
+              +267 78 692 888
+            </a>
+            <a href="mailto:edmond.moepswa@gmail.com" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+              <Mail className="w-4 h-4" />
+              edmond.moepswa@gmail.com
+            </a>
+            <div className="flex items-center gap-3 opacity-70">
+              <MapPin className="w-4 h-4" />
+              Gaborone, Botswana
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="flex flex-col gap-3 text-sm font-medium">
+            <span className="text-[#a3a3a3] text-[10px] uppercase tracking-widest mb-2 opacity-50">Quick Links</span>
+            <Link href="/refund-policy" className="hover:opacity-70 transition-opacity">Refund & Dispute Policy</Link>
+            <Link href="/cancellation-policy" className="hover:opacity-70 transition-opacity">Cancellation Policy</Link>
+            <Link href="/terms-and-conditions" className="hover:opacity-70 transition-opacity">Terms & Conditions</Link>
+            <Link href="/legal-restrictions" className="hover:opacity-70 transition-opacity">Legal Restrictions</Link>
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 md:items-end">
@@ -1120,14 +1150,20 @@ export default function App() {
       {/* Calculator Section */}
       <section id="calculator-section" className="bg-[#0a0a0a] border-t border-white/10 py-16 md:py-28 px-4 md:px-16 w-full">
         <div className="max-w-[1800px] mx-auto mb-12 md:mb-20">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
+          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
             // Project Estimate Calculator
           </span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tighter">
-            Get a premium website within your budget
-          </h2>
         </div>
         <div className="max-w-7xl mx-auto w-full">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white mb-6 tracking-tight">
+              Get a premium website within your budget
+            </h2>
+            <p className="text-[#a3a3a3] text-lg leading-relaxed max-w-2xl mx-auto">
+              Estimate your project cost instantly. Select your required services and number of pages to see a transparent price breakdown for your next digital venture.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden">
           {/* LEFT COLUMN */}
           <div className="bg-[#0D0D0D] p-8 lg:p-12 divide-y divide-[#1E1E1E]">
@@ -1171,7 +1207,7 @@ export default function App() {
                   const v = Array.isArray(val) ? val[0] : val;
                   if (typeof v === 'number' && !isNaN(v)) setPages(v);
                 }}
-                className="mb-2 [&_[data-slot=slider-range]]:bg-[#FF4D2E] [&_[data-slot=slider-thumb]]:border-[#FF4D2E] [&_[data-slot=slider-thumb]]:shadow-[0_0_20px_rgba(255,77,46,0.7)] transition-shadow"
+                className="mb-4 h-6 [&_[data-slot=slider-track]]:h-2 [&_[data-slot=slider-range]]:bg-[#FF4D2E] [&_[data-slot=slider-range]]:shadow-[0_0_10px_rgba(255,77,46,0.3)] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border-[#FF4D2E] [&_[data-slot=slider-thumb]]:shadow-[0_0_20px_rgba(255,77,46,0.7)] transition-all"
               />
               <div className="flex justify-between text-white/50 text-sm">
                 <span>1</span>
@@ -1332,19 +1368,12 @@ export default function App() {
       {/* Cal.com Section */}
       <CalSection />
 
-      {/* Free Resources / Gumroad Lead Magnets */}
-      <section className="bg-[#111111] py-24 px-6 md:px-10 font-sans">
-        <div className="max-w-5xl mx-auto">
-          <div className="mb-20 text-center md:text-left">
-            <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-8">
-              // Free Resources
-            </span>
-            <h2 className="text-4xl md:text-6xl lg:text-[80px] font-bold leading-[1.05] tracking-tighter text-white mt-8">
-              Download free guides
-            </h2>
-            <p className="text-[#a3a3a3] mt-12 max-w-xl text-lg md:text-xl leading-relaxed mx-auto md:mx-0">
-              Practical resources to help you build a better digital presence. Completely free — no strings attached.
-            </p>
+      <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 border-t border-white/5">
+        <div className="max-w-5xl mx-auto text-center md:text-left">
+          <div className="mb-14">
+            <span className="text-[#FF4D2E] text-xs font-bold uppercase tracking-[0.2em]">// Free Resources</span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white mt-6 tracking-tight">Download free guides</h2>
+            <p className="text-[#a3a3a3] mt-6 max-w-xl text-lg leading-relaxed mx-auto md:mx-0">Practical resources to help you build a better digital presence. Completely free — no strings attached.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -1384,7 +1413,7 @@ export default function App() {
               >
                 <span className="text-4xl mb-6">{item.icon}</span>
                 <span className="text-[#FF4D2E] text-[10px] font-bold uppercase tracking-[0.15em] mb-3">{item.tag} · Free</span>
-                <h3 className="text-white font-bold text-xl mb-4 leading-tight group-hover:text-[#FF4D2E] transition-colors">{item.title}</h3>
+                <h3 className="text-white font-medium text-xl mb-4 leading-tight group-hover:text-[#FF4D2E] transition-colors">{item.title}</h3>
                 <p className="text-[#a3a3a3] text-sm flex-1 leading-relaxed">{item.desc}</p>
                 <div className="mt-8 flex items-center gap-2 text-[#FF4D2E] text-sm font-bold group-hover:gap-3 transition-all">
                   Download Free <span className="text-lg">→</span>
@@ -1398,59 +1427,7 @@ export default function App() {
       {/* Substack Feed */}
       <SubstackFeed />
 
-      {/* Contact & Legal */}
-      <section className="bg-[#0a0a0a] py-20 px-6 md:px-10 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
 
-          {/* Contact Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 pb-16 border-b border-white/5">
-            <div>
-              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-12">
-                // Contact
-              </span>
-              <ul className="space-y-8 text-[#a3a3a3]">
-                <li className="flex gap-4 items-start">
-                  <span className="text-[#FF4D2E] text-xl mt-1">📞</span>
-                  <div>
-                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Phone & WhatsApp</p>
-                    <a href="https://wa.me/26778692888" target="_blank" rel="noopener noreferrer" className="text-xl hover:text-[#FF4D2E] transition-colors tracking-tight font-medium">+267 78 692 888</a>
-                  </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <span className="text-[#FF4D2E] text-xl mt-1">✉️</span>
-                  <div>
-                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Email</p>
-                    <a href="mailto:edmond.moepswa@gmail.com" className="text-xl hover:text-[#FF4D2E] transition-colors tracking-tight font-medium">edmond.moepswa@gmail.com</a>
-                  </div>
-                </li>
-                <li className="flex gap-4 items-start">
-                  <span className="text-[#FF4D2E] text-xl mt-1">📍</span>
-                  <div>
-                    <p className="text-white font-bold text-lg mb-1 tracking-tight">Location</p>
-                    <span className="text-xl tracking-tight font-medium">Gaborone, Botswana</span>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <span className="text-[#FF4D2E] font-medium tracking-wider text-xs md:text-sm uppercase block mb-12">
-                // Quick Links
-              </span>
-              <ul className="space-y-6 text-[#a3a3a3]">
-                <li><Link href="/refund-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Refund & Dispute Policy</Link></li>
-                <li><Link href="/cancellation-policy" className="hover:text-[#FF4D2E] transition-colors font-medium">Cancellation Policy</Link></li>
-                <li><Link href="/terms-and-conditions" className="hover:text-[#FF4D2E] transition-colors font-medium">Terms & Conditions</Link></li>
-                <li><Link href="/legal-restrictions" className="hover:text-[#FF4D2E] transition-colors font-medium">Legal Restrictions</Link></li>
-              </ul>
-            </div>
-          </div>
-
-
-          <p className="text-[#444] text-[10px] font-bold tracking-[0.2em] text-center pt-8 border-t border-white/5 uppercase">
-            © {new Date().getFullYear()} Edmond Moepswa. All rights reserved. · Gaborone, Botswana · <a href="mailto:edmond.moepswa@gmail.com" className="hover:text-[#FF4D2E] transition-colors">edmond.moepswa@gmail.com</a>
-          </p>
-        </div>
-      </section>
 
       {/* Footer */}
       <Footer />

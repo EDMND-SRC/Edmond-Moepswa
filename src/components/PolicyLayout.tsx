@@ -25,7 +25,7 @@ export const PolicyLayout: React.FC<PolicyLayoutProps> = ({ title, lastUpdated, 
             ← Back to Portfolio
           </Link>
           
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-normal mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
             {title}
           </h1>
           
@@ -36,7 +36,7 @@ export const PolicyLayout: React.FC<PolicyLayoutProps> = ({ title, lastUpdated, 
           )}
 
           <div className="prose prose-invert prose-orange max-w-none 
-            prose-headings:text-white prose-headings:font-bold 
+            prose-headings:text-white prose-headings:font-medium 
             prose-p:text-[#a3a3a3] prose-p:leading-relaxed 
             prose-li:text-[#a3a3a3]
             prose-strong:text-white
