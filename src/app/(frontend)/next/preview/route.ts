@@ -32,10 +32,21 @@ export async function GET(req: NextRequest): Promise<Response> {
   let user
 
   try {
-    user = await payload.auth({
-      req: req as unknown as PayloadRequest,
+    // Construct a minimal PayloadRequest-compatible object.
+    // NextRequest does not implement PayloadRequest directly, so we build the
+    // shape that payload.auth() expects (headers, cookies, url, method).
+    const cookieList = req.cookies.getAll()
+    const payloadReq = {
       headers: req.headers,
-    })
+      cookies: {
+        getAll: () => cookieList,
+        get: (name: string) => cookieList.find((c) => c.name === name)?.value,
+      },
+      url: req.url,
+      method: req.method,
+    } as unknown as PayloadRequest
+
+    user = await payload.auth({ req: payloadReq, headers: req.headers })
   } catch (error) {
     payload.logger.error({ err: error }, 'Error verifying token for live preview')
     return new Response('You are not allowed to preview this page', { status: 403 })

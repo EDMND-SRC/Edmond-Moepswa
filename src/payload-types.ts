@@ -71,6 +71,7 @@ export interface Config {
     services: Service;
     projects: Project;
     testimonials: Testimonial;
+    faqs: Faq;
     media: Media;
     leads: Lead;
     users: User;
@@ -95,6 +96,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -223,7 +225,7 @@ export interface Page {
  */
 export interface Media {
   id: number;
-  alt?: string | null;
+  alt: string;
   caption?: {
     root: {
       type: string;
@@ -474,8 +476,15 @@ export interface ArchiveBlock {
 export interface Project {
   id: number;
   title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
   slug: string;
-  category: 'web-design' | 'branding' | 'web-development' | 'product-design';
+  category: 'web' | 'automation' | 'boilerplate' | 'open-source' | 'seo';
+  /**
+   * e.g. 2024 or 2023-2024
+   */
   year?: string | null;
   description?: {
     root: {
@@ -492,10 +501,10 @@ export interface Project {
     };
     [k: string]: unknown;
   } | null;
-  thumbnail: number | Media;
+  thumbnail?: (number | null) | Media;
   images?:
     | {
-        image?: (number | null) | Media;
+        image: number | Media;
         id?: string | null;
       }[]
     | null;
@@ -725,7 +734,7 @@ export interface Service {
   price?: number | null;
   features?:
     | {
-        feature?: string | null;
+        feature: string;
         id?: string | null;
       }[]
     | null;
@@ -763,10 +772,31 @@ export interface Testimonial {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  question: string;
+  answer: string;
+  category?: ('general' | 'services' | 'process' | 'pricing' | 'technical') | null;
+  /**
+   * Lower numbers appear first
+   */
+  order?: number | null;
+  /**
+   * Inactive FAQs are hidden from the website
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
  */
 export interface Lead {
   id: number;
+  website?: string | null;
   name?: string | null;
   email: string;
   source: 'contact' | 'calculator' | 'gumroad';
@@ -790,7 +820,8 @@ export interface Lead {
  */
 export interface User {
   id: number;
-  name?: string | null;
+  name: string;
+  roles: ('admin' | 'editor')[];
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1019,6 +1050,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'testimonials';
         value: number | Testimonial;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
       } | null)
     | ({
         relationTo: 'media';
@@ -1258,6 +1293,7 @@ export interface ServicesSelect<T extends boolean = true> {
  */
 export interface ProjectsSelect<T extends boolean = true> {
   title?: T;
+  generateSlug?: T;
   slug?: T;
   category?: T;
   year?: T;
@@ -1290,6 +1326,19 @@ export interface TestimonialsSelect<T extends boolean = true> {
   content?: T;
   avatar?: T;
   rating?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  question?: T;
+  answer?: T;
+  category?: T;
+  order?: T;
+  isActive?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1392,6 +1441,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "leads_select".
  */
 export interface LeadsSelect<T extends boolean = true> {
+  website?: T;
   name?: T;
   email?: T;
   source?: T;
@@ -1407,6 +1457,7 @@ export interface LeadsSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1763,6 +1814,8 @@ export interface SiteSetting {
     linkedin?: string | null;
     twitter?: string | null;
     github?: string | null;
+    instagram?: string | null;
+    threads?: string | null;
     substack?: string | null;
   };
   updatedAt?: string | null;
@@ -1831,6 +1884,8 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         linkedin?: T;
         twitter?: T;
         github?: T;
+        instagram?: T;
+        threads?: T;
         substack?: T;
       };
   updatedAt?: T;

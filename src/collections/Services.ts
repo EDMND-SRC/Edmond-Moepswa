@@ -28,6 +28,7 @@ export const Services: CollectionConfig = {
     {
       name: 'price',
       type: 'number',
+      min: 0,
       admin: {
         description: 'Base price in Pula (BWP)',
       },
@@ -39,6 +40,7 @@ export const Services: CollectionConfig = {
         {
           name: 'feature',
           type: 'text',
+          required: true,
         },
       ],
     },

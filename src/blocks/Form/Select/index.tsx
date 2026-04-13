@@ -55,7 +55,6 @@ export const Select: React.FC<
             </SelectComponent>
           )
         }}
-        rules={{ required }}
       />
       {errors[name] && <Error name={name} />}
     </Width>

@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { slugField } from 'payload'
 import { authenticated } from '../access/authenticated'
 import { anyone } from '../access/anyone'
 
@@ -20,27 +21,25 @@ export const Projects: CollectionConfig = {
       type: 'text',
       required: true,
     },
-    {
-      name: 'slug',
-      type: 'text',
-      required: true,
-      unique: true,
-      index: true,
-    },
+    slugField({ fieldToUse: 'title' }),
     {
       name: 'category',
       type: 'select',
       options: [
-        { label: 'Web Design', value: 'web-design' },
-        { label: 'Branding', value: 'branding' },
-        { label: 'Web Development', value: 'web-development' },
-        { label: 'Product Design', value: 'product-design' },
+        { label: 'Web Design & Development', value: 'web' },
+        { label: 'Workflow Automation', value: 'automation' },
+        { label: 'Boilerplate Products', value: 'boilerplate' },
+        { label: 'Open Source', value: 'open-source' },
+        { label: 'SEO & GEO', value: 'seo' },
       ],
       required: true,
     },
     {
       name: 'year',
       type: 'text',
+      admin: {
+        description: 'e.g. 2024 or 2023-2024',
+      },
     },
     {
       name: 'description',
@@ -50,16 +49,18 @@ export const Projects: CollectionConfig = {
       name: 'thumbnail',
       type: 'upload',
       relationTo: 'media',
-      required: true,
+      required: false,
     },
     {
       name: 'images',
       type: 'array',
+      maxRows: 20,
       fields: [
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
+          required: true,
         },
       ],
     },

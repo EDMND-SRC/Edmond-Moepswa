@@ -2,7 +2,10 @@ build
 dist / media
 node_modules
 .DS_Store
-.env*
+.env
+.env.local
+.env.*.local
+.env.test
 *.log
 .next
 next-env.d.ts
@@ -14,6 +17,9 @@ public/media/
 public/robots.txt
 public/sitemap*.xml
 
+# Build artifacts
+tsconfig.tsbuildinfo
+screenshots/
 
 # Playwright
 node_modules/

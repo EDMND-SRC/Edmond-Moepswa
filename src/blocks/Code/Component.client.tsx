@@ -8,7 +8,7 @@ type Props = {
   language?: string
 }
 
-export const Code: React.FC<Props> = ({ code, language = '' }) => {
+export const Code: React.FC<Props> = ({ code, language = 'text' }) => {
   if (!code) return null
 
   return (

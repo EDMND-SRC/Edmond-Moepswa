@@ -8,7 +8,7 @@ import RichText from '@/components/RichText'
 
 export const MediumImpactHero: React.FC<Page['hero']> = ({ links, media, richText }) => {
   return (
-    <div className="">
+    <div>
       <div className="container mb-8">
         {richText && <RichText className="mb-6" data={richText} enableGutter={false} />}
 
@@ -16,7 +16,7 @@ export const MediumImpactHero: React.FC<Page['hero']> = ({ links, media, richTex
           <ul className="flex gap-4">
             {links.map(({ link }, i) => {
               return (
-                <li key={i}>
+                <li key={link?.url || link?.reference?.relationTo || i}>
                   <CMSLink {...link} />
                 </li>
               )

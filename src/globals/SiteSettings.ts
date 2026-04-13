@@ -13,7 +13,8 @@ export const SiteSettings: GlobalConfig = {
       name: 'siteTitle',
       type: 'text',
       required: true,
-      defaultValue: 'Edmond Moepswa | Product Designer & Web Developer',
+      defaultValue:
+        'Edmond Moepswa | Web Designer · Full-Stack Developer · Workflow Automation Specialist',
     },
     {
       name: 'siteDescription',
@@ -44,10 +45,61 @@ export const SiteSettings: GlobalConfig = {
       name: 'socialLinks',
       type: 'group',
       fields: [
-        { name: 'linkedin', type: 'text' },
-        { name: 'twitter', type: 'text' },
-        { name: 'github', type: 'text' },
-        { name: 'substack', type: 'text', defaultValue: 'https://substack.com/@edmnd' },
+        {
+          name: 'linkedin',
+          type: 'text',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
+        {
+          name: 'twitter',
+          type: 'text',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
+        {
+          name: 'github',
+          type: 'text',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
+        {
+          name: 'instagram',
+          type: 'text',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
+        {
+          name: 'threads',
+          type: 'text',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
+        {
+          name: 'substack',
+          type: 'text',
+          defaultValue: '',
+          validate: (value: string | string[] | null | undefined) => {
+            if (typeof value === 'string' && value && !value.startsWith('https://'))
+              return 'Must start with https://'
+            return true
+          },
+        },
       ],
     },
   ],

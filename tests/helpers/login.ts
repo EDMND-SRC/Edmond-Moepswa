@@ -20,8 +20,10 @@ export async function login({
 }: LoginOptions): Promise<void> {
   await page.goto(`${serverURL}/admin/login`)
 
-  await page.fill('#field-email', user.email)
-  await page.fill('#field-password', user.password)
+  // Use resilient attribute-based selectors instead of generated #field-* IDs
+  // which may change between Payload versions.
+  await page.fill('input[name="email"]', user.email)
+  await page.fill('input[name="password"]', user.password)
   await page.click('button[type="submit"]')
 
   await page.waitForURL(`${serverURL}/admin`)

@@ -1,13 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-@import "tailwindcss";
-
-
+@import 'tailwindcss';
 
 @custom-variant dark (&:is(.dark *));
-
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-}
 
 @utility transform-3d {
   transform-style: preserve-3d;
@@ -46,6 +39,14 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* z-index scale */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-cursor: 600;
 }
 
 .dark {
@@ -133,5 +134,40 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility: Visible focus states for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #ff4d2e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure minimum touch target size for mobile (44x44px) */
+@media (max-width: 768px) {
+  button,
+  [role='button'],
+  a,
+  input[type='radio'],
+  input[type='checkbox'] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

@@ -13,6 +13,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "incremental": true,
+    "tsBuildInfoFile": ".next/cache/.tsbuildinfo",
     "jsx": "react-jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -24,7 +25,7 @@
         "name": "next"
       }
     ],
-    "paths": { "@/*": ["./src/*"], 
+    "paths": {
       "@payload-config": [
         "./src/payload.config.ts"
       ],
@@ -40,13 +41,15 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "redirects.js",
     "next-env.d.ts",
-    "next.config.js",
     "next-sitemap.config.cjs",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "types/**/*.d.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "scripts/seed-dodo-products.ts",
+    "scripts/seed-dodo-products-api.ts",
+    "seed-project-thumbnails.ts"
   ]
 }

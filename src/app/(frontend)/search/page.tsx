@@ -3,6 +3,9 @@ import type { Metadata } from 'next/types'
 import { CollectionArchive } from '@/components/CollectionArchive'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+
+// ISR: Revalidate search results every hour
+export const revalidate = 3600
 import React from 'react'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
@@ -27,7 +30,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
       categories: true,
       meta: true,
     },
-    // pagination: false reduces overhead if you don't need totalDocs
     pagination: false,
     ...(query
       ? {
@@ -35,22 +37,22 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
             or: [
               {
                 title: {
-                  like: query,
+                  contains: query,
                 },
               },
               {
                 'meta.description': {
-                  like: query,
+                  contains: query,
                 },
               },
               {
                 'meta.title': {
-                  like: query,
+                  contains: query,
                 },
               },
               {
                 slug: {
-                  like: query,
+                  contains: query,
                 },
               },
             ],
@@ -58,6 +60,19 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
         }
       : {}),
   })
+
+  const mappedPosts: CardPostData[] = posts.docs.map((doc) => ({
+    slug: doc.slug ?? null,
+    title: doc.title ?? null,
+    meta: doc.meta
+      ? {
+          title: doc.meta.title ?? null,
+          description: doc.meta.description ?? null,
+          image: doc.meta.image ?? null,
+        }
+      : null,
+    categories: doc.categories?.map((cat) => ({ title: cat.title ?? null })) ?? null,
+  }))
 
   return (
     <div className="pt-24 pb-24">
@@ -72,8 +87,8 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
         </div>
       </div>
 
-      {posts.docs.length > 0 ? (
-        <CollectionArchive posts={posts.docs as any} />
+      {mappedPosts.length > 0 ? (
+        <CollectionArchive posts={mappedPosts} />
       ) : (
         <div className="container">No results found.</div>
       )}

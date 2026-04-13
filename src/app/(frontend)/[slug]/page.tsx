@@ -11,12 +11,17 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
+// ISR: Revalidate pages every hour — avoids hitting DB on every request
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
   const pages = await payload.find({
     collection: 'pages',
     draft: false,
-    limit: 1000,
+    // Limit to 100 pages — sufficient for current site scope.
+    // Increase if the site grows beyond 100 published pages.
+    limit: 100,
     overrideAccess: false,
     pagination: false,
     select: {

@@ -7,12 +7,13 @@ export function CopyButton({ code }: { code: string }) {
   const [text, setText] = useState('Copy')
 
   function updateCopyStatus() {
-    if (text === 'Copy') {
-      setText(() => 'Copied!')
-      setTimeout(() => {
-        setText(() => 'Copy')
-      }, 1000)
-    }
+    setText((prev) => {
+      if (prev === 'Copy') {
+        setTimeout(() => setText('Copy'), 1000)
+        return 'Copied!'
+      }
+      return prev
+    })
   }
 
   return (
@@ -21,8 +22,13 @@ export function CopyButton({ code }: { code: string }) {
         className="flex gap-1"
         variant={'secondary'}
         onClick={async () => {
-          await navigator.clipboard.writeText(code)
-          updateCopyStatus()
+          try {
+            await navigator.clipboard.writeText(code)
+            updateCopyStatus()
+          } catch (err) {
+            console.error('Failed to copy:', err)
+            setText('Failed to copy')
+          }
         }}
       >
         <p>{text}</p>

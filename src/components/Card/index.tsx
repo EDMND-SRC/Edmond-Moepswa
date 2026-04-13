@@ -4,18 +4,19 @@ import useClickableCard from '@/utilities/useClickableCard'
 import Link from 'next/link'
 import React, { Fragment } from 'react'
 
-
+import type { Media as MediaType } from '@/payload-types'
 import { Media } from '@/components/Media'
 
 export type CardPostData = {
-  slug?: string | null
-  title?: string | null
-  meta?: {
-    title?: string | null
-    description?: string | null
-    image?: any | null
+  id?: number | string
+  slug: string | null
+  title: string | null
+  meta: {
+    title: string | null
+    description: string | null
+    image: MediaType | number | null
   } | null
-  categories?: any[] | null
+  categories: Array<{ title: string | null }> | null
 }
 
 export const Card: React.FC<{
@@ -63,7 +64,7 @@ export const Card: React.FC<{
                     const isLast = index === categories.length - 1
 
                     return (
-                      <Fragment key={index}>
+                      <Fragment key={categoryTitle}>
                         {categoryTitle}
                         {!isLast && <Fragment>, &nbsp;</Fragment>}
                       </Fragment>

@@ -1,4 +1,4 @@
-import type { Project, ArchiveBlock as ArchiveBlockProps } from '@/payload-types'
+import type { ArchiveBlock as ArchiveBlockType, Project } from '@/payload-types'
 
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
@@ -7,16 +7,33 @@ import RichText from '@/components/RichText'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
 
+function projectToCardPostData(project: Project) {
+  return {
+    id: project.id,
+    slug: project.slug,
+    title: project.title,
+    meta: project.meta
+      ? {
+          title: project.meta.title ?? null,
+          description: project.meta.description ?? null,
+          image: null,
+        }
+      : null,
+    categories: [],
+  }
+}
+
 export const ArchiveBlock: React.FC<
-  any & {
+  ArchiveBlockType & {
     id?: string
+    disableInnerContainer?: boolean
   }
 > = async (props) => {
   const { id, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
 
   const limit = limitFromProps || 3
 
-  let posts: Project[] = []
+  let posts: ReturnType<typeof projectToCardPostData>[] = []
 
   if (populateBy === 'collection') {
     const payload = await getPayload({ config: configPromise })
@@ -25,16 +42,20 @@ export const ArchiveBlock: React.FC<
       collection: 'projects',
       depth: 1,
       limit,
+      overrideAccess: false,
     })
 
-    posts = fetchedPosts.docs
+    posts = fetchedPosts.docs.map(projectToCardPostData)
   } else {
     if (selectedDocs?.length) {
-      const filteredSelectedPosts = selectedDocs.map((post: any) => {
-        if (typeof post.value === 'object') return post.value
-      }) as Project[]
-
-      posts = filteredSelectedPosts
+      posts = selectedDocs
+        .map((post) => {
+          if (typeof post.value === 'object' && post.value !== null) {
+            return projectToCardPostData(post.value as Project)
+          }
+          return null
+        })
+        .filter((p): p is NonNullable<typeof p> => p !== null)
     }
   }
 
@@ -45,7 +66,7 @@ export const ArchiveBlock: React.FC<
           <RichText className="ms-0 max-w-[48rem]" data={introContent} enableGutter={false} />
         </div>
       )}
-      <CollectionArchive posts={posts as any} />
+      <CollectionArchive posts={posts} />
     </div>
   )
 }

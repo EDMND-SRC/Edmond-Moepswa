@@ -19,12 +19,16 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   return url
 }
 
-export const generateMeta = async (args: {
-  doc: Partial<Page> | null
-}): Promise<Metadata> => {
+export const generateMeta = async (args: { doc: Partial<Page> | null }): Promise<Metadata> => {
   const { doc } = args
 
-  const ogImage = getImageURL((doc?.meta as any)?.image)
+  // Page.meta doesn't have an image field in the generated types, but it may be populated
+  // from search/collection metadata. Safely extract it without `as any`.
+  const metaImage =
+    typeof (doc?.meta as Record<string, unknown>)?.image === 'object'
+      ? ((doc?.meta as Record<string, unknown>)?.image as Media)
+      : undefined
+  const ogImage = getImageURL(metaImage)
 
   const title = doc?.meta?.title
     ? `${doc?.meta?.title} | Edmond Moepswa`

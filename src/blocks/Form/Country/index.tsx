@@ -57,7 +57,6 @@ export const Country: React.FC<
             </Select>
           )
         }}
-        rules={{ required }}
       />
       {errors[name] && <Error name={name} />}
     </Width>

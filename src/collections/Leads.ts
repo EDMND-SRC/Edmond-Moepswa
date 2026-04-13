@@ -16,6 +16,17 @@ export const Leads: CollectionConfig = {
   },
   fields: [
     {
+      name: 'website',
+      type: 'text',
+      admin: {
+        condition: () => false,
+      },
+      validate: (value: string | string[] | null | undefined) => {
+        if (typeof value === 'string' && value) return 'Spam detected'
+        return true
+      },
+    },
+    {
       name: 'name',
       type: 'text',
     },
@@ -58,4 +69,22 @@ export const Leads: CollectionConfig = {
     },
   ],
   timestamps: true,
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Basic email validation to prevent spam submissions
+        if (data.email && typeof data.email === 'string') {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          if (!emailRegex.test(data.email)) {
+            throw new Error('Invalid email address format')
+          }
+        }
+        // Sanitize name field
+        if (data.name && typeof data.name === 'string') {
+          data.name = data.name.trim()
+        }
+        return data
+      },
+    ],
+  },
 }

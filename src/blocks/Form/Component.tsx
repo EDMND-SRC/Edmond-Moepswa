@@ -2,7 +2,7 @@
 import type { FormFieldBlock, Form as FormType } from '@payloadcms/plugin-form-builder/types'
 
 import { useRouter } from 'next/navigation'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import RichText from '@/components/RichText'
 import { Button } from '@/components/ui/button'
@@ -31,8 +31,18 @@ export const FormBlock: React.FC<
     introContent,
   } = props
 
+  const defaultFieldValues = React.useMemo(() => {
+    const values: Record<string, unknown> = {}
+    formFromProps.fields?.forEach((field) => {
+      if ('name' in field && field.name) {
+        values[field.name] = field.defaultValue ?? ''
+      }
+    })
+    return values
+  }, [formFromProps.fields])
+
   const formMethods = useForm({
-    defaultValues: formFromProps.fields,
+    defaultValues: defaultFieldValues,
   })
   const {
     control,
@@ -45,10 +55,18 @@ export const FormBlock: React.FC<
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
   const [error, setError] = useState<{ message: string; status?: string } | undefined>()
   const router = useRouter()
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current)
+      }
+    }
+  }, [])
 
   const onSubmit = useCallback(
-    (data: FormFieldBlock[]) => {
-      let loadingTimerID: ReturnType<typeof setTimeout>
+    (data: Record<string, unknown>) => {
       const submitForm = async () => {
         setError(undefined)
 
@@ -58,7 +76,7 @@ export const FormBlock: React.FC<
         }))
 
         // delay loading indicator by 1s
-        loadingTimerID = setTimeout(() => {
+        loadingTimerRef.current = setTimeout(() => {
           setIsLoading(true)
         }, 1000)
 
@@ -71,18 +89,19 @@ export const FormBlock: React.FC<
             headers: {
               'Content-Type': 'application/json',
             },
+            credentials: 'include',
             method: 'POST',
           })
 
           const res = await req.json()
 
-          clearTimeout(loadingTimerID)
+          clearTimeout(loadingTimerRef.current)
 
           if (req.status >= 400) {
             setIsLoading(false)
 
             setError({
-              message: res.errors?.[0]?.message || 'Internal Server Error',
+              message: 'Failed to submit form. Please try again or contact us directly.',
               status: res.status,
             })
 
@@ -103,7 +122,7 @@ export const FormBlock: React.FC<
           console.warn(err)
           setIsLoading(false)
           setError({
-            message: 'Something went wrong.',
+            message: 'Failed to submit form. Please try again or contact us directly.',
           })
         }
       }
@@ -135,7 +154,10 @@ export const FormBlock: React.FC<
                     const Field: React.FC<any> = fields?.[field.blockType as keyof typeof fields]
                     if (Field) {
                       return (
-                        <div className="mb-6 last:mb-0" key={index}>
+                        <div
+                          className="mb-6 last:mb-0"
+                          key={field.blockName || `${field.blockType}-${index}`}
+                        >
                           <Field
                             form={formFromProps}
                             {...field}

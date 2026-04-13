@@ -1,7 +1,6 @@
 import { Banner } from '@payloadcms/ui/elements/Banner'
 import React from 'react'
 
-import { SeedButton } from './SeedButton'
 import './index.scss'
 
 const baseClass = 'before-dashboard'
@@ -10,58 +9,35 @@ const BeforeDashboard: React.FC = () => {
   return (
     <div className={baseClass}>
       <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
+        <h4>Welcome back, Edmond!</h4>
       </Banner>
-      Here&apos;s what to do next:
+      Here&apos;s what you can manage:
       <ul className={`${baseClass}__instructions`}>
         <li>
-          <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
-          <a href="/" target="_blank">
-            visit your website
-          </a>
-          {' to see the results.'}
+          <strong>Projects</strong> — Add, edit, or reorder project showcase items. Each project
+          supports a thumbnail, rich-text description, category, and external link.
         </li>
         <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
+          <strong>Testimonials</strong> — Manage client testimonials with names, roles, ratings, and
+          content. Replace seeded placeholders with real client quotes as they come in.
         </li>
         <li>
-          Commit and push your changes to the repository to trigger a redeployment of your project.
+          <strong>FAQs</strong> — Organise frequently asked questions by category (General,
+          Services, Process, Pricing, Technical) and control display order.
+        </li>
+        <li>
+          <strong>Leads</strong> — Review inbound leads captured from the contact form, pricing
+          calculator, and Cal.com booking widget.
+        </li>
+        <li>
+          <strong>Services</strong> — Update service descriptions, pricing tiers, and add-ons for
+          all eight service categories.
+        </li>
+        <li>
+          <strong>Site Settings</strong> — Update contact details, social links, and site-wide
+          configuration from the Globals section.
         </li>
       </ul>
-      {'Pro Tip: This block is a '}
-      <a
-        href="https://payloadcms.com/docs/custom-components/overview"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        custom component
-      </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
     </div>
   )
 }

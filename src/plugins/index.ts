@@ -1,12 +1,12 @@
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
-import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
-import { Plugin } from 'payload'
+import { Plugin, Field } from 'payload'
+import { fieldAffectsData } from 'payload/shared'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
-import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
+import { createLexicalEditor } from '@/fields/defaultLexical'
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 
@@ -26,10 +26,9 @@ export const plugins: Plugin[] = [
   redirectsPlugin({
     collections: ['pages'],
     overrides: {
-      // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
         return defaultFields.map((field) => {
-          if ('name' in field && field.name === 'from') {
+          if (fieldAffectsData(field) && field.name === 'from') {
             return {
               ...field,
               admin: {
@@ -45,10 +44,6 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  nestedDocsPlugin({
-    collections: [],
-    generateURL: (docs) => docs.reduce((url, doc) => `${url}/${doc.slug}`, ''),
-  }),
   seoPlugin({
     collections: ['pages', 'services', 'projects'],
     generateTitle,
@@ -60,18 +55,14 @@ export const plugins: Plugin[] = [
     },
     formOverrides: {
       fields: ({ defaultFields }) => {
-        return (defaultFields as any).map((field: any) => {
-          if ('name' in field && field.name === 'confirmationMessage') {
+        return defaultFields.map((field: Field) => {
+          if (fieldAffectsData(field) && field.name === 'confirmationMessage') {
             return {
               ...field,
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    FixedToolbarFeature(),
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                  ]
-                },
+              editor: createLexicalEditor({
+                headingSizes: ['h1', 'h2', 'h3', 'h4'],
+                fixedToolbar: true,
+                inlineToolbar: false,
               }),
             }
           }

@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(github.com)",
+      "Read(//tmp/ui-ux-pro-max-skill/**)",
+      "Bash(python3 *)",
+      "Bash(npm install *)",
+      "Bash(pnpm add *)",
+      "Bash(bun *)",
+      "Bash(find *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(/users/edmond/02_bridgearc_projects/internal/edmond-moepswa-portfolio/node_modules/.bin/tsc *)",
+      "Bash(python *)",
+      "Bash(sleep *)",
+      "Bash(pkill *)",
+      "Bash(pnpm *)",
+      "Bash(node *)",
+      "Bash(rm *)",
+      "Bash(git *)",
+      "Bash(ls *)",
+      "Bash(mv *)"
+    ]
+  },
+  "$version": 3
+}

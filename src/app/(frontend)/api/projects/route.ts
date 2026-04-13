@@ -1,0 +1,31 @@
+import { getPayloadSingleton } from '@/lib/payload'
+import { NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
+
+const getProjects = async () => {
+  const payload = await getPayloadSingleton()
+  const result = await payload.find({
+    collection: 'projects',
+    depth: 1,
+    limit: 10,
+    sort: '-createdAt',
+    overrideAccess: false,
+    select: { title: true, slug: true, category: true, thumbnail: true, featured: true },
+  })
+  return result.docs
+}
+
+const getCachedProjects = () =>
+  unstable_cache(async () => getProjects(), ['projects'], {
+    tags: ['projects'],
+  })
+
+export async function GET() {
+  try {
+    const projects = await getCachedProjects()()
+    return NextResponse.json({ projects })
+  } catch (error) {
+    console.error('Failed to fetch projects:', error)
+    return NextResponse.json({ projects: [] }, { status: 500 })
+  }
+}

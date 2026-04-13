@@ -1,47 +1,55 @@
-import type { TextFieldSingleValidation } from 'payload'
+import type { RichTextField } from 'payload'
 import {
-  BoldFeature,
-  ItalicFeature,
-  LinkFeature,
-  ParagraphFeature,
+  FixedToolbarFeature,
+  HeadingFeature,
+  InlineToolbarFeature,
   lexicalEditor,
-  UnderlineFeature,
-  type LinkFields,
+  type LexicalEditorProps as LexicalEditorConfig,
 } from '@payloadcms/richtext-lexical'
 
-export const defaultLexical = lexicalEditor({
-  features: [
-    ParagraphFeature(),
-    UnderlineFeature(),
-    BoldFeature(),
-    ItalicFeature(),
-    LinkFeature({
-      enabledCollections: ['pages'],
-      fields: ({ defaultFields }) => {
-        const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
-          if ('name' in field && field.name === 'url') return false
-          return true
-        })
+type HeadingSizes = 'h1' | 'h2' | 'h3' | 'h4'
 
-        return [
-          ...defaultFieldsWithoutUrl,
-          {
-            name: 'url',
-            type: 'text',
-            admin: {
-              condition: (_data, siblingData) => siblingData?.linkType !== 'internal',
-            },
-            label: ({ t }) => t('fields:enterURL'),
-            required: true,
-            validate: ((value, options) => {
-              if ((options?.siblingData as LinkFields)?.linkType === 'internal') {
-                return true // no validation needed, as no url should exist for internal links
-              }
-              return value ? true : 'URL is required'
-            }) as TextFieldSingleValidation,
-          },
-        ]
-      },
-    }),
-  ],
-})
+interface CreateLexicalEditorOptions {
+  /** Enabled heading sizes. Default: ['h1', 'h2', 'h3', 'h4'] */
+  headingSizes?: HeadingSizes[]
+  /** Enable fixed toolbar. Default: true */
+  fixedToolbar?: boolean
+  /** Enable inline toolbar. Default: true */
+  inlineToolbar?: boolean
+}
+
+/**
+ * Create a default lexical editor configuration with common features.
+ * Use this factory instead of copy-pasting lexicalEditor() calls across blocks.
+ */
+export function createLexicalEditor(options: CreateLexicalEditorOptions = {}) {
+  const {
+    headingSizes = ['h1', 'h2', 'h3', 'h4'],
+    fixedToolbar = true,
+    inlineToolbar = true,
+  } = options
+
+  return lexicalEditor({
+    features: ({ rootFeatures }) => {
+      const features = [...rootFeatures]
+
+      if (headingSizes.length > 0) {
+        features.push(HeadingFeature({ enabledHeadingSizes: headingSizes }))
+      }
+      if (fixedToolbar) {
+        features.push(FixedToolbarFeature())
+      }
+      if (inlineToolbar) {
+        features.push(InlineToolbarFeature())
+      }
+
+      return features
+    },
+  })
+}
+
+/**
+ * The default lexical editor with all features enabled.
+ * Kept for backward compatibility - prefer createLexicalEditor() for new code.
+ */
+export const defaultLexical = createLexicalEditor()

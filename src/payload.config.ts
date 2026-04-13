@@ -10,10 +10,11 @@ import { Users } from './collections/Users'
 import { Services } from './collections/Services'
 import { Projects } from './collections/Projects'
 import { Testimonials } from './collections/Testimonials'
+import { FAQs } from './collections/FAQs'
 import { Leads } from './collections/Leads'
 import { SiteSettings } from './globals/SiteSettings'
-import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { Footer } from './Footer/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -64,9 +65,13 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    push: false,
   }),
-  collections: [Pages, Services, Projects, Testimonials, Media, Leads, Users],
-  cors: [getServerSideURL()].filter(Boolean),
+  collections: [Pages, Services, Projects, Testimonials, FAQs, Media, Leads, Users],
+  cors: [
+    getServerSideURL(),
+    process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : '',
+  ].filter(Boolean),
   globals: [Header, Footer, SiteSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
