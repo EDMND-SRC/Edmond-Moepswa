@@ -26,27 +26,27 @@ const commitments: Commitment[] = [
   {
     icon: KeyRound,
     title: "You own everything",
-    body: "Source code, databases, design files, documentation — all handed over at the end. No vendor lock-in, no 'call me if you need changes.' It's yours.",
+    body: "Source code, databases, design files, and documentation are all handed over when the project is done. There is no vendor lock-in and no 'call me if you need changes' — everything is yours.",
   },
   {
     icon: FileCheck,
     title: "Full documentation, every time",
-    body: "Not a README you'll never read. Actual documentation: how your system works, how to update it, where things are configured, and what to do when something breaks.",
+    body: "Not just a README that gets ignored. I provide actual documentation on how the system works, how to update it, where things are configured, and what to do if something breaks.",
   },
   {
     icon: Clock,
     title: "The review clock pauses",
-    body: "When I send you designs or a build to test, the delivery timeline stops until you've had time to review properly. No rushing. No 'approve in 24 hours or the deadline slips.'",
+    body: "When I send you designs or a build to test, the delivery timeline stops while you review. You won't be rushed into approvals just to meet an arbitrary deadline.",
   },
   {
     icon: LockOpen,
     title: "Free tiers first, always",
-    body: "I'll design around free plans for hosting, databases, CRMs, and automation tools. If you need to upgrade, I'll tell you why — and what you're getting for the money.",
+    body: "I'll design around free plans for hosting, databases, and automation tools where possible. If an upgrade is necessary, I'll explain why and exactly what you're paying for.",
   },
   {
     icon: Wrench,
     title: "I build around your actual workflow",
-    body: "Not the one you think you should have. The one your team actually uses. That means fewer workarounds, less resistance to adoption, and systems people actually use.",
+    body: "I build for the workflow your team actually uses, not the one you think you should have. This results in systems that stick because they solve real friction.",
   },
 ]
 
@@ -70,7 +70,7 @@ export default function CommitmentsSection() {
             No surprises. No lock-in.
           </h2>
           <p className="text-[#b0b0b0] text-base md:text-lg max-w-2xl">
-            These aren't marketing promises. They're the rules I work by. Every client gets the same treatment.
+            These aren't marketing promises, they're the rules I work by for every client.
           </p>
         </div>
 

@@ -80,7 +80,7 @@ export function StoreClient({ initialProducts }: { initialProducts: DodoProduct[
             Boilerplate Products &amp; Free Resources
           </h1>
           <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl leading-relaxed">
-            Pre-built, production-ready starter kits. Free guides and resources to help you build better.
+            I build production-ready starter kits and free resources to help you build faster.
             All prices include international tax compliance.
           </p>
         </div>
@@ -106,7 +106,7 @@ export function StoreClient({ initialProducts }: { initialProducts: DodoProduct[
               Free Resources
             </h2>
             <p className="text-[#b0b0b0] text-sm mb-10 max-w-xl">
-              Download free guides — pay what you want (or nothing).
+              Download free guides or pay what you want if you find the material valuable.
             </p>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {freeProducts.map((product) => (
@@ -125,7 +125,7 @@ export function StoreClient({ initialProducts }: { initialProducts: DodoProduct[
               Boilerplate Products
             </h2>
             <p className="text-[#b0b0b0] text-sm mb-10 max-w-xl">
-              Production-ready starter kits. Buy once, deploy fast, customise to your brand.
+              Buy these production-ready kits once, deploy them fast, and customise them to your brand.
             </p>
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {paidProducts.map((product) => (

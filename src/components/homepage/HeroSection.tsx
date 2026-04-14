@@ -306,7 +306,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
             &amp; Builder
           </h1>
           <p className="text-base md:text-lg lg:text-xl text-white/80 mt-3 md:mt-4 max-w-md md:max-w-lg ml-auto leading-relaxed">
-            Web design, development &amp; workflow automation — designed to last.
+            Web design, development &amp; workflow automation — built for handover.
           </p>
         </div>
       </div>

@@ -169,7 +169,7 @@ export default function IntroSection() {
     'Each role required the same thing: understand how the business actually makes decisions, then build the systems and tools to help it make better ones. I did that for cafes and restaurants, for private wealth clients, for a construction project management company, and for a football club. That club just earned promotion to the Botswana Premier League. I learned more about building systems that hold up in those roles than in any formal training.'
 
   const p3Text =
-    'Today, I operate BridgeArc from Gaborone. I build websites, web apps, and workflow automations for businesses that need things that work properly and keep working. Every project ships with documentation and complete ownership.'
+    'Today, I operate BridgeArc Digital from Gaborone. I build websites, web apps, and workflow automations for businesses that need things that work properly and keep working. Every project ships with documentation and complete ownership.'
 
   const p1Words = p1Text.split(/(\s+)/).filter((w: string) => !/^\s+$/.test(w)).length
   const p2Words = p2Text.split(/(\s+)/).filter((w: string) => !/^\s+$/.test(w)).length

@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     ],
   },
   description:
-    'Edmond Moepswa — Web Designer, Full-Stack Developer & Workflow Automation Specialist in Gaborone, Botswana. Custom websites, web apps, and workflow automation designed to last. From P&L statements to production code. Free 30-minute discovery call.',
+    'Edmond Moepswa — Web Designer, Full-Stack Developer & Workflow Automation Specialist in Gaborone, Botswana. Custom websites, web apps, and workflow automation built for handover. From P&L statements to production code. Free 30-minute discovery call.',
   keywords: [
     'web designer',
     'web developer',
@@ -79,7 +79,7 @@ export const metadata: Metadata = {
     url: SERVER_URL,
     title: 'Edmond Moepswa — Systems Thinker & Builder',
     description:
-      'Web design, development & workflow automation — designed to last. From P&L statements to production code.',
+      'Web design, development & workflow automation — built for handover. From P&L statements to production code.',
     siteName: 'Edmond Moepswa',
     images: [
       {
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Edmond Moepswa — Systems Thinker & Builder',
-    description: 'Web design, development & workflow automation — designed to last.',
+    description: 'Web design, development & workflow automation — built for handover.',
     creator: '@edmondmoepswa',
     images: ['/og-image'],
   },
@@ -120,7 +120,7 @@ const jsonLd = {
       url: SERVER_URL,
       jobTitle: 'Web Designer, Full-Stack Developer & Workflow Automation Specialist',
       description:
-        'Web design, development & workflow automation — designed to last. From P&L statements to production code.',
+        'Web design, development & workflow automation — built for handover. From P&L statements to production code.',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Gaborone',
@@ -139,7 +139,7 @@ const jsonLd = {
       '@type': 'LocalBusiness',
       '@id': `${SERVER_URL}/#localbusiness`,
       name: 'Edmond Moepswa — Web Design & Development',
-      description: 'Custom websites, web apps, and workflow automation designed to last.',
+      description: 'Custom websites, web apps, and workflow automation built for handover.',
       url: SERVER_URL,
       address: {
         '@type': 'PostalAddress',

@@ -77,7 +77,7 @@ export default function ContactPage() {
                 Free 30-Minute Discovery Call
               </h2>
               <p className="text-[#b0b0b0] text-base leading-relaxed">
-                Pick a time that works for you. No commitment -- just an honest conversation about
+                Pick a time that works for you. No commitment is required; just an honest conversation about
                 your goals and how I can help.
               </p>
             </div>
@@ -250,8 +250,7 @@ export default function ContactPage() {
               What happens on the call
             </h2>
             <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed">
-              A free, no-obligation 30-minute conversation to understand your needs and explore how
-              I can help.
+              A free discovery call to understand your needs and explore how I can help.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -274,8 +273,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-white font-medium mb-2">2. Explore Possibilities</h3>
                 <p className="text-[#b0b0b0] text-sm leading-relaxed">
-                  I&apos;ll share ideas based on similar projects I&apos;ve done -- what works, what
-                  doesn&apos;t, and what might be a fit for you.
+                  I&apos;ll share ideas from similar projects I&apos;ve done to help you decide on the right fit for your situation.
                 </p>
               </div>
             </div>
@@ -287,7 +285,7 @@ export default function ContactPage() {
                 <h3 className="text-white font-medium mb-2">3. Outline a Plan</h3>
                 <p className="text-[#b0b0b0] text-sm leading-relaxed">
                   If there&apos;s a fit, I&apos;ll outline a recommended approach, ballpark
-                  investment, and timeline. No pressure -- just clarity.
+                  investment, and timeline. I&apos;ll help you get clear on the path forward with no pressure to proceed.
                 </p>
               </div>
             </div>
@@ -299,7 +297,7 @@ export default function ContactPage() {
                 <h3 className="text-white font-medium mb-2">4. Follow-Up Within 48 Hours</h3>
                 <p className="text-[#b0b0b0] text-sm leading-relaxed">
                   You&apos;ll receive a written summary of our conversation and any recommended next
-                  steps. Zero obligation to proceed.
+                  steps. There is no obligation to proceed at any point.
                 </p>
               </div>
             </div>

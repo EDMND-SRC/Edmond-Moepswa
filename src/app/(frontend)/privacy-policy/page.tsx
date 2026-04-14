@@ -34,8 +34,8 @@ export default function PrivacyPolicyPage() {
           operational details shared during the scoping and delivery process.
         </li>
         <li>
-          <strong>Gumroad purchases:</strong> name, email address, and purchase history for digital
-          product downloads (processed by Gumroad as merchant of record).
+          <strong>Store purchases:</strong> name, email address, and purchase history for digital
+          product downloads (processed by Dodo Payments as merchant of record).
         </li>
         <li>
           <strong>Make.com webhook data:</strong> form submissions, lead data, and automation
@@ -62,7 +62,7 @@ export default function PrivacyPolicyPage() {
         <li>To scope, deliver, and manage client projects.</li>
         <li>To communicate with you regarding project updates, deliverables, and invoices.</li>
         <li>To analyse website usage and improve the user experience.</li>
-        <li>To deliver digital products purchased through Gumroad.</li>
+        <li>To deliver digital products purchased through the Store.</li>
         <li>To comply with applicable legal obligations.</li>
       </ul>
 
@@ -88,22 +88,27 @@ export default function PrivacyPolicyPage() {
 
       <h2>5. Data Protection in Botswana</h2>
       <p>
-        As of the last update date, Botswana does not yet have a comprehensive standalone data
-        protection law equivalent to the GDPR. However, data protection obligations arise under:
+        Botswana has a comprehensive data protection law: the <strong>Data Protection Act, 2024
+        (Act No. 18 of 2024)</strong>, which came into full effect on January 14, 2025. This Act is
+        enforced by the <strong>Information and Data Protection Commission</strong>.
       </p>
       <ul>
         <li>
-          The <strong>Cybercrime and Computer Related Crimes Act (2007)</strong>, which addresses
-          unauthorised access to and misuse of electronic data.
+          <strong>Key Obligations:</strong> Data controllers must adhere to principles of lawfulness,
+          fairness, and transparency. Processing activities are subject to purpose limitation, data
+          minimisation, and accountability.
         </li>
         <li>
-          Sectoral regulations issued by the <strong>Bank of Botswana</strong> and{' '}
-          <strong>NBFIRA</strong> that impose data handling requirements on financial services and
-          insurance entities.
+          <strong>Data Subject Rights:</strong> You have the right to access, rectify, erase,
+          restrict, and port your personal data, as well as the right to object to processing.
         </li>
         <li>
-          Constitutional protections against unlawful search and seizure, which extend to certain
-          forms of data privacy.
+          <strong>Breach Notification:</strong> In the event of a significant data breach, I am
+          required to notify the Commission within 72 hours of becoming aware of the incident.
+        </li>
+        <li>
+          <strong>Penalties:</strong> Violations of the Act can lead to administrative fines and
+          penalties as prescribed by the Data Protection Act and enforced by the Commission.
         </li>
       </ul>
       <p>
@@ -112,85 +117,67 @@ export default function PrivacyPolicyPage() {
       </p>
 
       <h2>6. Third-Party Services and Data Sharing</h2>
-      <p>
-        I use the following third-party services to operate this website and deliver services. Each
-        service has its own privacy policy:
-      </p>
-      <ul>
-        <li>
-          <strong>Vercel Inc.</strong> (Hosting) -- Server infrastructure, edge network, and
-          serverless functions. Vercel is SOC 2 Type II compliant. Data may be processed in the
-          United States and other regions where Vercel operates.{' '}
-          <a
-            href="https://vercel.com/legal/privacy-policy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            Vercel Privacy Policy
+      <div className="flex flex-col gap-6 mb-12">
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">Vercel Inc. (Hosting)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Server infrastructure and edge functions. Vercel is SOC 2 Type II compliant.
+          </p>
+          <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Vercel Privacy Policy →
           </a>
-        </li>
-        <li>
-          <strong>Cal.com</strong> (Scheduling) -- Discovery call bookings. Processes name, email,
-          phone number, and timezone.{' '}
-          <a
-            href="https://cal.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            Cal.com Privacy Policy
+        </div>
+
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">Cal.com (Scheduling)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Discovery call bookings. Processes name, email, and timezone.
+          </p>
+          <a href="https://cal.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Cal.com Privacy Policy →
           </a>
-        </li>
-        <li>
-          <strong>Make.com (Integromat)</strong> (Automation) -- Workflow automation and webhook
-          processing. May process form submissions, lead data, and CRM integration payloads.{' '}
-          <a
-            href="https://www.make.com/en/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            Make.com Privacy Policy
+        </div>
+
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">Make.com (Automation)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Workflow automation for form submissions and leads.
+          </p>
+          <a href="https://www.make.com/en/privacy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Make.com Privacy Policy →
           </a>
-        </li>
-        <li>
-          <strong>Gumroad, Inc.</strong> (Digital Products) -- Merchant of record for digital
-          product sales. Processes payment and customer data.{' '}
-          <a
-            href="https://gumroad.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            Gumroad Privacy Policy
+        </div>
+
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">Dodo Payments (Digital Products)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Merchant of record for store orders. Processes customer and payment data.
+          </p>
+          <a href="https://dodopayments.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Dodo Payments Privacy Policy →
           </a>
-        </li>
-        <li>
-          <strong>PostHog Inc.</strong> (Product Analytics) -- Website usage analytics. May collect
-          page views, session recordings, and event data.{' '}
-          <a
-            href="https://posthog.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            PostHog Privacy Policy
+        </div>
+
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">PostHog Inc. (Analytics)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Website usage analytics, page views, and event data.
+          </p>
+          <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            PostHog Privacy Policy →
           </a>
-        </li>
-        <li>
-          <strong>Google LLC</strong> (Google Analytics 4, where enabled) -- Website analytics.
-          Processes usage data and demographic information.{' '}
-          <a
-            href="https://policies.google.com/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#FF4D2E]"
-          >
-            Google Privacy Policy
+        </div>
+
+        <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+          <h3 className="text-white font-medium mb-1">Google LLC (Reporting)</h3>
+          <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
+            Google Analytics 4 for general website usage reporting.
+          </p>
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Google Privacy Policy →
           </a>
-        </li>
-      </ul>
+        </div>
+      </div>
       <p>
         I do not sell personal information to third parties. I do not share client data with other
         clients or use one client&apos;s confidential information in another client&apos;s project.
@@ -238,7 +225,7 @@ export default function PrivacyPolicyPage() {
           retention policy.
         </li>
         <li>
-          <strong>Gumroad purchase records:</strong> retained by Gumroad as merchant of record per
+          <strong>Store purchase records:</strong> retained by Dodo Payments as merchant of record per
           their own retention schedule. I receive minimal purchase data (name, email, product) for
           fulfilment purposes.
         </li>
@@ -280,7 +267,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>10. International Data Transfers</h2>
       <p>
-        Because I use cloud-based services (Vercel, Neon, Supabase, Make.com, Gumroad, PostHog,
+        Because I use cloud-based services (Vercel, Neon, Supabase, Make.com, Dodo Payments, PostHog,
         Google), your data may be transferred to and processed in countries outside Botswana,
         including the United States and European Union. These transfers are governed by the
         third-party services&apos; own data transfer mechanisms (e.g., EU Standard Contractual

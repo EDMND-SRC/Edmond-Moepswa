@@ -50,7 +50,7 @@ export const services: Service[] = [
     id: '01',
     title: 'Web Design & Development',
     description:
-      'Professional websites, custom-designed from scratch. No templates, no themes, no page builders. Every project includes documentation and a handover session so you can manage it yourself.',
+      'I design and build professional websites from scratch. Every project includes full documentation and a handover session so you can manage the system yourself without ongoing vendor lock-in.',
     pricingTiers: [
       {
         name: 'Launch (Landing Page)',
@@ -114,7 +114,7 @@ export const services: Service[] = [
     id: '02',
     title: 'Web Applications & Digital Products',
     description:
-      'Custom web applications — storefronts, SaaS products, internal tools, full platforms. Built with Next.js, React, Payload CMS, PostgreSQL, and whatever else the project needs.',
+      'I build functional web applications for clients whose requirements go beyond a marketing site. This includes client portals, booking platforms, SaaS products, and internal operations tools. Every build is scoped individually after a discovery call.',
     pricingTiers: [
       {
         name: 'Tier A — Storefront',
@@ -148,14 +148,13 @@ export const services: Service[] = [
         price: 'From P48,000',
         timeline: '6–16 weeks, scoped per project',
         features: [
-          'Fully bespoke, production-grade applications',
-          'Multi-tenant architecture with role-based access',
-          'Complex business logic and workflows',
-          'Third-party API integrations',
-          'Real-time features (WebSockets, Server-Sent Events)',
-          'Advanced security and compliance',
-          'Scalable infrastructure design',
-          'Ongoing support available via retainer',
+          'Fully bespoke application built on a "Lean-Scale" architecture (Next.js, Payload CMS, Supabase)',
+          'Complex business logic, multi-role access control, and third-party API orchestrations',
+          'Example: Client portal with secure document exchange, status tracking, and automated notifications',
+          'Example: Multi-staff booking platform with availability logic and automated billing via Dodo Payments',
+          'Example: Membership platform with gated content and international subscription management',
+          'Foundation Cover retainer (from P2,500/m): 24/7 uptime monitoring, error tracking, and analytics review',
+          'Development includes technical documentation, a full handover, and source code ownership',
         ],
       },
     ],
@@ -321,11 +320,11 @@ export const services: Service[] = [
         price: 'P2,500',
         timeline: '60 minutes',
         features: [
-          'Deep-dive into your current systems',
-          'Tech stack assessment',
-          'Gap analysis and recommendations',
-          'Prioritised action plan',
-          'Written summary delivered within 48 hours',
+          'Review of your current systems, tools, and workflows',
+          'Assessment from a business operations perspective, not just a technical one',
+          'Honest evaluation of what needs building vs. what can be solved with existing tools',
+          'Written summary with specific next steps, delivered within 48 hours',
+          'Includes Google Business Profile (GBP) Quick Start for applicable local SMEs',
         ],
       },
       {
@@ -333,12 +332,11 @@ export const services: Service[] = [
         price: 'P5,000',
         timeline: '3–5 business days',
         features: [
-          'Full review of existing architecture',
-          'Security assessment',
-          'Performance audit',
-          'Scalability evaluation',
-          'Written report with recommendations',
-          '1-hour follow-up call',
+          'Full review of your existing codebase or system architecture',
+          'Security assessment and performance audit',
+          'Specific recommendations with estimated effort for each',
+          'Written report with diagrams where relevant',
+          '1-hour follow-up call to walk through findings',
         ],
       },
       {

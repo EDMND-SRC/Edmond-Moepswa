@@ -7,7 +7,7 @@ Systems thinker and full-stack developer based in Gaborone, Botswana. Designs an
 
 ## What This Is
 
-A production personal brand website for Edmond Moepswa, an independent software developer and digital services consultant operating through BridgeArc. The site showcases:
+A production personal brand website for Edmond Moepswa, an independent software developer and digital services consultant operating through BridgeArc Digital. The site showcases:
 
 - **8 demo projects** spanning web design, workflow automation, boilerplate products, and open-source work
 - **9 client testimonials** from engagements across Australia and Botswana

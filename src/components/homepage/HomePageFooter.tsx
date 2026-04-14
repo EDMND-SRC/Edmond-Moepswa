@@ -135,6 +135,15 @@ export default function HomePageFooter() {
               ·
             </span>
             <Link
+              href="/refund-policy"
+              className="hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded"
+            >
+              Refunds
+            </Link>
+            <span className="text-white/20" aria-hidden="true">
+              ·
+            </span>
+            <Link
               href="/terms-and-conditions"
               className="hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded"
             >

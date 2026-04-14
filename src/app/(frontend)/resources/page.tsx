@@ -1,79 +1,77 @@
+import React from 'react'
+import {
+  Book,
+  ExternalLink,
+  Mail,
+} from 'lucide-react'
 import Link from 'next/link'
-import { Mail, Wrench } from 'lucide-react'
-import { SUBSTACK_URL } from '@/lib/constants'
 import { ResourceCards } from '@/components/resources/ResourceCards'
 
 export default function ResourcesPage() {
   return (
-    <main id="main-content" className="bg-[#0a0a0a] text-white">
-      {/* Hero Banner */}
-      <section className="border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 md:px-10 py-24 md:py-32">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-            // Free Resources
+    <div className="min-h-screen bg-[#0a0a0a] text-white pt-32 pb-24 px-6 md:px-10">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-16">
+          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base uppercase">
+            // Resources
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter mt-6 mb-6">
-            Download free guides &amp; tools
+            Free guides for your next project
           </h1>
-          <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl leading-relaxed">
-            Practical resources to help you build a better digital presence. Completely free -- no
-            strings attached.
+          <p className="text-[#a3a3a3] text-lg md:text-xl max-w-2xl leading-relaxed">
+            Checklists and planning documents I use with clients. Download them, no email required.
           </p>
         </div>
-      </section>
 
-      {/* Free Resources Grid */}
-      <section className="py-24 md:py-32 px-6 md:px-10">
-        <div className="max-w-5xl mx-auto">
+        {/* Free Guides & Strategy Section */}
+        <section className="mb-24">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-10 h-10 rounded-xl bg-[#FF4D2E]/10 flex items-center justify-center border border-[#FF4D2E]/20">
+              <Book className="w-5 h-5 text-[#FF4D2E]" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-medium tracking-tight">Strategy & Guides</h2>
+          </div>
+
           <ResourceCards />
-        </div>
-      </section>
+        </section>
 
-      {/* Coming Soon: Tools & Calculators */}
-      <section className="py-24 md:py-32 px-6 md:px-10 border-t border-white/10 bg-white/[0.01]">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-8">
-            <Wrench className="w-8 h-8 text-[#FF4D2E]" />
+        {/* Substack Newsletter CTA */}
+        <section className="bg-[#111111] rounded-3xl p-8 md:p-12 border border-white/10 relative overflow-hidden mb-24">
+          <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+            <div className="flex-1">
+              <div className="w-12 h-12 rounded-2xl bg-[#FF4D2E]/10 flex items-center justify-center border border-[#FF4D2E]/20 mb-6">
+                <Mail className="w-6 h-6 text-[#FF4D2E]" />
+              </div>
+              <h3 className="text-xl md:text-2xl font-medium tracking-tight text-white mb-4">
+                The BridgeArc Digital Review
+              </h3>
+              <p className="text-[#a3a3a3] text-lg leading-relaxed mb-8">
+                I write about building and running a digital services business from Botswana.
+                Occasional, not weekly.
+              </p>
+              <a
+                href="https://edmnd.substack.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#FF4D2E] hover:bg-[#FF4D2E]/90 text-white px-8 py-4 rounded-full font-medium transition-all group"
+              >
+                Join the list
+                <ExternalLink className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+              </a>
+            </div>
+
+            <div className="hidden md:block w-48 h-48 opacity-10">
+              <Mail className="w-full h-full text-[#FF4D2E] rotate-12" />
+            </div>
           </div>
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mb-6">
-            Tools &amp; Calculators
-          </h2>
-          <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed mb-4">
-            Coming soon: interactive tools to help you estimate project costs, calculate ROI on your
-            website, and plan your digital strategy.
-          </p>
-          <span className="text-[#b0b0b0]/50 text-sm">Watch this space</span>
-        </div>
-      </section>
 
-      {/* Substack Subscription CTA */}
-      <section className="py-24 md:py-32 px-6 md:px-10 border-t border-white/10">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#FF4D2E]/10 border border-[#FF4D2E]/20 flex items-center justify-center mx-auto mb-8">
-            <Mail className="w-8 h-8 text-[#FF4D2E]" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mb-6">
-            Stay in the loop
-          </h2>
-          <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed mb-8">
-            Subscribe to my Substack newsletter for insights on web design, development, workflow
-            automation, and building a digital services business in Africa.
-          </p>
-          <a
-            href={SUBSTACK_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
-          >
-            Subscribe on Substack
-            <span className="text-lg">&rarr;</span>
-          </a>
-        </div>
-      </section>
+          {/* Background Gradient */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#FF4D2E]/5 blur-[100px] -z-10" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#FF4D2E]/5 blur-[100px] -z-10" />
+        </section>
 
-      {/* Back to Home */}
-      <section className="py-12 px-6 md:px-10 border-t border-white/10">
-        <div className="max-w-4xl mx-auto text-center">
+        {/* Back to Home */}
+        <div className="text-center">
           <Link
             href="/"
             className="text-[#FF4D2E] text-sm font-medium hover:underline inline-flex items-center gap-2"
@@ -81,7 +79,7 @@ export default function ResourcesPage() {
             &larr; Back to Homepage
           </Link>
         </div>
-      </section>
-    </main>
+      </div>
+    </div>
   )
 }

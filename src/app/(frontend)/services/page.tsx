@@ -80,8 +80,7 @@ export default function ServicesPage() {
             Transparent pricing for every service
           </h1>
           <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl leading-relaxed">
-            From landing pages to full-scale platforms. Every engagement includes documentation,
-            training, and handover.
+            From landing pages to full-scale platforms, every engagement includes thorough documentation and a complete handover session.
           </p>
         </div>
       </section>
@@ -524,8 +523,7 @@ export default function ServicesPage() {
               Not sure which service you need?
             </h2>
             <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed">
-              Book a free 30-minute discovery call. We&apos;ll discuss your goals, and I&apos;ll
-              recommend the right approach — even if it&apos;s not one of my services.
+              Book a free 30-minute discovery call to discuss your goals. I&apos;ll recommend the right approach, even if it&apos;s not one of my services.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">

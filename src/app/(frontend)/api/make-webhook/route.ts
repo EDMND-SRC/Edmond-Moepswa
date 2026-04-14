@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const WEBHOOK_URLS: Record<string, string | undefined> = {
   'lead-capture': process.env.MAKE_WEBHOOK_LEAD_CAPTURE,
   'calculator-quote': process.env.MAKE_WEBHOOK_CALCULATOR_QUOTE,
-  'gumroad-download': process.env.MAKE_WEBHOOK_GUMROAD_DOWNLOAD,
+  'dodo-download': process.env.MAKE_WEBHOOK_DODO_DOWNLOAD,
   'cal-booking': process.env.CAL_WEBHOOK_URL,
 }
 
@@ -60,13 +60,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { workflow, data } = body
 
-    // Authentication check — allow unauthenticated lead-capture and gumroad-download
+    // Authentication check — allow unauthenticated lead-capture and dodo-download
     const authHeader = request.headers.get('authorization')
     const expectedToken = process.env.CRON_SECRET
 
     if (workflow === 'lead-capture') {
       // Allow unauthenticated lead-capture submissions; validate data shape
-    } else if (workflow === 'gumroad-download') {
+    } else if (workflow === 'dodo-download') {
       // Allow unauthenticated anonymous tracking
     } else if (!expectedToken || authHeader !== `Bearer ${expectedToken}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

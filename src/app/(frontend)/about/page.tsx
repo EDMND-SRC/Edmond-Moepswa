@@ -28,8 +28,8 @@ export default function AboutPage() {
             A systems thinker who understands P&Ls, risk, and production code.
           </ScrollTextReveal>
           <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            From Canberra hospitality to Botswana boardrooms — and now building digital systems that
-            last.
+            From Canberra hospitality to Botswana boardrooms, I now focus on building digital systems
+            built for handover.
           </p>
         </div>
       </section>
@@ -180,7 +180,7 @@ export default function AboutPage() {
                   Independent Builder — Full-Time
                 </h3>
                 <p className="text-[#b0b0b0] text-base leading-relaxed">
-                  Today, Edmond operates through BridgeArc — a digital services practice that builds
+                  Today, Edmond operates through BridgeArc Digital — a digital services practice that builds
                   websites, web applications, and workflow automations for businesses and
                   institutions.
                 </p>
@@ -271,8 +271,8 @@ export default function AboutPage() {
             it make more.&rdquo;
           </ScrollTextReveal>
           <p className="text-[#b0b0b0] text-lg leading-relaxed max-w-2xl mx-auto">
-            That&apos;s the premise BridgeArc is built on. Study the business. Map the workflow.
-            Build the system. Document it. Hand it over.
+            BridgeArc Digital was born from a simple observation: most businesses don&apos;t need more features; they
+            need more clarity. They need systems they can actually manage.
           </p>
         </div>
       </section>
@@ -288,11 +288,10 @@ export default function AboutPage() {
               // Next Steps
             </span>
             <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mt-4 mb-6">
-              Let&apos;s discuss your project
+              Schedule a discovery call
             </h2>
             <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed">
-              Book a free 30-minute discovery call to discuss your goals, challenges, and how I can
-              help. No commitment — just an honest conversation.
+              Book a free 30-minute discovery call to discuss your goals and challenges. No commitment is required, just an honest conversation about how I can help.
             </p>
           </div>
           <div className="bg-[#111111] rounded-3xl p-4 md:p-8 border border-white/10 overflow-hidden">
