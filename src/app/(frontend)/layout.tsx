@@ -25,6 +25,32 @@ export const metadata: Metadata = {
       'Edmond Moepswa — Web Designer · Full-Stack Developer · Workflow Automation Specialist',
     template: '%s | Edmond Moepswa',
   },
+  icons: {
+    icon: [
+      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    other: [
+      {
+        rel: 'manifest',
+        url: '/favicon/site.webmanifest',
+      },
+      {
+        rel: 'icon',
+        url: '/favicon/android-chrome-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        rel: 'icon',
+        url: '/favicon/android-chrome-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+    ],
+  },
   description:
     'Edmond Moepswa — Web Designer, Full-Stack Developer & Workflow Automation Specialist in Gaborone, Botswana. Custom websites, web apps, and workflow automation designed to last. From P&L statements to production code. Free 30-minute discovery call.',
   keywords: [

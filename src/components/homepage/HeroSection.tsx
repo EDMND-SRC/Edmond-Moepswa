@@ -109,7 +109,14 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
       <motion.div
         className="absolute inset-0 z-0"
         style={
-          reducedMotion ? undefined : { filter: filterStyle, x: cursorOffset.x, y: cursorOffset.y }
+          reducedMotion
+            ? { willChange: 'auto' }
+            : {
+                filter: filterStyle,
+                x: cursorOffset.x,
+                y: cursorOffset.y,
+                willChange: 'transform, filter',
+              }
         }
         transition={{ type: 'spring', stiffness: 100, damping: 20 }}
       >
@@ -122,6 +129,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
             priority
             loading="eager"
             sizes="100vw"
+            quality={90}
             onError={() => setPortraitError(true)}
           />
         )}
