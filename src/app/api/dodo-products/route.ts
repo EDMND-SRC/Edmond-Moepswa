@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
-
-const client = new DodoPayments({
-  bearerToken: process.env.DODO_PAYMENTS_API_KEY!,
-  environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as 'test_mode' | 'live_mode') || 'test_mode',
-})
-
 export const revalidate = 60 // Revalidate every 60 seconds
 
 export async function GET() {
   try {
+    const client = new DodoPayments({
+      bearerToken: process.env.DODO_PAYMENTS_API_KEY || '',
+      environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as 'test_mode' | 'live_mode') || 'test_mode',
+    })
+
     const response = await client.products.list({ limit: 50 } as any)
 
     // Transform products for the storefront

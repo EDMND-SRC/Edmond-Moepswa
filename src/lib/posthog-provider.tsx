@@ -5,8 +5,8 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 
 // Check that PostHog is client-side
-if (typeof window !== 'undefined') {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_API_KEY!, {
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_API_KEY) {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_API_KEY, {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_API_HOST || 'https://us.i.posthog.com',
     // Enable debug mode in development
     loaded: (posthog) => {

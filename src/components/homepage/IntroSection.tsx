@@ -67,7 +67,7 @@ function ScrollColorRevealParagraph({
     }
 
     // Check if this word is inside any emphasis range
-    const inEmphasis = emphasisRanges.some((r) => segStart >= r.start && segEnd <= r.end)
+    const inEmphasis = emphasisRanges.some((r) => Math.max(segStart, r.start) < Math.min(segEnd, r.end))
 
     tokens.push({ type: inEmphasis ? 'emphasis' : 'plain', word: segment })
   }
@@ -133,14 +133,16 @@ function ScrollColorRevealParagraph({
 // Respects prefers-reduced-motion.
 // ---------------------------------------------------------------------------
 
-function HeadingWord({ word, reducedMotion }: { word: string; reducedMotion: boolean }) {
+function HeadingWord({ word, isEmphasis, reducedMotion }: { word: string; isEmphasis: boolean; reducedMotion: boolean }) {
+  const className = `inline-block group-hover:opacity-50 transition-opacity duration-200 hover:!opacity-100 mr-[0.25em] last:mr-0 ${isEmphasis ? 'text-[#FF4D2E]' : 'text-white'}`
+
   if (reducedMotion) {
-    return <span className="inline-block">{word}</span>
+    return <span className={className}>{word}</span>
   }
 
   return (
     <motion.span
-      className="inline-block group-hover:opacity-50 transition-opacity duration-200 hover:!opacity-100 mr-[0.25em] last:mr-0"
+      className={className}
       initial={{ scale: 1, y: 0 }}
       whileHover={{ scale: 1.08, y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -161,6 +163,7 @@ export default function IntroSection() {
   const heading =
     "I've been on both sides of the desk. Now I design and build systems that hold up."
   const headingWordsArr = heading.split(' ')
+  const emphasisHeadingWords = ["both", "sides", "of", "the", "desk.", "systems", "that", "hold", "up."]
 
   const p1Text =
     'I spent a decade on the other side of the desk before I wrote my first line of production code. I ran and managed hospitality operations in Canberra; I gave financial advice and built portfolios for HNW clients in Sydney; I built risk and insurance functions from zero for a construction project management company in Gaborone.'
@@ -188,10 +191,10 @@ export default function IntroSection() {
 
         {/* Main Content */}
         <div className="md:col-span-9 lg:col-span-10 flex flex-col gap-10">
-          {/* Heading — brand orange, hover magnification */}
-          <div className="text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.1] tracking-tighter text-[#FF4D2E] group">
+          {/* Heading — white with brand orange on emphasis, hover magnification */}
+          <div className="text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.1] tracking-tighter group">
             {headingWordsArr.map((word, i) => (
-              <HeadingWord key={i} word={word} reducedMotion={reducedMotion} />
+              <HeadingWord key={i} word={word} isEmphasis={emphasisHeadingWords.includes(word)} reducedMotion={reducedMotion} />
             ))}
           </div>
 

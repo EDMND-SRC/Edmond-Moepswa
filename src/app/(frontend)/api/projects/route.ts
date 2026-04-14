@@ -1,6 +1,5 @@
 import { getPayloadSingleton } from '@/lib/payload'
 import { NextResponse } from 'next/server'
-import { unstable_cache } from 'next/cache'
 
 const getProjects = async () => {
   const payload = await getPayloadSingleton()
@@ -24,14 +23,9 @@ const getProjects = async () => {
   return result.docs
 }
 
-const getCachedProjects = () =>
-  unstable_cache(async () => getProjects(), ['projects'], {
-    tags: ['projects'],
-  })
-
 export async function GET() {
   try {
-    const projects = await getCachedProjects()()
+    const projects = await getProjects()
     return NextResponse.json({ projects })
   } catch (error) {
     console.error('Failed to fetch projects:', error)

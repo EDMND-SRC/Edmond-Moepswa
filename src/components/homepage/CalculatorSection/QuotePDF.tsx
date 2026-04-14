@@ -144,7 +144,7 @@ export const QuotePDF = ({ selections }: QuotePDFProps) => {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Image src="/public/brand/logo-horizontal.png" style={styles.logo} />
+          <Image src={`${process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'}/brand/logo-horizontal.png`} style={styles.logo} />
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Project Quote</Text>
             <Text style={styles.subtitle}>{dateStr}</Text>

@@ -24,21 +24,16 @@ function SingleDigit({ digit, delay }: { digit: number; delay: number }) {
 
   return (
     <motion.span
-      className="inline-block w-[0.6em] text-center tabular-nums overflow-hidden"
+      className="inline-flex w-[0.6em] h-[1.1em] text-center tabular-nums overflow-hidden relative"
       initial={{ y: 0 }}
-      animate={{ y: `-${digit * 100}%` }}
-      transition={{
-        duration: 0.8,
-        delay,
-        ease: [0.25, 0.1, 0.25, 1],
-      }}
     >
       <motion.div
-        className="flex flex-col h-full items-center"
+        className="flex flex-col items-center absolute top-0 w-full"
+        initial={{ y: 0 }}
         animate={
           digit > 0
             ? {
-                y: [0, `-${digit * 100}%`],
+                y: [0, `-${digit * 10}%`],
                 scale: [1.15, 1],
                 color: ['#FF4D2E', 'inherit'],
               }
@@ -53,7 +48,7 @@ function SingleDigit({ digit, delay }: { digit: number; delay: number }) {
         }}
       >
         {digits.map((d) => (
-          <span key={d} className="h-full flex items-center justify-center leading-none">
+          <span key={d} className="h-[1.1em] flex items-center justify-center leading-none">
             {d}
           </span>
         ))}
@@ -96,7 +91,7 @@ export default function AnimatedNumber({
   }
 
   return (
-    <span ref={ref} className={className}>
+    <span ref={ref} className={`flex flex-row items-center ${className}`}>
       {digits.map((digit, i) => {
         const delay = (digits.length - 1 - i) * (staggerPerDigit / 1000)
         return <SingleDigit key={i} digit={digit} delay={delay} />
