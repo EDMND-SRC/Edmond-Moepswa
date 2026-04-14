@@ -110,7 +110,7 @@ describe('API Integration Tests', () => {
 
       if (faqs.docs.length > 1) {
         for (let i = 0; i < faqs.docs.length - 1; i++) {
-          expect(faqs.docs[i].order).toBeLessThanOrEqual(faqs.docs[i + 1].order)
+          expect((faqs.docs[i] as any).order).toBeLessThanOrEqual((faqs.docs[i + 1] as any).order)
         }
       }
     })

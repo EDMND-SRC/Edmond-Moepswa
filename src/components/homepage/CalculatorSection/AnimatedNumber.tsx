@@ -34,7 +34,7 @@ function SingleDigit({ digit, delay }: { digit: number; delay: number }) {
       }}
     >
       <motion.div
-        className="flex flex-col"
+        className="flex flex-col h-full items-center"
         animate={
           digit > 0
             ? {
@@ -53,7 +53,7 @@ function SingleDigit({ digit, delay }: { digit: number; delay: number }) {
         }}
       >
         {digits.map((d) => (
-          <span key={d} className="h-[1em] leading-none">
+          <span key={d} className="h-full flex items-center justify-center leading-none">
             {d}
           </span>
         ))}

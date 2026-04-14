@@ -3,17 +3,17 @@ import DodoPayments from 'dodopayments'
 
 const client = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY!,
-  environment: process.env.DODO_PAYMENTS_ENVIRONMENT === 'test' ? 'test_mode' : 'live_mode',
+  environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as 'test_mode' | 'live_mode') || 'test_mode',
 })
 
 export const revalidate = 60 // Revalidate every 60 seconds
 
 export async function GET() {
   try {
-    const response: any = await client.products.list({ limit: 50 } as any)
+    const response = await client.products.list({ limit: 50 } as any)
 
     // Transform products for the storefront
-    const transformed = (response.data || []).map((p: any) => ({
+    const transformed = ((response as any).data || []).map((p: any) => ({
       id: p.id,
       name: p.name,
       description: p.description || '',

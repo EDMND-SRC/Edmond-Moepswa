@@ -15,15 +15,17 @@ export default function ServicesSection() {
         </div>
 
         <div className="flex flex-col gap-16 md:gap-24">
-          {services.map((service) => (
-            <ServiceBlock
-              key={service.id}
-              service={service}
-              currency="BWP"
-              rates={{ BWP: 1 }}
-              showPricing={false}
-            />
-          ))}
+          {services
+            .filter((service) => service.id !== '07' && service.id !== '08')
+            .map((service) => (
+              <ServiceBlock
+                key={service.id}
+                service={service}
+                currency="BWP"
+                rates={{ BWP: 1 }}
+                showPricing={false}
+              />
+            ))}
         </div>
       </div>
     </section>

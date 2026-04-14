@@ -45,34 +45,7 @@ interface HeroSectionProps {
 }
 
 /** Extracted to call useTransform at top level — avoids Rules of Hooks violation in .map() */
-function RippleStrip({
-  index,
-  scrollY,
-  portraitSrc,
-}: {
-  index: number
-  scrollY: MotionValue<number>
-  portraitSrc: string
-}) {
-  const yOffset = useTransform(scrollY, [0, 400], [0, (index - 2) * 12])
-  const clipPath = `inset(0 ${100 - (index + 1) * 20}% 0 ${index * 20}%)`
-  return (
-    <motion.div
-      style={{ clipPath, y: yOffset }}
-      className="absolute inset-0 z-[1] pointer-events-none"
-    >
-      <Image
-        src={portraitSrc}
-        fill
-        className="object-cover"
-        alt=""
-        aria-hidden
-        priority={index === 2}
-        sizes="(max-width: 768px) 50vw, 20vw"
-      />
-    </motion.div>
-  )
-}
+
 
 export default function HeroSection({ isScrolled }: HeroSectionProps) {
   const reducedMotion = useReducedMotion()
@@ -106,20 +79,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
       onMouseMove={handleHeroMouseMove}
     >
       {/* Background Portrait */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={
-          reducedMotion
-            ? { willChange: 'auto' }
-            : {
-                filter: filterStyle,
-                x: cursorOffset.x,
-                y: cursorOffset.y,
-                willChange: 'transform, filter',
-              }
-        }
-        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
-      >
+      <div className="absolute inset-0 z-0">
         {!portraitError && (
           <Image
             src={portraitSrc}
@@ -129,21 +89,11 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
             priority
             loading="eager"
             sizes="100vw"
-            quality={90}
+            quality={100}
             onError={() => setPortraitError(true)}
           />
         )}
-        <motion.div
-          style={reducedMotion ? { opacity: 0 } : { opacity: rustOpacityValue }}
-          className="absolute inset-0 bg-[#FF4D2E] mix-blend-multiply pointer-events-none"
-        />
-        {/* Split-scroll ripple strips */}
-        {!reducedMotion &&
-          !portraitError &&
-          [0, 1, 2, 3, 4].map((i) => (
-            <RippleStrip key={i} index={i} scrollY={scrollY} portraitSrc={portraitSrc} />
-          ))}
-      </motion.div>
+      </div>
 
       {/* Scrolling Name Text */}
       <div

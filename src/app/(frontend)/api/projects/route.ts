@@ -10,7 +10,16 @@ const getProjects = async () => {
     limit: 10,
     sort: '-createdAt',
     overrideAccess: false,
-    select: { title: true, slug: true, category: true, thumbnail: true, featured: true },
+    select: {
+      title: true,
+      slug: true,
+      category: true,
+      thumbnail: true,
+      featured: true,
+      description: true,
+      year: true,
+      link: true,
+    },
   })
   return result.docs
 }

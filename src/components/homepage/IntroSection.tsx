@@ -8,9 +8,9 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 // ---------------------------------------------------------------------------
 // ScrollColorReveal — wraps text in a scroll-driven color reveal.
 // Supports "emphasis phrases" that get a 3-stage animation:
-//   dark gray (#595959) → brand orange (#FF4D2E) → light gray (#e5e5e5)
+//   dark gray (#595959) → brand orange (#FF4D2E) → white (#FFFFFF)
 // Regular words get a 2-stage animation:
-//   dark gray (#595959) → light gray (#e5e5e5)
+//   dark gray (#595959) → white (#FFFFFF)
 // ---------------------------------------------------------------------------
 
 interface EmphasisPhrase {
@@ -104,7 +104,7 @@ function ScrollColorRevealParagraph({
           const color = useTransform(
             scrollYProgress,
             [start, mid, end],
-            ['#595959', '#FF4D2E', '#e5e5e5'],
+            ['#595959', '#FF4D2E', '#FFFFFF'],
           )
           return (
             <motion.span key={i} style={{ color }} className="inline">
@@ -116,7 +116,7 @@ function ScrollColorRevealParagraph({
         // 2-stage: dark gray → light gray
         const start = progress
         const end = start + rangeWidth
-        const color = useTransform(scrollYProgress, [start, end], ['#595959', '#e5e5e5'])
+        const color = useTransform(scrollYProgress, [start, end], ['#595959', '#FFFFFF'])
         return (
           <motion.span key={i} style={{ color }} className="inline">
             {token.word}
@@ -140,7 +140,7 @@ function HeadingWord({ word, reducedMotion }: { word: string; reducedMotion: boo
 
   return (
     <motion.span
-      className="inline-block group-hover:opacity-50 transition-opacity duration-200 hover:!opacity-100"
+      className="inline-block group-hover:opacity-50 transition-opacity duration-200 hover:!opacity-100 mr-[0.25em] last:mr-0"
       initial={{ scale: 1, y: 0 }}
       whileHover={{ scale: 1.08, y: -2 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
@@ -226,7 +226,7 @@ export default function IntroSection() {
               { text: 'work properly and keep working' },
               { text: 'complete ownership' },
             ]}
-            className="text-[#595959] text-sm md:text-base leading-relaxed max-w-3xl font-normal"
+            className="text-[#595959] text-lg md:text-xl leading-relaxed max-w-3xl font-normal"
           />
 
           {/* CTA */}
