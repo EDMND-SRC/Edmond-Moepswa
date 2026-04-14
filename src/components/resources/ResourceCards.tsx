@@ -20,7 +20,7 @@ const freeResources: FreeResource[] = [
     desc: 'Discover the 5 most common website mistakes that silently drive potential clients away -- and how to fix them fast.',
     icon: AlertTriangle,
     tag: 'PDF Guide',
-    dodoProductId: undefined, // Set after creating product in Dodo
+    dodoProductId: 'pdt_0NceaY8UNB1GoMOLesz8X',
     legacyUrl: 'https://edmnd.gumroad.com/l/bgbgoq',
   },
   {
@@ -28,7 +28,7 @@ const freeResources: FreeResource[] = [
     desc: 'A complete pre-launch checklist to ensure your website goes live without bugs, missing pages, or embarrassing errors.',
     icon: ClipboardCheck,
     tag: 'Checklist',
-    dodoProductId: undefined,
+    dodoProductId: 'pdt_0NceaYFa2uiHUZPpN7KOA',
     legacyUrl: 'https://edmnd.gumroad.com/l/fwruno',
   },
   {
@@ -36,7 +36,7 @@ const freeResources: FreeResource[] = [
     desc: 'Write a clear web design brief that saves you time, money, and endless back-and-forth with your designer.',
     icon: FileText,
     tag: 'E-book',
-    dodoProductId: undefined,
+    dodoProductId: 'pdt_0NceaYzEq1qzsiDZHrFWb',
     legacyUrl: 'https://edmnd.gumroad.com/l/legyuk',
   },
 ]

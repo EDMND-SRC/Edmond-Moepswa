@@ -1,8 +1,10 @@
 # Dodo Payments Integration Strategy — Edmond Moepswa
 
 **Generated:** 6 April 2026
+**Last Updated:** 13 April 2026 (Full Integration Complete — Storefront, PWYW, Adaptive Currency, Webhooks)
 **Platform:** Dodo Payments (dodopayments.com)
 **Free Tier:** No monthly platform fee — percentage-based per-transaction fee. Standard payouts free (USD SWIFT $25 fee applies).
+**Current Mode:** Test Mode (indefinite until website is satisfied)
 
 ---
 
@@ -12,12 +14,43 @@ Dodo Payments operates as a Merchant of Record (MoR) — it legally sells the pr
 
 For Edmond's service offerings, Dodo Payments serves as:
 
-1. **Tier A — Starter Storefront** — Hosted product page at store.dodopayments.com/[store] for selling digital products, SaaS, and subscriptions internationally
+1. **Primary Storefront** — Replacing Gumroad/Lemon Squeezy for free resources and paid boilerplate products. All products hosted on this site's `/store` page with Dodo checkout.
 2. **International payment gateway** — For Botswana-based businesses selling to international customers where Stripe is unavailable
 3. **Tax and compliance handling** — Dodo manages sales tax, VAT, and digital services tax across 150+ countries — the seller receives net revenue without tax registration overhead
 4. **Boilerplate payment integration** — E-commerce stores (Boilerplate 6) and SaaS products (Tier C) that need international payment processing
 
 ---
+
+## Integration Status (13 April 2026)
+
+### ✅ Code Complete
+- ✅ `dodopayments` SDK installed and integrated
+- ✅ Test mode API key configured (`DODO_PAYMENTS_API_KEY`)
+- ✅ Store ID configured (`DODO_PAYMENTS_STORE_ID=bus_0NcbJEcXUhVRoZWBULvZ9`)
+- ✅ Webhook secret configured (`DODO_PAYMENTS_WEBHOOK_SECRET`)
+- ✅ Store page (`/store`) fully redesigned with Dodo integration:
+  - PWYW (Pay What You Want) support for free resources
+  - Fixed pricing for paid boilerplate products
+  - Custom amount input for PWYW products with suggested price
+  - Adaptive currency display (70+ currencies)
+  - Checkout flow redirects to Dodo hosted checkout
+- ✅ Checkout API route: `/api/checkout` — creates checkout sessions with PWYW amount support
+- ✅ Products API route: `/api/dodo-products` — fetches all products for storefront
+- ✅ Webhook handler: `/api/webhooks/dodo` — verifies signatures, handles payment/subscription events
+- ✅ ResourceCards component updated to use Dodo checkout (with Gumroad fallback)
+- ✅ Adaptive currency: enabled via Dodo dashboard (Settings → Business → Adaptive Pricing)
+- ✅ Vercel env vars synced (all 10 integration vars deployed to production/preview/development)
+- ✅ Build verified: `pnpm build` passes with zero errors
+- ✅ Seed script: `scripts/seed-dodo-products-api.ts` — ready to create products when API key has write scope
+
+### ⏳ Pending: Product Creation
+- ⏳ API key currently returns "RBAC: access denied" on write operations
+- ⏳ Need to either:
+  1. Grant write scope to existing API key in Dodo Dashboard → Developer → API Keys
+  2. Create a new API key with "Full Access" or "Write" permissions
+  3. Create 12 products manually via dashboard (fallback)
+
+### 📋 Products to Create
 
 ## Cost Structure (2026)
 

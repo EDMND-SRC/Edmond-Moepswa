@@ -19,7 +19,10 @@
       "Bash(rm *)",
       "Bash(git *)",
       "Bash(ls *)",
-      "Bash(mv *)"
+      "Bash(mv *)",
+      "Bash(for *)",
+      "Bash(do)",
+      "Bash(done)"
     ]
   },
   "$version": 3
