@@ -76,6 +76,7 @@ export interface Config {
     leads: Lead;
     users: User;
     orders: Order;
+    products: Product;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -102,6 +103,7 @@ export interface Config {
     leads: LeadsSelect<false> | LeadsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -884,6 +886,41 @@ export interface Order {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  description: string;
+  /**
+   * Price in cents. Set to 0 for free resources.
+   */
+  priceCents?: number | null;
+  /**
+   * Currency code (e.g., USD, BWP).
+   */
+  currency?: string | null;
+  /**
+   * The product ID from Dodo Payments dashboard.
+   */
+  dodoProductId: string;
+  type: 'free' | 'paid';
+  category: 'guide' | 'checklist' | 'ebook' | 'boilerplate' | 'tool';
+  /**
+   * Product thumbnail image.
+   */
+  thumbnail?: (number | null) | Media;
+  featured?: boolean | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1111,6 +1148,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'orders';
         value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1535,6 +1576,25 @@ export interface OrdersSelect<T extends boolean = true> {
   currency?: T;
   status?: T;
   metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  priceCents?: T;
+  currency?: T;
+  dodoProductId?: T;
+  type?: T;
+  category?: T;
+  thumbnail?: T;
+  featured?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }

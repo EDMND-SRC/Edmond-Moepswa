@@ -14,16 +14,6 @@ export const Services: CollectionConfig = {
     useAsTitle: 'title',
     defaultColumns: ['title', 'price', 'updatedAt'],
   },
-  hooks: {
-    beforeChange: [
-      ({ data }) => {
-        if (data && 'stripeProductId' in data && data.stripeProductId && !data.dodoProductId) {
-          data.dodoProductId = data.stripeProductId
-        }
-        return data
-      },
-    ],
-  },
   fields: [
     {
       name: 'title',
@@ -67,14 +57,6 @@ export const Services: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Linked Dodo Payments Product ID',
-      },
-    },
-    {
-      name: 'stripeProductId',
-      type: 'text',
-      admin: {
-        position: 'sidebar',
-        description: '[DEPRECATED] Linked Stripe Product ID',
       },
     },
   ],

@@ -2,26 +2,29 @@
 
 import { useState, useCallback } from 'react'
 import { 
-  AlertTriangle, 
-  ClipboardCheck, 
-  FileText, 
   Loader2, 
   ExternalLink,
-  BookOpen,
-  Wrench,
   Download,
-  ShoppingCart
+  ShoppingCart,
+  BookOpen
 } from 'lucide-react'
-import { CodepenIcon } from '@/components/icons/BrandIcons'
+import { 
+  NextJs, 
+  Markdown, 
+  Bash, 
+  Notion, 
+  ViteJS 
+} from 'developer-icons'
 import type { Product } from '@/payload-types'
+import type { ComponentType } from 'react'
 
-// Map category slugs to icons
-const iconMap: Record<string, any> = {
-  guide: AlertTriangle,
-  checklist: ClipboardCheck,
-  ebook: FileText,
-  boilerplate: CodepenIcon,
-  tool: Wrench,
+// Map category slugs to branding icons
+const iconMap: Record<string, ComponentType<{ className?: string; size?: number | string }>> = {
+  guide: Markdown,
+  checklist: Bash,
+  ebook: Notion,
+  boilerplate: NextJs,
+  tool: ViteJS,
 }
 
 interface ResourceCardsProps {

@@ -29,7 +29,7 @@ export default function SuccessPage() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition-all group"
             >
-              <Linkedin className="w-6 h-6 text-[#0077B5]" />
+              <LinkedinIcon className="w-6 h-6" />
               <div className="text-left">
                 <p className="text-sm font-medium text-white">Let's connect</p>
                 <p className="text-xs text-[#a3a3a3]">Follow for daily updates</p>
@@ -41,7 +41,7 @@ export default function SuccessPage() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition-all group"
             >
-              <Twitter className="w-6 h-6 text-[#1DA1F2]" />
+              <TwitterIcon className="w-6 h-6" />
               <div className="text-left">
                 <p className="text-sm font-medium text-white">Follow on X</p>
                 <p className="text-xs text-[#a3a3a3]">Short-form tech tips</p>
