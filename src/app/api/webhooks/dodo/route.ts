@@ -66,6 +66,7 @@ export async function POST(req: Request) {
           productId: payment.product_id,
         })
         
+        // Create Order record
         await payload.create({
           collection: 'orders',
           data: {
@@ -79,6 +80,25 @@ export async function POST(req: Request) {
             metadata: event,
           },
         })
+
+        // Capture as Lead if email is available
+        if (payment.customer?.email) {
+          try {
+            const isPurchase = payment.amount > 0
+            await payload.create({
+              collection: 'leads',
+              data: {
+                email: payment.customer.email,
+                name: payment.customer.name || '',
+                source: 'contact', // Closest match in current select options
+                message: `Dodo ${isPurchase ? 'Purchase' : 'Download'}: ${payment.product_name}`,
+                status: isPurchase ? 'qualified' : 'new',
+              },
+            })
+          } catch (leadError) {
+            console.error('Failed to create lead from webhook:', leadError)
+          }
+        }
         break
       }
 

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { renderToStream } from '@react-pdf/renderer'
+import { renderToBuffer } from '@react-pdf/renderer'
 import { QuotePDF } from '@/components/homepage/CalculatorSection/QuotePDF'
 import React from 'react'
-import { Readable } from 'stream'
 
 export async function POST(req: Request) {
   try {
@@ -13,15 +12,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing selections data' }, { status: 400 })
     }
 
-    const stream = (await renderToStream(<QuotePDF selections={selections} />)) as unknown as Readable
+    const buffer = await renderToBuffer(<QuotePDF selections={selections} />)
 
     // Construct safe filename
     const safeLabel = String(selections.serviceLabel || 'quote').replace(/\s+/g, '-').toLowerCase()
 
-    return new NextResponse(stream as any, {
+    return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="quote-${safeLabel}.pdf"`,
+        'Content-Length': buffer.length.toString(),
       },
     })
   } catch (error) {

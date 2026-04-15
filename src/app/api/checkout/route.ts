@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const session = await client.checkoutSessions.create({
       product_cart: [cartItem],
       customer: customerEmail ? { email: customerEmail } : undefined,
-      return_url: `${process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'}/store/success`,
+      return_url: `${process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'}/resources/success`,
     })
 
     return NextResponse.json({ url: session.checkout_url })

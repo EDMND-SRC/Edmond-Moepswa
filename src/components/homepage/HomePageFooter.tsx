@@ -99,7 +99,7 @@ export default function HomePageFooter() {
               { href: '/about', label: 'About' },
               { href: '/services', label: 'Services' },
               { href: '/contact', label: 'Contact' },
-              { href: '/store', label: 'Store' },
+              { href: '/resources', label: 'Resources' },
             ].map((link, i, arr) => (
               <span key={link.href} className="inline-flex items-center">
                 <Link

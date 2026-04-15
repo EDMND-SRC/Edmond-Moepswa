@@ -66,15 +66,23 @@ function ProjectCard({
   const isFirst = index === 0
   const isLast = index === total - 1
 
-  const startFade = isLast ? 0 : index / (total - 1)
-  const endFade = isLast ? 1 : (index + 1) / (total - 1)
-  const startIn = isFirst ? 0 : (index - 1) / (total - 1)
-  const endIn = isFirst ? 1 : index / (total - 1)
+  // Refined ranges for distinct "stacking" effect
+  // A card starts coming in early, but the previous one only starts scaling/fading 
+  // after the new one has covered a significant portion.
+  const step = 1 / total
+  const margin = step * 0.2 // Small buffer between card transitions
+  
+  const startIn = isFirst ? 0 : (index / total) - (step * 0.8)
+  const endIn = isFirst ? 0 : index / total
+  
+  const startFade = isLast ? 1 : (index + 1) / total
+  const endFade = isLast ? 1 : ((index + 1) / total) + (step * 0.5)
 
-  const scale = useTransform(scrollYProgress, [startFade, endFade], [1, 0.9])
+  const scale = useTransform(scrollYProgress, [startFade, endFade], [1, 0.85])
   const opacity = useTransform(scrollYProgress, [startFade, endFade], [1, 0])
-  const y = useTransform(scrollYProgress, [startIn, endIn], ['100%', '0%'])
-  const kenBurnsScale = useTransform(scrollYProgress, [startFade, endFade], [1, 1.12])
+  const y = useTransform(scrollYProgress, [startIn, endIn], ['120%', '0%'])
+  const shadowOpacity = useTransform(scrollYProgress, [startFade, endFade], [0.1, 0.4])
+  const kenBurnsScale = useTransform(scrollYProgress, [startFade, endIn], [1, 1.15])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (reducedMotion || !cardRef.current) return
@@ -178,6 +186,12 @@ function ProjectCard({
             <div className="border-t border-white/10"></div>
           </motion.div>
         </div>
+
+        {/* Shadow Overlay for depth during transition */}
+        <motion.div 
+          className="absolute inset-0 bg-black pointer-events-none z-20"
+          style={{ opacity: isLast ? 0 : shadowOpacity }}
+        />
       </motion.div>
     </motion.a>
   )
