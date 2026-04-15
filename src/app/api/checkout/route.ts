@@ -6,9 +6,15 @@ const client = new DodoPayments({
   environment: process.env.DODO_PAYMENTS_ENVIRONMENT === 'test' ? 'test_mode' : 'live_mode',
 })
 
+interface CheckoutRequest {
+  productId: string
+  customerEmail?: string
+  amount?: number
+}
+
 export async function POST(req: Request) {
   try {
-    const { productId, customerEmail, amount } = await req.json()
+    const { productId, customerEmail, amount }: CheckoutRequest = await req.json()
 
     if (!productId) {
       return NextResponse.json({ error: 'productId is required' }, { status: 400 })
@@ -24,18 +30,19 @@ export async function POST(req: Request) {
       cartItem.amount = amount
     }
 
-    const session: any = await client.checkoutSessions.create({
+    const session = await client.checkoutSessions.create({
       product_cart: [cartItem],
       customer: customerEmail ? { email: customerEmail } : undefined,
       return_url: `${process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'}/store/success`,
-    } as any)
+    })
 
-    return NextResponse.json({ url: session.url || session.checkout_url })
-  } catch (error: any) {
-    console.error('Checkout session creation failed:', error)
+    return NextResponse.json({ url: session.checkout_url })
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    console.error('Checkout session creation failed:', err)
     return NextResponse.json(
-      { error: error?.message || 'Failed to create checkout session' },
-      { status: error?.status || 500 },
+      { error: err.message || 'Failed to create checkout session' },
+      { status: err.status || 500 },
     )
   }
 }

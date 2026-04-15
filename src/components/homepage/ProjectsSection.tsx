@@ -5,8 +5,9 @@ import Image from 'next/image'
 import { motion, useScroll, useTransform, type Variants } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
+import type { Project as PayloadProject, Media } from '@/payload-types'
 
-interface Project {
+interface UIProject {
   id: number
   year: string
   title: string
@@ -50,7 +51,7 @@ function ProjectCard({
   reducedMotion,
   onHoverChange,
 }: {
-  project: Project
+  project: UIProject
   index: number
   total: number
   scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress']
@@ -183,7 +184,7 @@ function ProjectCard({
 }
 
 export default function ProjectsSection() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<UIProject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -196,33 +197,40 @@ export default function ProjectsSection() {
   })
   const reducedMotion = useReducedMotion()
 
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 })
+  const cursorRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
 
   const fetchProjects = useCallback((signal?: AbortSignal) => {
     setError(false)
     setIsLoading(true)
-    fetch('/api/projects', { signal })
-      .then((res) => res.json())
+    // Optimization: Filter out boilerplate on the server
+    fetch('/api/projects?where[category][not_equals]=boilerplate&limit=100', { signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+        return res.json()
+      })
       .then((data) => {
-        if (data.projects?.length > 0) {
-          const mapped: Project[] = data.projects
-            .filter((p: any) => p.category !== 'boilerplate')
-            .map((p: any) => ({
-              id: p.id,
-              year: p.year || 'N/A',
-              title: p.title,
-              description: p.description
-                ? typeof p.description === 'string'
-                  ? p.description
-                  : p.description.root?.children
-                      ?.map((c: any) => c.children?.map((cc: any) => cc.text).join(''))
-                      .join('') || ''
-                : '',
-              categories: p.category ? [categoryLabels[p.category] || p.category] : [],
-              image: p.thumbnail ? getMediaUrl(p.thumbnail) : undefined,
-              link: p.link || '#',
-            }))
+        const payloadData = (data.docs || data.projects || []) as PayloadProject[]
+        if (Array.isArray(payloadData) && payloadData.length > 0) {
+          const mapped: UIProject[] = payloadData.map((p) => ({
+            id: p.id,
+            year: p.year || 'N/A',
+            title: p.title,
+            description: p.description
+              ? typeof p.description === 'string'
+                ? p.description
+                : (
+                    p.description.root?.children as Array<{
+                      children?: Array<{ text?: string }>
+                    }>
+                  )
+                    ?.map((c) => c.children?.map((cc) => cc.text).join(''))
+                    .join('') || ''
+              : '',
+            categories: p.category ? [categoryLabels[p.category] || p.category] : [],
+            image: p.thumbnail ? getMediaUrl(p.thumbnail as Media) : '',
+            link: p.link || '#',
+          }))
           setProjects(mapped)
         } else {
           setProjects([])
@@ -241,12 +249,21 @@ export default function ProjectsSection() {
   }, [fetchProjects])
 
   useEffect(() => {
+    let rafId: number
     const updateMousePos = (e: MouseEvent) => {
-      if (!isHovering) return
-      setCursorPos({ x: e.clientX, y: e.clientY })
+      if (!isHovering || !cursorRef.current) return
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        if (cursorRef.current) {
+          cursorRef.current.style.transform = `translate3d(${e.clientX - 48}px, ${e.clientY - 48}px, 0)`
+        }
+      })
     }
     window.addEventListener('mousemove', updateMousePos)
-    return () => window.removeEventListener('mousemove', updateMousePos)
+    return () => {
+      window.removeEventListener('mousemove', updateMousePos)
+      cancelAnimationFrame(rafId)
+    }
   }, [isHovering])
 
   const filteredProjects = useMemo(() => {
@@ -381,16 +398,13 @@ export default function ProjectsSection() {
 
       {/* Custom Cursor - only for mouse users with motion */}
       {!reducedMotion && isHovering && (
-        <motion.div
-          className="fixed top-0 left-0 w-24 h-24 bg-[#FF4D2E] rounded-full pointer-events-none z-50 flex items-center justify-center text-white font-medium mix-blend-normal"
-          animate={{
-            x: cursorPos.x - 48,
-            y: cursorPos.y - 48,
-          }}
-          transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.1 }}
+        <div
+          ref={cursorRef}
+          className="fixed top-0 left-0 w-24 h-24 bg-[#FF4D2E] rounded-full pointer-events-none z-50 flex items-center justify-center text-white font-medium mix-blend-normal will-change-transform"
+          style={{ transform: 'translate3d(-100px, -100px, 0)' }}
         >
           View
-        </motion.div>
+        </div>
       )}
     </section>
   )

@@ -75,6 +75,7 @@ export interface Config {
     media: Media;
     leads: Lead;
     users: User;
+    orders: Order;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -100,6 +101,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -743,7 +745,11 @@ export interface Service {
    */
   icon?: string | null;
   /**
-   * Linked Stripe Product ID
+   * Linked Dodo Payments Product ID
+   */
+  dodoProductId?: string | null;
+  /**
+   * [DEPRECATED] Linked Stripe Product ID
    */
   stripeProductId?: string | null;
   meta?: {
@@ -840,6 +846,41 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  /**
+   * Dodo Payments Transaction ID
+   */
+  dodoPaymentId: string;
+  /**
+   * Dodo Payments Subscription ID (if applicable)
+   */
+  dodoSubscriptionId?: string | null;
+  customerEmail: string;
+  productName?: string | null;
+  productId?: string | null;
+  amount?: number | null;
+  currency?: string | null;
+  status: 'succeeded' | 'failed' | 'refunded' | 'cancelled';
+  /**
+   * Full webhook payload for debugging
+   */
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1068,6 +1109,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
         relationTo: 'redirects';
         value: number | Redirect;
       } | null)
@@ -1277,6 +1322,7 @@ export interface ServicesSelect<T extends boolean = true> {
         id?: T;
       };
   icon?: T;
+  dodoProductId?: T;
   stripeProductId?: T;
   meta?:
     | T
@@ -1474,6 +1520,23 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  dodoPaymentId?: T;
+  dodoSubscriptionId?: T;
+  customerEmail?: T;
+  productName?: T;
+  productId?: T;
+  amount?: T;
+  currency?: T;
+  status?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

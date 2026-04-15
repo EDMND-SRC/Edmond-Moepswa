@@ -13,23 +13,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing selections data' }, { status: 400 })
     }
 
-    // Render PDF to stream
-    const stream = await renderToStream(<QuotePDF selections={selections} />)
-    
-    // Convert Node stream to Web stream for NextResponse
-    const webStream = new ReadableStream({
-      async start(controller) {
-        for await (const chunk of stream as any) {
-          controller.enqueue(chunk)
-        }
-        controller.close()
-      },
-    })
+    const stream = (await renderToStream(<QuotePDF selections={selections} />)) as unknown as Readable
 
-    return new NextResponse(webStream, {
+    // Construct safe filename
+    const safeLabel = String(selections.serviceLabel || 'quote').replace(/\s+/g, '-').toLowerCase()
+
+    return new NextResponse(stream as any, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="quote-${selections.serviceLabel.replace(/\s+/g, '-').toLowerCase()}.pdf"`,
+        'Content-Disposition': `attachment; filename="quote-${safeLabel}.pdf"`,
       },
     })
   } catch (error) {

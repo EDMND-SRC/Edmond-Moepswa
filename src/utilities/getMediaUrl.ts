@@ -1,12 +1,27 @@
+import { Media } from '@/payload-types'
 import { getClientSideURL } from '@/utilities/getURL'
 
 /**
- * Processes media resource URL to ensure proper formatting
- * @param url The original URL from the resource
+ * Processes media resource URL or Media object to ensure proper formatting
+ * @param media The original URL string or Media object
  * @param cacheTag Optional cache tag to append to the URL
  * @returns Properly formatted URL with cache tag if provided
  */
-export const getMediaUrl = (url: string | null | undefined, cacheTag?: string | null): string => {
+export const getMediaUrl = (
+  media: string | Media | null | undefined,
+  cacheTag?: string | null,
+): string => {
+  if (!media) return ''
+
+  let url: string
+  if (typeof media === 'object' && 'url' in media && media.url) {
+    url = media.url
+  } else if (typeof media === 'string') {
+    url = media
+  } else {
+    return ''
+  }
+
   if (!url) return ''
 
   if (cacheTag && cacheTag !== '') {

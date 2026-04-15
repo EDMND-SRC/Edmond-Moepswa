@@ -12,6 +12,7 @@ import { Projects } from './collections/Projects'
 import { Testimonials } from './collections/Testimonials'
 import { FAQs } from './collections/FAQs'
 import { Leads } from './collections/Leads'
+import { Orders } from './collections/Orders'
 import { SiteSettings } from './globals/SiteSettings'
 import { Header } from './Header/config'
 import { Footer } from './Footer/config'
@@ -67,7 +68,7 @@ export default buildConfig({
     },
     push: false,
   }),
-  collections: [Pages, Services, Projects, Testimonials, FAQs, Media, Leads, Users],
+  collections: [Pages, Services, Projects, Testimonials, FAQs, Media, Leads, Users, Orders],
   cors: [
     getServerSideURL(),
     process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : '',

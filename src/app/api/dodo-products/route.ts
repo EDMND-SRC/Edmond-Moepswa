@@ -2,6 +2,27 @@ import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
 export const revalidate = 60 // Revalidate every 60 seconds
 
+interface DodoProductAPI {
+  id: string
+  name: string
+  description: string | null
+  image_url: string | null
+  tax_category: string
+  pricing: {
+    amount: number
+    currency: string
+    type: 'one_time' | 'subscription'
+    pwyw_enabled?: boolean
+    pwyw_min_amount?: number
+    pwyw_suggested_amount?: number
+  }
+}
+
+interface DodoListResponse {
+  items: DodoProductAPI[]
+  data?: DodoProductAPI[] // fallback for older SDK versions
+}
+
 export async function GET() {
   try {
     const client = new DodoPayments({
@@ -9,10 +30,17 @@ export async function GET() {
       environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as 'test_mode' | 'live_mode') || 'test_mode',
     })
 
-    const response = await client.products.list({ limit: 50 } as any)
+    // Fetch all products (max limit 100 for Dodo)
+    const response = (await client.products.list({ page_size: 100 })) as unknown as DodoListResponse
 
     // Transform products for the storefront
-    const transformed = ((response as any).data || []).map((p: any) => ({
+    const items = response.items || response.data || []
+    
+    if (!Array.isArray(items)) {
+      throw new Error('Invalid items response from Dodo Payments')
+    }
+
+    const transformed = items.map((p) => ({
       id: p.id,
       name: p.name,
       description: p.description || '',
@@ -27,11 +55,12 @@ export async function GET() {
     }))
 
     return NextResponse.json({ products: transformed })
-  } catch (error: any) {
-    console.error('Failed to fetch products:', error)
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number }
+    console.error('Failed to fetch products:', err)
     return NextResponse.json(
-      { error: error?.message || 'Failed to fetch products' },
-      { status: error?.status || 500 },
+      { error: err.message || 'Failed to fetch products' },
+      { status: err.status || 500 },
     )
   }
 }
