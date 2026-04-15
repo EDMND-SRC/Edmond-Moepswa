@@ -1,11 +1,9 @@
-import React from 'react'
 import {
   CheckCircle2,
-  Linkedin,
-  Twitter,
   Calendar,
   ArrowRight,
 } from 'lucide-react'
+import { LinkedinIcon, TwitterIcon } from '@/components/icons/BrandIcons'
 import Link from 'next/link'
 
 export default function SuccessPage() {

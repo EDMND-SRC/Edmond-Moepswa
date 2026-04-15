@@ -8,11 +8,11 @@ import {
   Loader2, 
   ExternalLink,
   BookOpen,
-  Codepen,
   Wrench,
   Download,
   ShoppingCart
 } from 'lucide-react'
+import { CodepenIcon } from '@/components/icons/BrandIcons'
 import type { Product } from '@/payload-types'
 
 // Map category slugs to icons
@@ -20,7 +20,7 @@ const iconMap: Record<string, any> = {
   guide: AlertTriangle,
   checklist: ClipboardCheck,
   ebook: FileText,
-  boilerplate: Codepen,
+  boilerplate: CodepenIcon,
   tool: Wrench,
 }
 
