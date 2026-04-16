@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, memo } from 'react'
 import Image from 'next/image'
-import { motion, useScroll, useTransform, type Variants } from 'motion/react'
+import { motion, useScroll, useTransform, useMotionValue, useSpring, type Variants } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
 import type { Project as PayloadProject, Media } from '@/payload-types'
@@ -43,7 +43,7 @@ const childVariants: Variants = {
  * Individual project card component.
  * All hooks are called at the top level — never inside a loop.
  */
-function ProjectCard({
+const ProjectCard = memo(function ProjectCard({
   project,
   index,
   total,
@@ -59,8 +59,15 @@ function ProjectCard({
   onHoverChange: (hovering: boolean) => void
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null)
-  const [tiltX, setTiltX] = useState(0)
-  const [tiltY, setTiltY] = useState(0)
+  
+  // Use MotionValues for tilt to avoid React re-renders on every mouse move
+  const mX = useMotionValue(0)
+  const mY = useMotionValue(0)
+  
+  // Smoothen the tilt with a spring
+  const tiltX = useSpring(mY, { stiffness: 150, damping: 25 })
+  const tiltY = useSpring(mX, { stiffness: 150, damping: 25 })
+
   const [imageError, setImageError] = useState(false)
 
   const isFirst = index === 0
@@ -89,15 +96,15 @@ function ProjectCard({
     const rect = cardRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
-    const offsetX = (e.clientX - centerX) / (rect.width / 2)
-    const offsetY = (e.clientY - centerY) / (rect.height / 2)
-    setTiltY(offsetX * 10)
-    setTiltX(-offsetY * 10)
+    
+    // Direct MotionValue updates bypass React's render cycle
+    mX.set((e.clientX - centerX) / (rect.width / 2) * 10)
+    mY.set(-(e.clientY - centerY) / (rect.height / 2) * 10)
   }
 
   const handleMouseLeave = () => {
-    setTiltX(0)
-    setTiltY(0)
+    mX.set(0)
+    mY.set(0)
   }
 
   return (
@@ -195,7 +202,9 @@ function ProjectCard({
       </motion.div>
     </motion.a>
   )
-}
+})
+
+ProjectCard.displayName = 'ProjectCard'
 
 export default function ProjectsSection() {
   const [projects, setProjects] = useState<UIProject[]>([])

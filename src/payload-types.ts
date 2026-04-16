@@ -750,10 +750,6 @@ export interface Service {
    * Linked Dodo Payments Product ID
    */
   dodoProductId?: string | null;
-  /**
-   * [DEPRECATED] Linked Stripe Product ID
-   */
-  stripeProductId?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -1364,7 +1360,6 @@ export interface ServicesSelect<T extends boolean = true> {
       };
   icon?: T;
   dodoProductId?: T;
-  stripeProductId?: T;
   meta?:
     | T
     | {

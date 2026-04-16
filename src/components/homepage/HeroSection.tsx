@@ -10,10 +10,12 @@ import MobileNav from '@/components/ui/MobileNav'
 import MagneticButton from '@/components/ui/MagneticButton'
 import ThreadsIcon from '@/components/icons/ThreadsIcon'
 import SubstackIcon from '@/components/icons/SubstackIcon'
-import { GithubIcon, LinkedinIcon, InstagramIcon } from '@/components/icons/BrandIcons'
+import { GithubIcon, LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
+
 import {
   WHATSAPP_URL,
   LINKEDIN_URL,
+  X_URL,
   INSTAGRAM_URL,
   THREADS_URL,
   SUBSTACK_URL,
@@ -21,6 +23,7 @@ import {
   CAL_USERNAME,
   CAL_NAMESPACE,
 } from '@/lib/constants'
+
 
 interface HeroSectionProps {
   isScrolled: boolean
@@ -165,9 +168,10 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
       </div>
 
       {/* Main Content Area (Bottom aligned) */}
-      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mt-24 mix-blend-difference text-white">
+      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mt-24 text-white">
         {/* Social Links */}
         <div className="flex flex-col gap-3 mb-12 md:mb-2">
+
           {LINKEDIN_URL && (
             <a
               href={LINKEDIN_URL}
@@ -204,6 +208,19 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
               Threads
             </a>
           )}
+          {X_URL && (
+            <a
+              href={X_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 text-sm font-medium hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded"
+              aria-label="Edmond Moepswa on X"
+            >
+              <TwitterIcon className="w-4 h-4" aria-hidden="true" />
+              X
+            </a>
+          )}
+
           {SUBSTACK_URL && (
             <a
               href={SUBSTACK_URL}
@@ -231,7 +248,8 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
         </div>
 
         {/* Hero Text */}
-        <div className="text-right relative">
+        <div className="text-right relative mix-blend-difference">
+
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium tracking-tight leading-[1.1]">
             // Systems Thinker
             <br />

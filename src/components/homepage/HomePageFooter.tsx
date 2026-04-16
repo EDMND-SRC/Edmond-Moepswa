@@ -15,18 +15,15 @@ import {
 } from '@/lib/constants'
 
 import {
-  GithubIcon,
+  GithubLight,
   LinkedinIcon,
   TwitterIcon,
+  XLight,
   InstagramIcon,
-  ThreadsIcon,
+  ThreadsLight,
 } from '@/components/icons/BrandIcons'
+import SubstackIcon from '@/components/icons/SubstackIcon'
 
-const SubstackIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-    <path d="M22 6H2l10.5 12L22 6zm0-2H2v2l10.5 12L22 6V4z" />
-  </svg>
-)
 
 export default function HomePageFooter() {
   const reducedMotion = useReducedMotion()
@@ -151,21 +148,23 @@ export default function HomePageFooter() {
           <div className="flex items-center gap-1" aria-label="Social media links">
             {[
               { href: LINKEDIN_URL, icon: LinkedinIcon, label: 'LinkedIn' },
-              { href: GITHUB_URL, icon: GithubIcon, label: 'GitHub' },
-              { href: X_URL, icon: TwitterIcon, label: 'X' },
+              { href: GITHUB_URL, icon: GithubLight, label: 'GitHub' },
+              { href: X_URL, icon: XLight, label: 'X' },
               { href: INSTAGRAM_URL, icon: InstagramIcon, label: 'Instagram' },
-              { href: THREADS_URL, icon: ThreadsIcon, label: 'Threads' },
+              { href: THREADS_URL, icon: ThreadsLight, label: 'Threads' },
               { href: SUBSTACK_URL, icon: SubstackIcon, label: 'Substack' },
             ].map((social) => (
+
               <a
                 key={social.label}
                 href={social.href || '#'}
                 target={social.href ? '_blank' : undefined}
                 rel={social.href ? 'noopener noreferrer' : undefined}
-                className="p-2 text-white/40 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded min-w-[36px] min-h-[36px] flex items-center justify-center"
+                className="p-2 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded min-w-[36px] min-h-[36px] flex items-center justify-center"
                 aria-label={`Edmond Moepswa on ${social.label}`}
               >
-                <social.icon className="w-4 h-4" />
+                <social.icon className="w-5 h-5 flex-shrink-0" />
+
               </a>
             ))}
           </div>

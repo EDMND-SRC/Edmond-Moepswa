@@ -24,6 +24,11 @@ export const getMediaUrl = (
 
   if (!url) return ''
 
+  // Fix Payload 3.x internal URLs if served from public/media
+  if (url.startsWith('/api/media/file/')) {
+    url = url.replace('/api/media/file/', '/media/')
+  }
+
   if (cacheTag && cacheTag !== '') {
     cacheTag = encodeURIComponent(cacheTag)
   }

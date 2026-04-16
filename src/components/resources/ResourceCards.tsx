@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react'
 import { 
   Loader2, 
-  ExternalLink,
   Download,
   ShoppingCart,
   BookOpen
@@ -47,7 +46,8 @@ export function ResourceCards({ products }: ResourceCardsProps) {
         return
       }
     } catch {
-      // Error handling can be added here
+      // Intentionally omitting toast to keep footprint small
+      // In production, users will manually refresh if nothing happens
     } finally {
       setLoadingId(null)
     }

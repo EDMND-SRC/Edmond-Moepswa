@@ -1,31 +1,52 @@
 import React from 'react'
 import {
   GitHubDark as Github,
+  GitHubLight as GithubLightIcon,
   LinkedIn,
   Instagram,
   XDark as X,
-  ThreadsDark as Threads
+  XLight as XLightIcon,
+  ThreadsDark as Threads,
+  ThreadsLight as ThreadsLightIcon
 } from 'developer-icons'
 
-export const GithubIcon = ({ className }: { className?: string }) => (
-  <Github className={className} size={24} />
+
+export const GithubIcon = ({ className, color = '#181717' }: { className?: string, color?: string }) => (
+  <Github className={className} size={24} color={color} />
 )
+
+export const GithubLight = ({ className }: { className?: string }) => (
+  <GithubLightIcon className={className} size={24} />
+)
+
 
 export const LinkedinIcon = ({ className }: { className?: string }) => (
-  <LinkedIn className={className} size={24} />
+  <LinkedIn className={className} size={24} color="#0A66C2" />
 )
+
 
 export const InstagramIcon = ({ className }: { className?: string }) => (
-  <Instagram className={className} size={24} />
+  <Instagram className={className} size={24} color="#E4405F" />
 )
 
-export const TwitterIcon = ({ className }: { className?: string }) => (
-  <X className={className} size={24} />
+
+export const TwitterIcon = ({ className, color = '#000000' }: { className?: string, color?: string }) => (
+  <X className={className} size={24} color={color} />
 )
 
-export const ThreadsIcon = ({ className }: { className?: string }) => (
-  <Threads className={className} size={24} />
+export const XLight = ({ className }: { className?: string }) => (
+  <XLightIcon className={className} size={24} />
 )
+
+
+export const ThreadsIcon = ({ className, color = '#000000' }: { className?: string, color?: string }) => (
+  <Threads className={className} size={24} color={color} />
+)
+
+export const ThreadsLight = ({ className }: { className?: string }) => (
+  <ThreadsLightIcon className={className} size={24} />
+)
+
 
 export const CodepenIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
