@@ -8,23 +8,17 @@ import {
   ShoppingCart,
   BookOpen
 } from 'lucide-react'
-import { 
-  NextJs, 
-  Markdown, 
-  Bash, 
-  Notion, 
-  ViteJS 
-} from 'developer-icons'
+import * as DevIcons from 'developer-icons'
 import type { Product } from '@/payload-types'
 import type { ComponentType } from 'react'
 
 // Map category slugs to branding icons
-const iconMap: Record<string, ComponentType<{ className?: string; size?: number | string }>> = {
-  guide: Markdown,
-  checklist: Bash,
-  ebook: Notion,
-  boilerplate: NextJs,
-  tool: ViteJS,
+const iconMap: Record<string, ComponentType<any>> = {
+  guide: DevIcons.Markdown,
+  checklist: DevIcons.Bash,
+  ebook: DevIcons.Notion,
+  boilerplate: DevIcons.NextJs,
+  tool: DevIcons.ViteJS,
 }
 
 interface ResourceCardsProps {
@@ -32,7 +26,7 @@ interface ResourceCardsProps {
 }
 
 export function ResourceCards({ products }: ResourceCardsProps) {
-  const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [loadingId, setLoadingId] = useState<number | null>(null)
 
   const handleResourceClick = useCallback(async (product: Product) => {
     setLoadingId(product.id)
@@ -67,7 +61,7 @@ export function ResourceCards({ products }: ResourceCardsProps) {
         const IconComponent = iconMap[item.category] || BookOpen
         const isLoading = loadingId === item.id
         const isFree = item.type === 'free'
-        const priceLabel = isFree ? 'Free' : `$${(item.priceCents / 100).toFixed(2)}`
+        const priceLabel = isFree ? 'Free' : `$${((item.priceCents ?? 0) / 100).toFixed(2)}`
 
         return (
           <button

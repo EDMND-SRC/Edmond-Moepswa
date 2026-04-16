@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     // Construct safe filename
     const safeLabel = String(selections.serviceLabel || 'quote').replace(/\s+/g, '-').toLowerCase()
 
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="quote-${safeLabel}.pdf"`,
