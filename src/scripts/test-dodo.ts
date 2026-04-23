@@ -4,6 +4,7 @@ dotenv.config({ path: '.env.local' });
 
 const dodo = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY,
+  environment: 'test_mode',
 });
 
 async function test() {

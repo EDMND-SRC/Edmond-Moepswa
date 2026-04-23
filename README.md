@@ -3,31 +3,31 @@
 **Website:** [edmond-moepswa.vercel.app](https://edmond-moepswa.vercel.app)
 **Substack:** [edmnd.substack.com](https://edmnd.substack.com)
 
-Systems thinker and full-stack developer based in Gaborone, Botswana. Designs and builds custom websites, web applications, and workflow automations for businesses and institutions — from P&L statements to production code.
+Full-stack developer and systems thinker based in Gaborone, Botswana. Designs and builds custom websites, web applications, and workflow automations for businesses and institutions — from P&L statements to production code.
 
 ## What This Is
 
-A production personal brand website for Edmond Moepswa, an independent software developer and digital services consultant operating through BridgeArc Digital. The site showcases:
+A production personal brand website for Edmond Moepswa, an independent software developer and digital services consultant. The site showcases:
 
 - **8 demo projects** spanning web design, workflow automation, boilerplate products, and open-source work
 - **9 client testimonials** from engagements across Australia and Botswana
 - **19 FAQs** covering services, pricing, process, and technical questions
 - **Interactive pricing calculator** with multi-currency support (19 currencies)
 - **Cal.com booking widget** for free 30-minute discovery calls
-- **Gumroad integration** for free resource downloads and paid boilerplate products
+- **Dodo Payments integration** for free resource downloads and paid automation products
 - **Make.com automation workflows** for lead capture, email replies, and nurture sequences
 
 ## Tech Stack
 
 | Layer          | Technology                                 |
 | -------------- | ------------------------------------------ |
-| **Framework**  | Next.js 16 (App Router) + Payload CMS 3.80 |
+| **Framework**  | Next.js 16 (App Router) + Payload CMS 3.82 |
 | **Database**   | PostgreSQL (Neon)                          |
 | **Styling**    | Tailwind CSS 4 + shadcn/ui components      |
 | **Animations** | Motion (Framer Motion successor)           |
 | **Scheduling** | Cal.com embed with webhook automation      |
 | **Automation** | Make.com (Teams plan)                      |
-| **Products**   | Gumroad (digital delivery), Dodo Payments  |
+| **Products**   | Dodo Payments                              |
 | **Hosting**    | Vercel (Team: EDMND-SRC)                   |
 | **Analytics**  | PostHog, Google Analytics 4                |
 | **Monitoring** | Sentry (errors), Better Stack (uptime)     |
@@ -47,6 +47,7 @@ Plus **boilerplate products** (pre-built starter kits) and **free resources** (g
 ## Project Structure
 
 ```
+business-planning/            # Business strategy & service catalogues
 src/
 ├── app/
 │   ├── (frontend)/           # Public-facing pages
@@ -54,8 +55,7 @@ src/
 │   │   ├── about/            # About page (4-act career narrative)
 │   │   ├── services/         # Services & pricing catalogue
 │   │   ├── contact/          # Contact form + Cal.com embed
-│   │   ├── store/            # Boilerplate products
-│   │   ├── resources/        # Free resources
+│   │   ├── resources/        # Free and paid digital products
 │   │   ├── search/           # Site search
 │   │   └── [slug]/           # Dynamic CMS pages
 │   └── (payload)/            # Payload CMS admin panel
@@ -64,6 +64,7 @@ src/
 │   ├── Testimonials.ts       # Client testimonials (9 seeded)
 │   ├── FAQs.ts               # FAQ items (19 seeded, 5 categories)
 │   ├── Services.ts           # Service offerings with pricing
+│   ├── Products.ts           # Dodo Payments products
 │   ├── Leads.ts              # Lead capture from forms/calculator
 │   ├── Media.ts              # Image uploads with responsive sizes
 │   ├── Users/                # Admin users (admin/editor roles)
@@ -85,27 +86,19 @@ src/
 
 ### Cal.com
 
-Embedded booking widget for 30-minute discovery calls. Webhooks route through Make.com for:
-
-- Booking confirmation emails
-- Google Sheets CRM logging
-- Cancelled booking re-engagement
+Embedded booking widget for 30-minute discovery calls.
 
 ### Make.com Automations
 
-7 workflows handling:
+3 workflows handling:
 
-1. Cal.com → Booking confirmation
-2. Cal.com → Google Sheets lead tracking
-3. Contact form → Intent-based email replies
-4. Calculator high-tier → Quote follow-up
-5. Weekly Vercel analytics report
-6. Cal.com cancelled → Re-engagement
-7. Gumroad download → Nurture sequence
+1. Contact form → Intent-based email replies
+2. Calculator high-tier → Quote follow-up
+3. Dodo download/purchase → Nurture sequence
 
-### Gumroad
+### Dodo Payments
 
-Free resources and paid boilerplate products delivered through Gumroad's storefront.
+Free resources and paid automation products delivered through Dodo Payments.
 
 ### Substack
 
@@ -178,7 +171,6 @@ Deployed to Vercel with Neon PostgreSQL. All environment variables documented in
 
 ## Security
 
-- Cal.com webhook URL proxied server-side (`/api/cal-webhook`)
 - Leads collection with email validation
 - Role-based access control (admin/editor)
 - All secrets via environment variables — never committed

@@ -29,7 +29,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     tiers: [
       {
         name: 'Launch',
-        priceBWP: 5000,
+        priceBWP: 6500,
         timeline: '5-8 business days',
         features: [
           'Single-page landing site',
@@ -113,7 +113,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
     tiers: [
       {
         name: 'Tier A - Storefront',
-        priceBWP: 2500,
+        priceBWP: 3500,
         timeline: '15-25 business days',
         features: [
           'Public-facing web app',
@@ -139,7 +139,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
       {
         name: 'Tier C - Custom SaaS',
-        priceBWP: 48000,
+        priceBWP: 55000,
         timeline: 'Scoped per project',
         features: [
           'Full custom architecture',
@@ -245,7 +245,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
       {
         name: 'Ongoing Retainer',
-        priceBWP: 3500,
+        priceBWP: 4500,
         timeline: 'Monthly',
         features: [
           'Monthly ranking reports',
@@ -281,7 +281,7 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
       },
       {
         name: 'Additional Hour Block',
-        priceBWP: 1250,
+        priceBWP: 1200,
         timeline: 'Per hour',
         features: [
           'Single hour add-on',

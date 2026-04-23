@@ -27,3 +27,14 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Business planning & strategy docs (not code)
+_bmad/
+_bmad-output/
+business-planning/
+strategy-docs/
+make-workflows/
+
+# Scratch & test output
+scratch/
+test-outputs/

@@ -1,0 +1,62 @@
+{
+  "repository_type": "monolith",
+  "parts": [
+    {
+      "id": "main",
+      "name": "Edmond Moepswa Personal Website",
+      "type": "web",
+      "description": "Full-stack Next.js application with Payload CMS backend",
+      "root_path": ".",
+      "technologies": [
+        "Next.js 16",
+        "TypeScript",
+        "Payload CMS 3.80",
+        "PostgreSQL (Neon)",
+        "Tailwind CSS 4",
+        "shadcn/ui",
+        "Motion",
+        "Vercel"
+      ],
+      "entry_points": [
+        "src/app/page.tsx",
+        "src/payload.config.ts",
+        "next.config.ts",
+        "package.json"
+      ],
+      "integrations": [
+        "Cal.com",
+        "Dodo Payments",
+        "Make.com",
+        "PostHog",
+        "Sentry",
+        "Better Stack"
+      ]
+    }
+  ],
+  "integration_points": [
+    {
+      "from": "frontend",
+      "to": "payload-cms",
+      "type": "API",
+      "details": "Next.js fetches data from Payload CMS API"
+    },
+    {
+      "from": "cal-com",
+      "to": "make-com",
+      "type": "webhook",
+      "details": "Booking notifications trigger Make.com workflows"
+    },
+    {
+      "from": "contact-form",
+      "to": "make-com",
+      "type": "API",
+      "details": "Lead capture triggers automation workflows"
+    },
+    {
+      "from": "dodo-payments",
+      "to": "payload-cms",
+      "type": "webhook",
+      "details": "Payment notifications update order status"
+    }
+  ]
+}

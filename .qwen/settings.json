@@ -2,10 +2,10 @@
   "modelProviders": {
     "openai": [
       {
-        "id": "qwen3-coder-plus",
-        "name": "qwen3-coder-plus",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-        "description": "Qwen3-Coder via Dashscope",
+        "id": "qwen3.6-plus",
+        "name": "qwen3.6-plus",
+        "baseUrl": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+        "description": "Qwen3.6-Plus",
         "envKey": "DASHSCOPE_API_KEY"
       }
     ]
@@ -19,7 +19,7 @@
     }
   },
   "model": {
-    "name": "qwen3-coder-plus"
+    "name": "qwen3.6-plus"
   },
   "permissions": {
     "allow": [

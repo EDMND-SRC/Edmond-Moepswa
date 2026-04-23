@@ -126,7 +126,7 @@ export const services: Service[] = [
           'Test mode walkthrough and live mode handover',
           'Written documentation for store management',
           'Manual bank transfer option always included',
-          'Available formats: Dodo Payments (from P2,500), Gumroad Store (from P2,500), Lemon Squeezy (from P3,500), Shopify Storefront (from P5,000)',
+          'Available formats: Dodo Payments (from P3,500), Gumroad Store (from P3,500), Lemon Squeezy (from P3,500), Shopify Storefront (from P5,000)',
         ],
       },
       {
@@ -140,7 +140,7 @@ export const services: Service[] = [
           'Technical SEO, analytics, email marketing, CRM routing',
           'WhatsApp click-to-chat integration',
           '2 rounds of revisions, full handover documentation',
-          'Available: Artisan & Craftmaker (from P25,000), Personal Professional Services (from P28,000), Food & Hospitality (from P30,000), Beauty & Wellness (from P28,000), Events & Photography (from P28,000), E-commerce Store (from P35,000)',
+          'Available: Artisan & Craftmaker (from P25,000), Professional Services Firm (from P25,000), Food & Hospitality (from P30,000), Beauty & Wellness (from P28,000), Events & Photography (from P28,000), NGO / Church (from P28,000), Financial Services & Insurance (from P35,000), E-commerce Store (from P35,000)',
         ],
       },
       {

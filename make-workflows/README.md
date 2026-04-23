@@ -1,317 +1,202 @@
 # Make.com Automation Workflows
 
-This folder contains the step-by-step setup instructions for Make.com (Teams Plan) automation workflows. Since Make.com scenarios require authentication with personal accounts (Google, Cal.com, Google Sheets, Gumroad), each workflow must be created via the Make.com visual builder UI.
+Automated email workflows for the Edmond Moepswa personal website. All 3 scenarios were created programmatically via the Make.com API — no manual scenario building required.
 
-Follow these blueprints to create and configure your automations.
-
-> **IMPORTANT:** Never commit API tokens, email addresses, or webhook URLs to version control. All sensitive values must be stored as environment variables in `.env.local` and Vercel project settings.
-
----
-
-## Workflow 1: Cal.com Booking Confirmation Email
-
-**Purpose:** Automatically send a confirmation email to anyone who books a discovery call.
-**Trigger:** Cal.com webhook fires when a new booking is created.
-**Actions:** Gmail sends a personalised confirmation to the attendee.
-
-### Make.com Setup
-
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Custom Webhook`.
-   - Make.com will generate a webhook URL. Copy this URL.
-   - In Cal.com dashboard: Settings → Webhooks → Add New Webhook.
-   - Event: `Booking Created`. Paste the Make.com webhook URL. Save.
-3. **Add Action Module** — Select `Gmail → Send an Email`.
-   - Connect your Google Account (edmond.moepswa@gmail.com).
-   - Grant required OAuth permissions.
-4. **Configure the email:**
-
-| Gmail Field | Value                                                                                                                            |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `1.attendees[].email` (map from webhook payload)                                                                                 |
-| Subject     | `Booking Confirmed: Discovery Call with Edmond Moepswa`                                                                          |
-| Content     | `Hi {1.attendees[].name},<br><br>Looking forward to our call on {1.startTime}.<br><br>Join here: {1.meetingUrl}<br><br>— Edmond` |
-
-### Testing
-
-- [ ] Book a test meeting via your Cal.com page.
-- [ ] Verify the webhook fires in Make.com (check scenario execution log).
-- [ ] Check your inbox for the confirmation email.
-- [ ] Confirm attendee name, date/time, and meeting link are correctly populated.
+> **Plan:** Make.com Teams Plan (expires 2026-08-12)  
+> **Zone:** eu2.make.com  
+> **Organization:** BridgeArc Digital (ID: 4892531)
 
 ---
 
-## Workflow 2: Cal.com Booking Lead Tracking (Google Sheets)
+## Scenarios Overview
 
-**Purpose:** Log every Cal.com booking into a Google Sheet for CRM/lead tracking.
-**Trigger:** Same Cal.com webhook as Workflow 1 (branch from the same webhook module).
-**Actions:** Google Sheets adds a new row with booking details.
+| # | Scenario | ID | Trigger | Status |
+|---|----------|----|---------|--------|
+| 1 | Contact Form Reply | `9114789` | Webhook (contact form submission) | ✅ Active |
+| 2 | Calculator High-Value Quote | `9114793` | Webhook (estimate > P 2,000) | ✅ Active |
+| 3 | Dodo Payments Nurture | `9114795` | Webhook (payment.succeeded) | ✅ Active |
 
-### Make.com Setup
-
-1. **In the same scenario as Workflow 1**, add a second branch from the `Custom Webhook` module.
-2. **Add Action Module** — Select `Google Sheets → Add a Row`.
-   - Connect your Google Account.
-   - Select the spreadsheet: `Portfolio Leads CRM` (create one if it does not exist).
-   - Ensure the sheet has columns: `Name`, `Email`, `Date/Time`, `Service Interest`, `Source`.
-3. **Configure the row:**
-
-| Google Sheets Column | Mapped Value                                        |
-| -------------------- | --------------------------------------------------- |
-| Name                 | `1.attendees[].name`                                |
-| Email                | `1.attendees[].email`                               |
-| Date/Time            | `1.startTime`                                       |
-| Service Interest     | `1.eventType.title` (or custom field if configured) |
-| Source               | `"Cal.com - Portfolio"` (static value)              |
-
-### Testing
-
-- [ ] Book a test meeting via your Cal.com page.
-- [ ] Verify a new row appears in the Google Sheet.
-- [ ] Confirm all columns are populated correctly.
+**Direct links:**
+- [Scenario 1](https://eu2.make.com/scenario/9114789)
+- [Scenario 2](https://eu2.make.com/scenario/9114793)
+- [Scenario 3](https://eu2.make.com/scenario/9114795)
 
 ---
 
-## Workflow 3: Contact Form Intent-Based Email Reply
+## How It Works
 
-**Purpose:** When a visitor submits the contact form on the portfolio, send a tailored email reply based on their project intent.
-**Trigger:** Custom webhook from the portfolio's `/api/make-webhook` route (workflow: `lead-capture`).
-**Actions:** Text parser extracts intent, then Gmail sends a tailored response.
+### Scenario 1: Contact Form Reply
 
-### Make.com Setup
+```
+Website contact form → /api/make-webhook (lead-capture) → Webhook → Gmail
+```
 
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Custom Webhook`.
-   - Copy the webhook URL. Set it as `MAKE_WEBHOOK_LEAD_CAPTURE` in `.env.local` and Vercel env vars.
-   - The portfolio form POSTs to `/api/make-webhook` with `{ workflow: 'lead-capture', data: { name, email, projectType, message, ... } }`.
-3. **Add Router Module** — Create routes based on `projectType`:
-   - Route 1: `projectType` contains "Website Design" or "Web Application"
-   - Route 2: `projectType` contains "Workflow Automation"
-   - Route 3: `projectType` contains "SEO/GEO"
-   - Route 4: `projectType` contains "Boilerplate Build"
-   - Route 5: `projectType` contains "Advisory/Consulting"
-   - Default Route: catch-all for "Other" or unmatched
-4. **Add Action Module (per route)** — Select `Gmail → Send an Email`.
-   - Connect your Google Account.
+When a visitor submits the contact form on `/contact`, the website POSTs to the internal API route, which forwards sanitized data to Make.com. Make.com sends a personalised HTML email reply via Gmail.
 
-### Field Mappings (per route example)
+- **Template:** `templates/workflow_3_contact_reply.html`
+- **Subject:** `// Re: {{projectType}} Project`
+- **Variables:** `name`, `email`, `projectType`
 
-| Gmail Field | Value                                                                                                                                                                                                                                                                        |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `data.email` (from webhook payload)                                                                                                                                                                                                                                          |
-| Subject     | `Thanks for reaching out, {data.name}!`                                                                                                                                                                                                                                      |
-| Content     | Route-specific template. Example for "Website Design":<br><br>`Hi {data.name},<br><br>Thanks for your interest in a website design project. I would love to learn more about your vision.<br><br>Book a free discovery call: https://cal.com/edmond-moepswa<br><br>— Edmond` |
+### Scenario 2: Calculator High-Value Quote
 
-### Testing
+```
+Pricing calculator → /api/make-webhook (calculator-quote) → Webhook → [Filter: > P 2,000] → Gmail
+```
 
-- [ ] Submit the contact form on `/contact` with project type "Website Design".
-- [ ] Verify the webhook fires in Make.com execution log.
-- [ ] Check inbox for the tailored email reply.
-- [ ] Repeat for each project type to verify routing.
+When a visitor uses the pricing calculator and requests a formal quote, and the estimate exceeds P 2,000, Make.com sends a personalised offer email.
 
----
+- **Template:** `templates/workflow_4_calculator_quote.html`
+- **Subject:** `// Your Estimate: P {{estimatedBWP}}`
+- **Variables:** `name`, `email`, `estimatedBWP`
+- **Filter:** Only fires when `estimatedBWP > 2000`
 
-## Workflow 4: Calculator High-Value Quote Alert
+### Scenario 3: Dodo Payments Nurture Sequence
 
-**Purpose:** When a visitor uses the pricing calculator and requests a formal quote for a high-value project (estimate > P2,000), send a personalised offer email.
-**Trigger:** Custom webhook from the calculator's "Request Formal Quote" button.
-**Actions:** Filter checks estimate > P2,000, then Gmail sends an offer email.
+```
+Dodo Payments (payment.succeeded) → Webhook → Gmail (Email 1) → Gmail (Email 2)
+```
 
-### Make.com Setup
+After a customer purchases or downloads a product via Dodo Payments, two emails are sent:
+1. **Email 1:** Soft check-in — confirms delivery, invites reply if stuck
+2. **Email 2:** Follow-up — pitches consulting services with a CTA to book a call
 
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Custom Webhook`.
-   - Copy the webhook URL. Set it as `MAKE_WEBHOOK_CALCULATOR_QUOTE` in `.env.local` and Vercel env vars.
-3. **Add Filter Module** — Set condition:
-   - `data.estimatedBWP` (number) > `2000`.
-4. **Add Action Module** — Select `Gmail → Send an Email`.
-   - Connect your Google Account.
+- **Templates:** `templates/workflow_7_dodo_nurture_day_1.html` and `templates/workflow_7_dodo_nurture_day_4.html`
+- **Variables:** `customer.name`, `customer.email`, `product_cart[1].name`
 
-### Field Mappings
-
-| Gmail Field | Value                                                                                                                                                                                                                                                                                    |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `data.email` (from webhook payload)                                                                                                                                                                                                                                                      |
-| Subject     | `Your Project Estimate: {data.estimatedBWP} BWP`                                                                                                                                                                                                                                         |
-| Content     | `Hi {data.name},<br><br>I noticed you were exploring a high-tier project on my site (estimated at {data.estimatedBWP} BWP).<br><br>I would love to discuss this in more detail and provide a formal quote. Let's schedule a call:<br><br>https://cal.com/edmond-moepswa<br><br>— Edmond` |
-
-### Testing
-
-- [ ] Use the calculator, select services that total > P2,000.
-- [ ] Click "Request Formal Quote", enter name + email, submit.
-- [ ] Verify the webhook fires in Make.com execution log.
-- [ ] Confirm the filter passes and the email is sent.
-- [ ] Test with a low-value estimate (< P2,000) — verify the filter blocks the email.
+> **Note:** Both emails send immediately in sequence. Make.com's Sleep module has a maximum duration of ~1 hour, which makes multi-day delays impossible within a single scenario. To add delays later, use a Data Store + scheduled scenario architecture.
 
 ---
 
-## Workflow 5: Weekly Vercel Analytics Report
+## Remaining Manual Steps: Done 23 April 2026 ✅
 
-**Purpose:** Receive a weekly summary of Vercel analytics (page views, visits, unique visitors) every Monday morning.
-**Trigger:** Scheduled trigger every Monday at 08:00 CAT.
-**Actions:** HTTP request fetches Vercel analytics API, then Gmail sends a formatted summary.
+Almost everything was automated via the Make.com API. Only **one** manual step remains:
 
-### Make.com Setup
+### Step 1: Register the Dodo Payments Webhook
 
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Tools → Basic Trigger` (Schedule).
-   - Configure: Every Monday at 08:00 (Africa/Gaborone timezone).
-3. **Add Action Module** — Select `HTTP → Make a Request`.
-   - Method: `GET`
-   - URL: `https://api.vercel.com/v2/projects/{VERCEL_PROJECT_ID}/analytics/views`
-   - Query Parameters:
-     - `slug` = `pageviews`
-     - `start` = `{{addDays(formatDate(now; "X"); -7)}}` (7 days ago)
-     - `end` = `{{formatDate(now; "X")}}` (now)
-   - Headers:
-     - `Authorization` = `Bearer {VERCEL_TOKEN}`
-   - Set `VERCEL_PROJECT_ID` and `VERCEL_TOKEN` from `.env.local`.
-4. **Add Action Module** — Select `Gmail → Send an Email`.
-   - To: Your email (edmond.moepswa@gmail.com).
-   - Subject: `Weekly Vercel Analytics — {{formatDate(now; "DD MMM YYYY")}}`
-   - Content: Parse the JSON response and format key metrics (pageviews, visitors, unique visitors) into a readable table.
+This tells Dodo Payments to notify Make.com whenever a payment succeeds.
 
-### Testing
+1. Go to [dodopayments.com](https://dodopayments.com) and log in
+2. Click **Developer** in the left sidebar
+3. Click **Webhooks**
+4. Click **Add Webhook**
+5. In the **URL** field, paste:
+   ```
+   https://hook.eu2.make.com/c89f0f0sprnmo7g8ymdunv4mgmo0a79w
+   ```
+6. Under **Events**, check the box for `payment.succeeded`
+7. Click **Save**
 
-- [ ] Manually trigger the scenario in Make.com.
-- [ ] Verify the HTTP request returns valid analytics data.
-- [ ] Check your inbox for the formatted email.
-- [ ] Confirm the date range in the query covers the last 7 days.
+That's it. Any successful payment will now trigger the nurture sequence.
 
 ---
 
-## Workflow 6: Cal.com Cancelled Booking Re-engagement
+## Email Templates
 
-**Purpose:** When a booked discovery call is cancelled, send a re-engagement email with a reschedule link and a small incentive.
-**Trigger:** Cal.com webhook fires when a booking is cancelled.
-**Actions:** Gmail sends a re-engagement email.
+All templates use **fully inline CSS** for Gmail compatibility. Gmail strips `<style>` blocks, so every style is applied directly on each HTML element.
 
-### Make.com Setup
+| Template | Purpose | CTA |
+|----------|---------|-----|
+| `workflow_3_contact_reply.html` | Reply to contact form submissions | Book a Call |
+| `workflow_4_calculator_quote.html` | High-value quote follow-up | Schedule Scope Review |
+| `workflow_7_dodo_nurture_day_1.html` | Post-purchase check-in (soft touch) | None (reply invite) |
+| `workflow_7_dodo_nurture_day_4.html` | Post-purchase follow-up (service pitch) | Book a Call |
 
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Custom Webhook`.
-   - Copy the webhook URL. In Cal.com dashboard: Settings → Webhooks → Add New Webhook.
-   - Event: `Booking Cancelled`. Paste the Make.com webhook URL. Save.
-   - (You can reuse `CAL_WEBHOOK_URL` or create a separate webhook URL for cancellation handling.)
-3. **Add Action Module** — Select `Gmail → Send an Email`.
-   - Connect your Google Account.
+### Editing Templates
 
-### Field Mappings
+1. Edit the `.html` file in `make-workflows/templates/`
+2. Run `node make-workflows/create-scenarios.mjs` to rebuild blueprints and update scenarios
+3. Or manually: open the scenario in Make.com → click the Gmail module → set Content Type to **HTML** → paste the updated HTML
 
-| Gmail Field | Value                                                                                                                                                                                                                                                                                                             |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `1.attendees[].email` (from webhook payload)                                                                                                                                                                                                                                                                      |
-| Subject     | `Sorry we missed you — let's reschedule`                                                                                                                                                                                                                                                                          |
-| Content     | `Hi {1.attendees[].name},<br><br>Sorry we could not connect for our discovery call. No worries — you can reschedule at a time that works better for you:<br><br>https://cal.com/edmond-moepswa<br><br>As a thank-you for your interest, use code **RECONNECT10** for 10% off your first project.<br><br>— Edmond` |
+### Make.com Variable Syntax
 
-### Testing
-
-- [ ] Book a test meeting, then cancel it from Cal.com.
-- [ ] Verify the webhook fires in Make.com execution log.
-- [ ] Check your inbox for the re-engagement email.
-- [ ] Confirm the attendee name and reschedule link are correct.
+In the templates, dynamic values use Make.com's double-brace syntax:
+- `{{1.name}}` — field from webhook module (module ID 1)
+- `{{1.customer.email}}` — nested field
+- `{{formatNumber(1.estimatedBWP; 2; ","; ".")}}` — formatted number
 
 ---
 
-## Workflow 7: Gumroad Download Nurture Sequence
+## File Structure
 
-**Purpose:** After someone downloads a free resource from Gumroad, send a two-email nurture sequence spaced over 4 days.
-**Trigger:** Gumroad webhook fires when a new sale/download occurs.
-**Actions:** Sleep 1 day → Email 1 → Sleep 3 days → Email 2.
-
-### Make.com Setup
-
-1. **Create Scenario** in Make.com.
-2. **Add Trigger Module** — Select `Gumroad → Watch Sales` (or use a Custom Webhook triggered by Gumroad's ping).
-   - If using Custom Webhook: In Gumroad dashboard → Products → Edit Product → Webhooks → add the Make.com webhook URL for "Purchase" events.
-   - Copy the webhook URL. Set it as `MAKE_WEBHOOK_GUMROAD_DOWNLOAD` in `.env.local` and Vercel env vars.
-3. **Add Action Module** — Select `Tools → Sleep`.
-   - Duration: `1 day` (86400 seconds).
-4. **Add Action Module** — Select `Gmail → Send an Email` (Email 1).
-   - Connect your Google Account.
-
-### Field Mappings — Email 1
-
-| Gmail Field | Value                                                                                                                                                                                                                                                                                  |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `buyer_email` (from Gumroad payload)                                                                                                                                                                                                                                                   |
-| Subject     | `Hope you found it useful!`                                                                                                                                                                                                                                                            |
-| Content     | `Hi {buyer_name},<br><br>I hope you enjoyed the free resource. If you found it helpful, here are a few things that might interest you:<br><br>- Book a free discovery call: https://cal.com/edmond-moepswa<br>- Check out my pricing calculator on the portfolio site<br><br>— Edmond` |
-
-5. **Add Action Module** — Select `Tools → Sleep`.
-   - Duration: `3 days` (259200 seconds).
-6. **Add Action Module** — Select `Gmail → Send an Email` (Email 2).
-
-### Field Mappings — Email 2
-
-| Gmail Field | Value                                                                                                                                                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| To          | `buyer_email` (from Gumroad payload)                                                                                                                                                                                |
-| Subject     | `Still thinking about your next project?`                                                                                                                                                                           |
-| Content     | `Hi {buyer_name},<br><br>Just checking in. If you are planning a website, web app, or automation project, I would be happy to chat.<br><br>Book a free 30-min call: https://cal.com/edmond-moepswa<br><br>— Edmond` |
-
-### Testing
-
-- [ ] Trigger a test Gumroad purchase (use Gumroad's test mode).
-- [ ] Verify the webhook fires in Make.com execution log.
-- [ ] After 1 day, verify Email 1 is received.
-- [ ] After 3 more days, verify Email 2 is received.
-- [ ] **Tip:** During testing, reduce sleep durations to 1 minute to verify quickly, then reset to production values.
+```
+make-workflows/
+├── README.md                    # This file
+├── create-scenarios.mjs         # Script to create/update scenarios via API
+├── blueprints/                  # Generated Make.com blueprint JSON files
+│   ├── workflow_1_contact_form_reply.json
+│   ├── workflow_2_calculator_quote.json
+│   └── workflow_3_dodo_nurture.json
+└── templates/                   # HTML email templates (inline CSS)
+    ├── workflow_3_contact_reply.html
+    ├── workflow_4_calculator_quote.html
+    ├── workflow_7_dodo_nurture_day_1.html
+    └── workflow_7_dodo_nurture_day_4.html
+```
 
 ---
 
 ## Environment Variables
 
-Add these to your `.env.local` file and Vercel project settings:
+All Make.com credentials and IDs are stored in `.env.local`:
 
-| Variable                        | Purpose                       | Where to Get                                                |
-| ------------------------------- | ----------------------------- | ----------------------------------------------------------- |
-| `MAKE_WEBHOOK_LEAD_CAPTURE`     | Contact form → lead tracking  | Make.com Custom Webhook URL (Workflow 3)                    |
-| `MAKE_WEBHOOK_CALCULATOR_QUOTE` | Calculator high-value trigger | Make.com Custom Webhook URL (Workflow 4)                    |
-| `MAKE_WEBHOOK_GUMROAD_DOWNLOAD` | Gumroad download tracking     | Make.com Custom Webhook or Gumroad webhook URL (Workflow 7) |
-| `CAL_WEBHOOK_URL`               | Cal.com booking notifications | Make.com Custom Webhook URL (Workflow 1 & 2)                |
-| `VERCEL_PROJECT_ID`             | Vercel analytics API          | Vercel dashboard → Project Settings                         |
-| `VERCEL_TOKEN`                  | Vercel API authentication     | Vercel dashboard → Settings → Tokens                        |
-
-> **Note:** The `CAL_WEBHOOK_URL` is already configured. New Make.com webhook URLs must be created and added after setting up each scenario in Make.com.
+| Variable | Purpose |
+|----------|---------|
+| `MAKE_API_TOKEN` | API authentication |
+| `MAKE_ORGANIZATION_ID` | Organization (4892531) |
+| `MAKE_TEAM_ID` | Team (2464095) |
+| `MAKE_ZONE` | API zone (eu2.make.com) |
+| `MAKE_GMAIL_CONNECTION_ID` | Gmail OAuth connection (13308866) |
+| `MAKE_WEBHOOK_LEAD_CAPTURE` | Contact form webhook URL |
+| `MAKE_WEBHOOK_CALCULATOR_QUOTE` | Calculator quote webhook URL |
+| `MAKE_WEBHOOK_DODO_PAYMENTS` | Dodo Payments webhook URL |
+| `MAKE_SCENARIO_CONTACT_FORM` | Scenario ID (9114789) |
+| `MAKE_SCENARIO_CALCULATOR_QUOTE` | Scenario ID (9114793) |
+| `MAKE_SCENARIO_DODO_NURTURE` | Scenario ID (9114795) |
 
 ---
 
-## Testing Checklist
+## Testing
 
-Run through these steps after creating all workflows:
+### Quick Test: Contact Form (Scenario 1)
 
-- [ ] **Workflow 1:** Book a Cal.com meeting → confirm email received.
-- [ ] **Workflow 2:** Book a Cal.com meeting → verify row in Google Sheet.
-- [ ] **Workflow 3:** Submit contact form on `/contact` → confirm tailored email reply.
-- [ ] **Workflow 4:** Use calculator with estimate > P2,000 → request quote → confirm email.
-- [ ] **Workflow 4 (negative):** Use calculator with estimate < P2,000 → confirm no email sent.
-- [ ] **Workflow 5:** Manually trigger Vercel analytics scenario → confirm weekly report email.
-- [ ] **Workflow 6:** Book then cancel a Cal.com meeting → confirm re-engagement email.
-- [ ] **Workflow 7:** Trigger Gumroad test purchase → confirm Email 1 after 1d, Email 2 after 3d (or 1min in test mode).
-- [ ] **All workflows:** Check Make.com execution history for errors or failed runs.
+1. Go to your website's `/contact` page
+2. Fill in the form with a test email you can check
+3. Select any project type and submit
+4. Check the [scenario execution log](https://eu2.make.com/scenario/9114789)
+5. Check your test email inbox for the styled reply
+
+### Quick Test: Calculator (Scenario 2)
+
+1. Go to your website's pricing calculator
+2. Select services totalling more than P 2,000
+3. Click "Request Formal Quote" and enter your test email
+4. Check the [scenario execution log](https://eu2.make.com/scenario/9114793)
+5. Verify the email arrives (test with < P 2,000 to confirm the filter blocks it)
+
+### Quick Test: Dodo Payments (Scenario 3)
+
+1. Use Dodo Payments **Test Mode** to trigger a test purchase
+2. Check the [scenario execution log](https://eu2.make.com/scenario/9114795)
+3. Verify both nurture emails arrive
 
 ---
 
 ## Troubleshooting
 
-| Issue                               | Cause                                                                            | Fix                                                                                                                         |
-| ----------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Webhook not firing                  | Wrong URL or webhook not connected                                               | Verify the Make.com webhook URL matches the one configured in the external service (Cal.com, Gumroad, portfolio API route). |
-| Gmail module fails                  | OAuth token expired or revoked                                                   | Re-authorise the Gmail connection in Make.com (module settings → Re-authorise).                                             |
-| Google Sheets row not added         | Sheet structure changed or missing permissions                                   | Ensure the sheet exists with the correct column headers. Re-authorise the Google Sheets connection.                         |
-| Make.com scenario runs but no email | Filter conditions not met                                                        | Check the filter logic. Review the payload structure in the execution log to ensure field names match.                      |
-| Vercel analytics returns 401        | Expired or invalid token                                                         | Regenerate `VERCEL_TOKEN` in Vercel dashboard and update Make.com HTTP module + `.env.local`.                               |
-| Gumroad webhook not received        | Webhook not configured in Gumroad dashboard                                      | Go to Gumroad → Products → Edit → Webhooks → add the Make.com URL for "Purchase" events.                                    |
-| Duplicate emails sent               | Webhook fires multiple times (e.g., Cal.com sends booking.created on update too) | Add deduplication in Make.com: store the last processed booking ID in a variable and skip if duplicate.                     |
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Webhook not firing | URL mismatch | Verify URLs in `.env.local` match the ones in Make.com |
+| Gmail module fails | OAuth expired | Open the scenario → click Gmail module → Re-authorize |
+| No email sent | Filter blocked it | Check execution log — for Scenario 2, estimate must exceed 2000 |
+| Duplicate emails | Dodo sends multiple events | Add a filter for `payment.succeeded` only (not other statuses) |
+| Email looks unstyled | Template uses CSS classes | Ensure all styles are inline (no `<style>` blocks) |
+| Scenario shows "inactive" | Was deactivated | Go to scenario URL → toggle ON, or use API: `POST /scenarios/{id}/start` |
 
 ---
 
 ## Security Notes
 
-- **Never commit webhook URLs or API tokens to version control.** All sensitive values must be stored in `.env.local` (gitignored) and Vercel environment variables.
-- **Make.com Teams Plan expires 2026-08-12.** Monitor the plan expiration and renew before workflows stop executing.
-- **Use environment variables** for all secrets. Reference them in Make.com module configuration using the UI mapping — never hardcode.
-- **Limit webhook access.** Custom webhooks in Make.com accept any POST request. If you notice unauthorised triggers, add a secret key validation in the webhook payload and filter on it in Make.com.
-- **Rotate tokens periodically.** Regenerate `VERCEL_TOKEN` and Gumroad `ACCESS_TOKEN` every 90 days as a best practice.
-- **Monitor Make.com execution logs** weekly for unexpected errors or unauthorised triggers.
+- **Never commit** `.env.local` to version control (it is gitignored)
+- **Teams Plan expires 2026-08-12** — renew before workflows stop
+- **Monitor execution logs** weekly at [Make.com dashboard](https://eu2.make.com)
+- The Gmail connection uses OAuth — if the token expires, re-authorize in any scenario's Gmail module

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const WEBHOOK_URLS: Record<string, string | undefined> = {
   'lead-capture': process.env.MAKE_WEBHOOK_LEAD_CAPTURE,
   'calculator-quote': process.env.MAKE_WEBHOOK_CALCULATOR_QUOTE,
-  'dodo-download': process.env.MAKE_WEBHOOK_DODO_DOWNLOAD,
+  'dodo-download': process.env.MAKE_WEBHOOK_DODO_PAYMENTS,
   'cal-booking': process.env.CAL_WEBHOOK_URL,
 }
 

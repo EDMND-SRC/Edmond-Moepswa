@@ -1,6 +1,6 @@
 {
   "platform": "claude",
-  "displayName": "Claude Code",
+  "displayName": "Antigravity",
   "installType": "full",
   "folderStructure": {
     "root": ".claude",

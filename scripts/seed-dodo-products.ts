@@ -2,7 +2,7 @@
  * Script to create products in Dodo Payments (Test Mode)
  *
  * This script creates:
- * 1. Free Resources (3 products - currently on Gumroad)
+ * 1. Free Resources (3 products)
  * 2. Paid Boilerplate Products (from the store page)
  *
  * Usage:
@@ -25,7 +25,7 @@ interface ProductToCreate {
   tax_category?: 'digital_products' | 'saas' | 'e_book' | 'edtech'
 }
 
-// Free Resources (currently on Gumroad)
+// Free Resources
 const freeResources: ProductToCreate[] = [
   {
     name: '5 Signs Your Website Is Costing You Clients',

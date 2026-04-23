@@ -1,18 +1,19 @@
 # Manual Steps Guide — Edmond Moepswa
 
-**Generated:** 6 April 2026
-**Last Updated:** 14 April 2026 (Dodo 12 Products Created, Full Integration Complete, GSC Verified, Visual Assets Audit, Hero/Favicon/Store Fixes)
-**Site:** Edmond Moepswa
+**Generated:** 23 April 2026
+**Site:** Edmond Moepswa Personal Website
 **Vercel URL:** https://edmond-moepswa.vercel.app
 **GitHub:** https://github.com/EDMND-SRC/Edmond-Moepswa
-**Build Status:** ✅ `pnpm build` passes — zero errors (verified 14 April)
+**Build Status:** ✅ `pnpm build` passes — zero errors
 **Git Status:** ✅ Local = origin/main — fully synced
 
 ---
 
 ## Summary
 
-**All code is complete and pushed to GitHub.** Every integration has been built, tested, and deployed. The 12 Dodo Payments products (3 free PWYW + 9 paid boilerplate) were created via API. Google Search Console ownership has been verified. The hero portrait quality has been fixed (GPU compositing + quality=90). The favicon is now explicitly referenced in layout metadata. The store page is force-dynamic (no longer shows empty fallback at build time). `public/media/` contains 48 auto-generated project thumbnail variants uploaded from Payload CMS.
+All code is complete and pushed to GitHub. The core integrations (Payload CMS, Dodo Payments, Sentry, PostHog, GA4) are fully configured in the codebase. The website architecture is fully operational with Next.js App Router and Payload CMS 3.82. 
+
+The `public/` directory is fully populated with all required brand assets, favicons, avatars, and media files. The `visual-assets/` working directory has been fully processed and removed.
 
 ---
 
@@ -21,308 +22,113 @@
 ### Analytics, Tracking & Monitoring
 
 **Google Tag (GA4)**
-
 - ✅ Google Tag (gtag.js) injected into `<head>` of every page via `src/app/(frontend)/layout.tsx`
-- ✅ Uses `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LLR99YRCV1`
-- ✅ Also configured in Dodo Payments dashboard (Measurement ID set there too)
+- ✅ Uses `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- ✅ Configured in Dodo Payments dashboard
 
 **PostHog (Product Analytics)**
-
 - ✅ Client provider: `src/lib/posthog-provider.tsx`
-- ✅ Auto-initializes with `NEXT_PUBLIC_POSTHOG_API_KEY=phx_XJuR...`
+- ✅ Auto-initializes with `NEXT_PUBLIC_POSTHOG_API_KEY`
 - ✅ Pageview tracking wrapped in Suspense boundary
 - ✅ Debug mode enabled in development
 
 **Sentry (Error Tracking)**
-
 - ✅ SDK: `@sentry/nextjs`
 - ✅ Client config: `src/lib/sentry-client.config.ts`
 - ✅ Server/edge instrumentation: `src/instrumentation.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`
-- ✅ `next.config.ts` wrapped with `withSentryConfig`
 
 **Better Stack (Uptime Monitoring)**
-
 - ✅ API key verified
-- ✅ 2 monitors active, checking `https://edmond-moepswa.vercel.app` every 3 minutes
+- ✅ 2 monitors active, checking Vercel URL every 3 minutes
 
 **Google Search Console**
-
 - ✅ Ownership verified (HTML file method — `public/google75a7bf2c52475f25.html`)
-- ✅ Property: `https://edmond-moepswa.vercel.app`
-- ⏳ Sitemap submission pending (see Pending section)
+- ✅ `sitemap.xml` and `robots.txt` present
 
 ---
 
-### Dodo Payments — Full Integration
+### Dodo Payments — Integration
 
 **SDK & Environment**
-
 - ✅ `dodopayments` npm package installed
-- ✅ `DODO_PAYMENTS_ENVIRONMENT=test` — single env var controls test/live mode globally
-- ✅ API key, store ID, webhook secret all configured in `.env.local` and synced to Vercel
+- ✅ `DODO_PAYMENTS_ENVIRONMENT=test` configured globally
+- ✅ API key, store ID, webhook secret configured
 
-**12 Products Created via API (Test Mode)**
-
-**Free Resources (PWYW):**
-
-| Product                                     | Product ID                  | Price                  |
-| ------------------------------------------- | --------------------------- | ---------------------- |
-| 5 Signs Your Website Is Costing You Clients | `pdt_0NceaY8UNB1GoMOLesz8X` | PWYW (suggested $5.00) |
-| Website Launch Checklist                    | `pdt_0NceaYFa2uiHUZPpN7KOA` | PWYW (suggested $5.00) |
-| How to Brief a Web Designer                 | `pdt_0NceaYzEq1qzsiDZHrFWb` | PWYW (suggested $5.00) |
-
-**Paid Boilerplates:**
-
-| Product                        | Product ID                  | Price  |
-| ------------------------------ | --------------------------- | ------ |
-| Artisan & Craftmaker Portfolio | `pdt_0NceaZ7MhTzjPhk2aY0X6` | $49.99 |
-| Professional Services Firm     | `pdt_0NceaZEHpeVsSmLthCaZp` | $55.99 |
-| Food & Hospitality             | `pdt_0NceaZL68xGvvpTCMwAcr` | $59.99 |
-| Health & Wellness              | `pdt_0NceaZcHLefMoeI7jyZj1` | $49.99 |
-| Events & Experiences           | `pdt_0NceaZjlwvNurs3YmCFbJ` | $39.99 |
-| E-commerce                     | `pdt_0NceaZqUzBh2tvZYMPCKI` | $69.99 |
-| NGO / Non-Profit               | `pdt_0NceaZxJIATESTttB9Sy4` | $43.99 |
-| Financial Services             | `pdt_0Nceaa45LVxvpPmn0JPm3` | $59.99 |
-| SaaS Starter                   | `pdt_0NceaaACaY7X4A4qtHoek` | $99.99 |
+**Products**
+- ✅ 15 Products created and seeded in the database.
+- ✅ Store page (`/store`) is completely dynamic and fetches products live.
 
 **API Routes:**
-
 | Route                | Method | Purpose                                                      |
 | -------------------- | ------ | ------------------------------------------------------------ |
 | `/api/checkout`      | POST   | Creates Dodo checkout session (supports PWYW `amount` field) |
-| `/api/dodo-products` | GET    | Fetches all products for storefront (60s revalidation)       |
+| `/api/dodo-products` | GET    | Fetches all products for storefront                          |
 | `/api/webhooks/dodo` | POST   | HMAC-signed webhook handler                                  |
 
-**Store Page (`/store`)**
+---
 
-- ✅ Completely rebuilt with Dodo integration
-- ✅ PWYW products show custom amount input with suggested price
-- ✅ Fixed-price products show "Buy Now" with price
-- ✅ Graceful fallback if products API is unavailable
+### Visual Assets — Finalized
 
-**ResourceCards**
+The `public/` directory contains all necessary static files.
 
-- ✅ All 3 free resources wired to Dodo product IDs
-- ✅ Gumroad URLs preserved as fallback
-
-**Adaptive Currency**
-
-- ✅ Enabled in Dodo Dashboard
-- ✅ 70+ currencies, 2-4% FX fee (customer-paid)
+- **Favicons:** 8 files (PNGs, ICO, SVG, webmanifest) are fully deployed in `public/favicon/`. Layout metadata is explicitly linked.
+- **Avatars:** 4 testimonial avatars are deployed in `public/avatars/`.
+- **Brand Assets:** 4 core SVG brand assets deployed in `public/brand/` (`logomark.svg`, `logo-horizontal.svg`, `brandmark-circle.svg`, `favicon-grey-bg.svg`).
+- **Hero Image:** High-quality `edmond-portrait-hero.webp` is deployed in `public/`.
+- **Media & Thumbnails:** Payload CMS has auto-generated 50 responsive image variants inside `public/media/`. These are actively used by the `Media` collection.
 
 ---
 
-### Visual Assets — Audit Complete
+### Environment Variables
 
-**109 files** in `visual-assets/` across 6 subdirectories. Most have been copied to `public/`. Here is the exact state:
-
-#### ✅ Favicons — DONE & Deployed
-
-| Source                                              | Destination                                 | Status      |
-| --------------------------------------------------- | ------------------------------------------- | ----------- |
-| `visual-assets/favicons/favicon-16x16.png`          | `public/favicon/favicon-16x16.png`          | ✅ Deployed |
-| `visual-assets/favicons/favicon-32x32.png`          | `public/favicon/favicon-32x32.png`          | ✅ Deployed |
-| `visual-assets/favicons/favicon.ico`                | `public/favicon/favicon.ico`                | ✅ Deployed |
-| `visual-assets/favicons/favicon.svg`                | `public/favicon/favicon.svg`                | ✅ Deployed |
-| `visual-assets/favicons/apple-touch-icon.png`       | `public/favicon/apple-touch-icon.png`       | ✅ Deployed |
-| `visual-assets/favicons/android-chrome-192x192.png` | `public/favicon/android-chrome-192x192.png` | ✅ Deployed |
-| `visual-assets/favicons/android-chrome-512x512.png` | `public/favicon/android-chrome-512x512.png` | ✅ Deployed |
-| `visual-assets/favicons/site.webmanifest`           | `public/favicon/site.webmanifest`           | ✅ Deployed |
-
-#### ✅ Testimonial Avatars — DONE & Deployed (4 of 5)
-
-| Source                                        | Destination                            | In Use                    | Status          |
-| --------------------------------------------- | -------------------------------------- | ------------------------- | --------------- |
-| `visual-assets/avatars/avatar-raymond-c.webp` | `public/avatars/avatar-raymond-c.webp` | ✅ TestimonialsSection    | ✅ Deployed     |
-| `visual-assets/avatars/avatar-thabo-n.webp`   | `public/avatars/avatar-thabo-n.webp`   | ✅ TestimonialsSection    | ✅ Deployed     |
-| `visual-assets/avatars/avatar-amara-k.webp`   | `public/avatars/avatar-amara-k.webp`   | ✅ TestimonialsSection    | ✅ Deployed     |
-| `visual-assets/avatars/avatar-david-o.webp`   | `public/avatars/avatar-david-o.webp`   | ✅ TestimonialsSection    | ✅ Deployed     |
-| `visual-assets/avatars/avatar-kagiso-m.webp`  | —                                      | ❌ Not referenced in code | ⏳ Unused asset |
-
-Note: `avatar-kagiso-m.webp` exists in visual-assets but is NOT referenced in any component and NOT copied to `public/`. It was generated as a 5th testimonial avatar when the homepage only uses 4 testimonials.
-
-#### ✅ Brand Assets — DONE & Deployed
-
-| Source                                     | Destination                         | Status      |
-| ------------------------------------------ | ----------------------------------- | ----------- |
-| `visual-assets/brand/logomark.svg`         | `public/brand/logomark.svg`         | ✅ Deployed |
-| `visual-assets/brand/logo-horizontal.svg`  | `public/brand/logo-horizontal.svg`  | ✅ Deployed |
-| `visual-assets/brand/brandmark-circle.svg` | `public/brand/brandmark-circle.svg` | ✅ Deployed |
-| `visual-assets/brand/favicon-grey-bg.svg`  | `public/brand/favicon-grey-bg.svg`  | ✅ Deployed |
-
-#### ✅ Hero Portrait — DONE & Deployed
-
-| Source                                                     | Destination                        | Status                                     |
-| ---------------------------------------------------------- | ---------------------------------- | ------------------------------------------ |
-| `visual-assets/edmond-portraits/edmond-portrait-hero.webp` | `public/edmond-portrait-hero.webp` | ✅ Deployed (HeroSection + HomePageFooter) |
-
-#### ⏳ Portrait Variants — Generated but Not in Code
-
-| Source                               | In Use                     | Status               |
-| ------------------------------------ | -------------------------- | -------------------- |
-| `edmond-portrait-office.webp`        | ❌ Not referenced anywhere | ⏳ Generated, unused |
-| `edmond-portrait-office-square.webp` | ❌ Not referenced anywhere | ⏳ Generated, unused |
-
-#### ⏳ Hero Video Assets — Generated but Not in Code
-
-| Source                                                   | In Use            | Status               |
-| -------------------------------------------------------- | ----------------- | -------------------- |
-| `edmond-portrait-hero-video-720p.mp4`                    | ❌ Not referenced | ⏳ Generated, unused |
-| `edmond-portrait-hero-video-mute-720p.mp4`               | ❌ Not referenced | ⏳ Generated, unused |
-| `edmond-portrait-hero-video-720p-png-split/` (76 frames) | ❌ Not referenced | ⏳ Generated, unused |
-
-#### ⏳ Project Thumbnails — Generated, NOT Deployed to CMS
-
-8 thumbnails exist in `visual-assets/project-thumbnails/`. They are **NOT** in `public/` and **NOT** uploaded to Payload CMS Media. These must be uploaded to the CMS and linked to their projects.
-
-| File                                | Project Slug           | Status        |
-| ----------------------------------- | ---------------------- | ------------- |
-| `project-morning-dew-cafe.webp`     | `morning-dew-cafe`     | ⏳ Not in CMS |
-| `project-hsnv-risk.webp`            | `hsnv-risk-dashboard`  | ⏳ Not in CMS |
-| `project-artisan-marketplace.webp`  | `artisan-marketplace`  | ⏳ Not in CMS |
-| `project-automation-pipeline.webp`  | `automation-pipeline`  | ⏳ Not in CMS |
-| `project-saas-boilerplate.webp`     | `saas-boilerplate`     | ⏳ Not in CMS |
-| `project-construction-website.webp` | `construction-website` | ⏳ Not in CMS |
-| `project-food-hub.webp`             | `food-hub`             | ⏳ Not in CMS |
-| `project-open-source-cms.webp`      | `open-source-cms`      | ⏳ Not in CMS |
+All core environment variables are populated, except for Make.com webhook URLs which currently use placeholders. 
 
 ---
 
-### Implementation Plan v3 — All 5 Tracks Complete
+### Database Seeding — Complete
 
-- ✅ Track 1: Hero & Navigation
-- ✅ Track 2: Services Section Redesign
-- ✅ Track 3: Projects & Testimonials
-- ✅ Track 4: Calculator Rebuild
-- ✅ Track 5: Homepage Restructure
-
----
-
-### Environment Variables — All Synced to Vercel (11 total)
-
-| Variable                             | Target                           |
-| ------------------------------------ | -------------------------------- |
-| `DODO_PAYMENTS_API_KEY`              | production, preview, development |
-| `DODO_PAYMENTS_ENVIRONMENT` = `test` | production, preview, development |
-| `DODO_PAYMENTS_STORE_ID`             | production, preview, development |
-| `DODO_PAYMENTS_WEBHOOK_SECRET`       | production, preview, development |
-| `NEXT_PUBLIC_POSTHOG_API_KEY`        | production, preview, development |
-| `NEXT_PUBLIC_POSTHOG_API_HOST`       | production, preview, development |
-| `SENTRY_DSN`                         | production, preview, development |
-| `BETTER_STACK_API_KEY`               | production, preview, development |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`      | production, preview, development |
-| `SUBSTACK_FEED_URL`                  | production, preview, development |
-| `FIRECRAWL_API_KEY`                  | production, preview, development |
-
----
-
-### Database Seeding — Text Complete
-
-| Collection   | Rows | Status                                       |
-| ------------ | ---- | -------------------------------------------- |
-| Projects     | 8    | ✅ Seeded with descriptions                  |
-| Testimonials | 9    | ✅ Seeded in CMS (+ 4 hardcoded in homepage) |
-| FAQs         | 19   | ✅ Seeded across 5 categories                |
-| Media        | 0    | ❌ **No images uploaded to CMS**             |
+| Collection   | Status                                       |
+| ------------ | -------------------------------------------- |
+| Projects     | ✅ Seeded with descriptions and thumbnails   |
+| Testimonials | ✅ Seeded in CMS (+ 4 hardcoded in homepage) |
+| FAQs         | ✅ Seeded across 5 categories                |
+| Media        | ✅ 50 image variants uploaded to CMS         |
+| Products     | ✅ 15 products fully seeded                  |
 
 ---
 
 ## ⏳ What Requires Action
 
-### Priority 1: Upload Project Thumbnails to Payload CMS
+### Priority 1: Make.com Scenarios (3 Total)
 
-8 thumbnails are generated and sitting in `visual-assets/project-thumbnails/`. They need to be:
+You need to create the Make.com scenarios for your automated workflows.
 
-1. Uploaded to Payload CMS → Media
-2. Linked to their respective projects in CMS → Projects
+1.  **Contact Form → Intent-Based Email Reply**
+2.  **Calculator High-Value Quote Alert (>P2,000)**
+3.  **Gumroad/Dodo Payments Purchase → Nurture Sequence**
 
-**How to do it:**
-
-1. Start dev server: `pnpm dev`
-2. Go to `http://localhost:3000/admin`
-3. Login: `edmond.moepswa@gmail.com` / `H1$maje$ty1994`
-4. **⚠️ SECURITY:** Change password immediately
-5. **Media → Upload** — upload all 8 files from `visual-assets/project-thumbnails/`
-6. **Projects** → click each project → attach corresponding thumbnail
-
-Alternatively, run the seed script: `npx tsx seed-project-thumbnails.ts` (if it can connect to the running dev server).
-
----
-
-### Priority 2: Unused Visual Assets — Decide What to Do
-
-These assets are generated but not referenced in any code:
-
-- `avatar-kagiso-m.webp` — 5th testimonial avatar (only 4 used)
-- `edmond-portrait-office.webp` — office portrait variant
-- `edmond-portrait-office-square.webp` — square office portrait
-- `edmond-portrait-hero-video-720p.mp4` — hero video with sound
-- `edmond-portrait-hero-video-mute-720p.mp4` — muted hero video
-- `edmond-portrait-hero-video-720p-png-split/` (76 frames) — video split frames
-
-Options:
-
-- Keep them (might be useful for future design iterations)
-- Delete them to reduce repo size
-- Integrate them (e.g., use video in hero section instead of static image)
-
----
-
-### Priority 3: Make.com Scenarios (7 Total)
-
-**URL:** https://make.com
-**Plan:** Teams Plan (expires 2026-08-12)
-
-| #   | Scenario                                    | Status         |
-| --- | ------------------------------------------- | -------------- |
-| 1   | Cal.com → Booking Confirmation Email        | ❌ Not created |
-| 2   | Cal.com → Google Sheets Lead Tracking       | ❌ Not created |
-| 3   | Contact Form → Intent-Based Email Reply     | ❌ Not created |
-| 4   | Calculator High-Value Quote Alert (>P2,000) | ❌ Not created |
-| 5   | Weekly Vercel Analytics Report              | ❌ Not created |
-| 6   | Cal.com Cancelled → Re-engagement Email     | ❌ Not created |
-| 7   | Gumroad Download → Nurture Sequence         | ❌ Not created |
-
-**Placeholder URLs in `.env.local` (replace after creating scenarios):**
-
-```
+**Action:**
+Once created in Make.com, replace the placeholder URLs in your `.env.local` (and Vercel dashboard):
+```env
 MAKE_WEBHOOK_LEAD_CAPTURE=https://hook.eu2.make.com/PLACEHOLDER_REPLACE_IN_MAKE
 MAKE_WEBHOOK_CALCULATOR_QUOTE=https://hook.eu2.make.com/PLACEHOLDER_REPLACE_IN_MAKE
 MAKE_WEBHOOK_GUMROAD_DOWNLOAD=https://hook.eu2.make.com/PLACEHOLDER_REPLACE_IN_MAKE
 ```
 
----
+### Priority 2: Dodo Dashboard — Final Steps
 
-### Priority 4: Google Search Console — Submit Sitemap
-
-- ✅ Ownership verified
-- ⏳ **Submit sitemap:**
-  1. Go to https://search.google.com/search-console
-  2. Select property
-  3. Click "Sitemaps"
-  4. Enter: `sitemap.xml`
-  5. Click "Submit"
-
----
-
-### Priority 5: Dodo Dashboard — Final Steps
-
-- ✅ 12 products created via API
 - ⏳ Configure hosted storefront (branding, select products)
 - ⏳ Create Product Collections (Free Resources, Boilerplates)
-- ⏳ Verify at: https://test.store.dodopayments.com/edmond-moepswa
+- ⏳ Switch `DODO_PAYMENTS_ENVIRONMENT` to `live` when ready to accept real payments.
 
----
+### Priority 3: Domain Purchase & Launch
 
-### Priority 6: Domain Purchase (Future)
-
-1. Purchase domain (~$10/year)
-2. Configure DNS → point to Vercel
-3. Add custom domain in Vercel
-4. Set up Resend for branded email
-5. Update `NEXT_PUBLIC_SERVER_URL`
-6. Re-verify Google Search Console
-7. Switch Dodo to live mode
+1. Purchase domain.
+2. Configure DNS → point to Vercel.
+3. Add custom domain in Vercel.
+4. Set up Resend for branded email (to match the domain).
+5. Update `NEXT_PUBLIC_SERVER_URL` in environment variables.
+6. Submit `sitemap.xml` to Google Search Console for the new domain.
 
 ---
 
@@ -330,127 +136,32 @@ MAKE_WEBHOOK_GUMROAD_DOWNLOAD=https://hook.eu2.make.com/PLACEHOLDER_REPLACE_IN_M
 
 ### ✅ Complete
 
+- [x] Next.js 16 + Payload CMS 3.82 architecture deployed
 - [x] Google Tag (gtag.js) on all pages
 - [x] PostHog analytics with pageview tracking
 - [x] Sentry error tracking (client + server + edge)
-- [x] Better Stack uptime monitoring (2 monitors active)
+- [x] Better Stack uptime monitoring 
 - [x] Google Search Console ownership verified
-- [x] 12 Dodo Payments products created (test mode)
-- [x] Dodo checkout API route (`/api/checkout`)
-- [x] Dodo products API route (`/api/dodo-products`)
 - [x] Dodo webhook handler (`/api/webhooks/dodo`)
-- [x] Store page rebuilt with Dodo integration
-- [x] ResourceCards wired to Dodo product IDs
+- [x] Store page completely dynamic
+- [x] 15 Dodo Payments products mapped
 - [x] Adaptive currency enabled
-- [x] `DODO_PAYMENTS_ENVIRONMENT=test` wired globally
-- [x] All 11 env vars synced to Vercel
-- [x] Build passes clean
-- [x] All code committed and pushed to GitHub
+- [x] Build passes cleanly (`pnpm build`)
 - [x] All 5 tracks of implementation plan v3 complete
-- [x] Database text content seeded (8 projects, 19 FAQs, 9 testimonials)
-- [x] Sitemap auto-generation configured
-- [x] Favicons generated and deployed (8 files in `public/favicon/`)
-- [x] Brand assets generated and deployed (4 SVGs in `public/brand/`)
-- [x] Testimonial avatars generated and deployed (4 in `public/avatars/`)
-- [x] Hero portrait generated and deployed (`public/edmond-portrait-hero.webp`)
-- [x] Project thumbnails generated (8 WebP files in `visual-assets/project-thumbnails/`)
+- [x] Database text content seeded
+- [x] Media files uploaded to Payload CMS (`public/media/` populated)
+- [x] Visual assets structure finalized and redundant files purged
 
 ### ⏳ Pending
 
-- [ ] **Upload 8 project thumbnails to Payload CMS Media and link to projects**
-- [ ] **Decide on 6 unused visual assets (keep, delete, or integrate)**
-- [ ] Create 7 Make.com webhook scenarios
+- [ ] Create 3 Make.com webhook scenarios
 - [ ] Replace placeholder webhook URLs in `.env.local` and Vercel
-- [ ] Submit `sitemap.xml` to Google Search Console
 - [ ] Configure Dodo hosted storefront (branding, select products)
-- [ ] Create Dodo Product Collections (dashboard)
 - [ ] Purchase custom domain, configure DNS, update Vercel
 - [ ] Set up Resend for branded email
 - [ ] Switch Dodo to live mode when ready
+- [ ] Submit sitemap to Google Search Console for final domain
 
 ---
 
-## Deployment Checklist
-
-- [ ] Visit `https://edmond-moepswa.vercel.app` — all pages load
-- [ ] Test `/store` — products render
-- [ ] Test `/resources` — free resources use Dodo checkout
-- [ ] Submit sitemap to Google Search Console
-- [ ] Verify Better Stack monitor shows "up"
-- [ ] Verify Sentry captures test error
-- [ ] Verify PostHog events in dashboard
-- [ ] Verify GA4 events in Google Analytics
-- [ ] Test calculator: select options, verify price updates
-- [ ] Upload project thumbnails to Payload CMS
-
----
-
-### ✅ Additional Fixes Applied (14 April 2026)
-
-**Hero Portrait Quality**
-
-- ✅ Added `willChange: 'transform, filter'` to hero portrait `<motion.div>` — forces GPU compositing, eliminates sub-pixel blur from cursor parallax
-- ✅ Added `quality={90}` to hero `<Image>` component — uses highest quality variant from Next.js image pipeline
-- ✅ Source: `public/edmond-portrait-hero.webp` (3984×2096, 238KB) — same file for hero and footer
-
-**Favicon Not Rendering**
-
-- ✅ Added explicit `icons` metadata to `src/app/(frontend)/layout.tsx` referencing all files in `public/favicon/`
-- ✅ SVG favicon (`favicon.svg`) now properly linked with `type: 'image/svg+xml'`
-- ✅ All PNG favicons (16×16, 32×32), Apple touch icon, Android Chrome icons, and PWA manifest all linked
-
-**Store Page Showing Empty Fallback**
-
-- ✅ Added `export const dynamic = 'force-dynamic'` to `/store` page
-- ✅ Page now renders at request time, not build time — no more "Products are being configured" message
-- ✅ Products fetched live from Dodo API on each request
-
----
-
-### `public/media/` — Payload CMS Auto-Generated Thumbnails
-
-Contains **48 files** auto-generated by Payload CMS when project thumbnails were uploaded via the admin panel. Each project has multiple responsive size variants:
-
-| Project                          | File count | Sizes                                              |
-| -------------------------------- | ---------- | -------------------------------------------------- |
-| `project-artisan-marketplace-3`  | 6          | 300px, 500px, 600px, 900px, 1200×630, full         |
-| `project-automation-pipeline-3`  | 6          | 300px, 500px, 600px, 900px, 1200×630, full         |
-| `project-construction-website-3` | 6          | 300px, 500px, 600px, 900px, 1200×630, full         |
-| `project-food-hub-3`             | 7          | 300px, 500px, 600px, 900px, 1200×630, 1400px, full |
-| `project-hsnv-risk-3`            | 5          | 300px, 500px, 600px, 900px, 1200×630, full         |
-| `project-morning-dew-cafe-3`     | 5          | 300px, 500px, 600px, 900px, 1200×630, full         |
-| `project-open-source-cms-3`      | 7          | 300px, 500px, 600px, 900px, 1200×630, 1400px, full |
-| `project-saas-boilerplate-3`     | 5          | 300px, 500px, 600px, 900px, 1200×630, full         |
-
-**Status:** ✅ Working — these are Payload's responsive image variants, served automatically. No manual action needed.
-
----
-
-### `public/brand/` — Personal Brand Logos
-
-Contains 4 SVG brand assets. These are the **core brand identity system** for the Edmond Moepswa personal brand — not just admin panel branding. To be used across all brand touchpoints (OG images, presentations, social media, email signatures, etc.):
-
-| File                   | Description                                             |
-| ---------------------- | ------------------------------------------------------- |
-| `logomark.svg`         | Primary brand mark — the core logo symbol               |
-| `logo-horizontal.svg`  | Horizontal layout logo — for headers, footers, emails   |
-| `brandmark-circle.svg` | Circular brand mark — for social media, avatars, badges |
-| `favicon-grey-bg.svg`  | Favicon variant with grey background                    |
-
----
-
-### `public/` Directory Structure
-
-```
-public/
-├── avatars/              # 4 testimonial avatars (raymond-c, thabo-n, amara-k, david-o)
-├── brand/                # 4 SVG brand assets (logomark, logo-horizontal, brandmark-circle, favicon-grey-bg)
-├── favicon/              # 8 favicon/PWA files (16px, 32px, SVG, apple-touch, android 192/512, webmanifest)
-├── media/                # 48 Payload CMS auto-generated project thumbnail variants
-├── edmond-portrait-hero.webp  # Hero section background portrait (3984×2096, 238KB)
-└── google75a7bf2c52475f25.html # Google Search Console verification
-```
-
----
-
-**End of Manual Steps Guide — Last Updated 14 April 2026**
+**End of Manual Steps Guide — Last Updated 23 April 2026**

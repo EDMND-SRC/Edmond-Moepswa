@@ -11,11 +11,9 @@ import {
   INSTAGRAM_URL,
   THREADS_URL,
   SUBSTACK_URL,
-  GITHUB_URL,
 } from '@/lib/constants'
 
 import {
-  GithubLight,
   LinkedinIcon,
   TwitterIcon,
   XLight,
@@ -148,7 +146,6 @@ export default function HomePageFooter() {
           <div className="flex items-center gap-1" aria-label="Social media links">
             {[
               { href: LINKEDIN_URL, icon: LinkedinIcon, label: 'LinkedIn' },
-              { href: GITHUB_URL, icon: GithubLight, label: 'GitHub' },
               { href: X_URL, icon: XLight, label: 'X' },
               { href: INSTAGRAM_URL, icon: InstagramIcon, label: 'Instagram' },
               { href: THREADS_URL, icon: ThreadsLight, label: 'Threads' },

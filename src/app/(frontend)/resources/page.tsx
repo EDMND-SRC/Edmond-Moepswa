@@ -116,7 +116,7 @@ export default async function ResourcesPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="max-w-md">
               <p className="text-[#a3a3a3] text-lg leading-relaxed">
-                I occasionally write about building BridgeArc and the digital landscape in Botswana.
+                I occasionally write about my work and the digital landscape in Botswana.
               </p>
             </div>
             <a

@@ -14,32 +14,32 @@ interface Resource {
 
 const freeResources: Resource[] = [
   {
-    title: '5 Signs Your Business Is Losing Money to Manual Processes',
-    desc: 'A short guide to identifying costly manual processes that could be automated in your business.',
+    title: '5 Signs Your Website Is Costing You Clients',
+    desc: 'Discover the 5 most common website mistakes that silently drive potential clients away — and how to fix them fast.',
     icon: AlertTriangle,
     tag: 'Short guide',
-    url: 'https://edmnd.gumroad.com/l/bgbgoq',
+    url: '/api/checkout?productId=pdt_0NceaY8UNB1GoMOLesz8X',
   },
   {
-    title: 'Digital Systems Health Check',
-    desc: 'A self-assessment scorecard for evaluating the health of your current digital infrastructure.',
+    title: 'Website Launch Checklist',
+    desc: 'A complete pre-launch checklist to ensure your website goes live without bugs, missing pages, or embarrassing errors.',
     icon: ClipboardCheck,
-    tag: 'Self-assessment scorecard',
-    url: 'https://edmnd.gumroad.com/l/fwruno',
+    tag: 'Checklist',
+    url: '/api/checkout?productId=pdt_0NceaYFa2uiHUZPpN7KOA',
   },
   {
-    title: 'UX Red Flags Checklist',
-    desc: 'Common UX mistakes that cost conversions — 15 red flags to check on your own site today.',
+    title: 'How to Brief a Web Designer',
+    desc: 'Write a clear web design brief that saves you time, money, and endless back-and-forth with your designer.',
     icon: FileText,
-    tag: 'Checklist (15 items)',
-    url: 'https://edmnd.gumroad.com/l/legyuk',
+    tag: 'Guide',
+    url: '/api/checkout?productId=pdt_0NceaYzEq1qzsiDZHrFWb',
   },
 ]
 
 const handleResourceClick = (resourceTitle: string, url: string) => {
   // Fire-and-forget tracking
   const payload = JSON.stringify({
-    workflow: 'gumroad-download',
+    workflow: 'resource-download',
     data: { resource: resourceTitle, timestamp: new Date().toISOString() },
   })
 
@@ -55,12 +55,8 @@ const handleResourceClick = (resourceTitle: string, url: string) => {
     }).catch(() => {})
   }
 
-  // Use <a> element click instead of window.open to avoid popup blockers
-  const link = document.createElement('a')
-  link.href = url
-  link.target = '_blank'
-  link.rel = 'noopener noreferrer'
-  link.click()
+  // Navigate to Dodo checkout
+  window.location.href = url
 }
 
 export default function FreeResourcesSection() {
@@ -75,7 +71,7 @@ export default function FreeResourcesSection() {
             Download free guides
           </h2>
           <p className="text-[#b0b0b0] mt-6 max-w-xl text-lg leading-relaxed mx-auto md:mx-0">
-            Practical guides and checklists. Free, no sign-up required.
+            Practical guides and checklists to help you build better digital systems.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

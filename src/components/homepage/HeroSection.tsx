@@ -10,7 +10,7 @@ import MobileNav from '@/components/ui/MobileNav'
 import MagneticButton from '@/components/ui/MagneticButton'
 import ThreadsIcon from '@/components/icons/ThreadsIcon'
 import SubstackIcon from '@/components/icons/SubstackIcon'
-import { GithubIcon, LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
+import { LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
 
 import {
   WHATSAPP_URL,
@@ -19,7 +19,6 @@ import {
   INSTAGRAM_URL,
   THREADS_URL,
   SUBSTACK_URL,
-  GITHUB_URL,
   CAL_USERNAME,
   CAL_NAMESPACE,
 } from '@/lib/constants'
@@ -231,18 +230,6 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
             >
               <SubstackIcon className="w-4 h-4" aria-hidden="true" />
               Substack
-            </a>
-          )}
-          {GITHUB_URL && (
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 text-sm font-medium hover:opacity-70 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] rounded"
-              aria-label="Edmond Moepswa on GitHub"
-            >
-              <GithubIcon className="w-4 h-4" aria-hidden="true" />
-              GitHub
             </a>
           )}
         </div>

@@ -115,6 +115,21 @@ const ENRICHMENT: Record<
     category: 'boilerplate',
     type: 'paid',
   },
+  pdt_0NdHmFjOP02gm8yLVOHF1: {
+    description: 'Production-ready Make.com blueprint to connect OpenAI with WhatsApp via the Cloud API. Includes memory handling and intent routing.',
+    category: 'tool',
+    type: 'paid',
+  },
+  pdt_0NdHmFtQ9oYzI3PCgpyTt: {
+    description: 'Automatically send WhatsApp reminders 24 hours before any Cal.com or Google Calendar event to reduce no-shows.',
+    category: 'tool',
+    type: 'paid',
+  },
+  pdt_0NdHmGE7hVcWFg9TwTNKn: {
+    description: 'Sync your bookings from Cal.com to Google Sheets, Notion, or HubSpot automatically with full lead attribution tracking.',
+    category: 'tool',
+    type: 'paid',
+  },
 }
 
 async function sync() {

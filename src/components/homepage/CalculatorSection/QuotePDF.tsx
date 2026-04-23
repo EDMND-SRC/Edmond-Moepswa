@@ -219,8 +219,8 @@ export const QuotePDF = ({ selections }: QuotePDFProps) => {
         {/* Footer */}
         <View style={styles.footer}>
           <View>
-            <Text style={styles.footerText}>BridgeArc Digital / Gaborone, Botswana</Text>
-            <Text style={styles.footerText}>edmond@bridgearc.com / www.bridgearc.com</Text>
+            <Text style={styles.footerText}>Edmond Moepswa / Gaborone, Botswana</Text>
+            <Text style={styles.footerText}>edmond.moepswa@gmail.com / edmond-moepswa.vercel.app</Text>
           </View>
           <Text style={styles.footerText}>Ref: {selections.serviceLabel.substring(0,3).toUpperCase()}-{Math.floor(Math.random() * 9000) + 1000}</Text>
         </View>
