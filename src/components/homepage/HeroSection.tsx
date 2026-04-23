@@ -81,11 +81,11 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
 
       {/* Scrolling Name Text */}
       <div
-        className="absolute inset-0 z-10 flex items-center pointer-events-none overflow-hidden"
+        className="absolute inset-0 z-10 flex items-center pointer-events-none overflow-hidden mix-blend-difference"
         aria-hidden="true"
       >
         <motion.div
-          className="flex whitespace-nowrap text-[#1a1a1a]/10 font-bold text-[15vw] tracking-tighter"
+          className="flex whitespace-nowrap text-white font-bold text-[15vw] tracking-tighter"
           animate={reducedMotion ? {} : { x: ['0%', '-50%'] }}
           transition={
             reducedMotion
@@ -166,7 +166,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
       </div>
 
       {/* Main Content Area (Bottom aligned) */}
-      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mt-24 text-white">
+      <div className="relative z-20 flex flex-col md:flex-row justify-between items-end w-full mt-24 text-[#1a1a1a]">
         {/* Social Links */}
         <div className="flex flex-col gap-3 mb-12 md:mb-2">
 
@@ -235,7 +235,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
 
         {/* Hero Text */}
         <div className="text-right relative">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium tracking-tight leading-[1.1] text-[#FF4D2E]">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium tracking-tight leading-[1.1] text-[#C63319]">
             // Systems Thinker
             <br />
             &amp; Builder
