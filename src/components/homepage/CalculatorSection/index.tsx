@@ -15,7 +15,6 @@ import { getTechIcon } from '@/lib/icon-registry'
 import { SERVICE_CATEGORIES } from './data'
 import type { PricingTier } from './data'
 import QuoteModal from './QuoteModal'
-import AnimatedNumber from './AnimatedNumber'
 import SummaryDownload from './SummaryDownload'
 import { CurrencySelector } from '@/components/ui/CurrencySelector'
 import { toast } from 'sonner'
@@ -314,13 +313,8 @@ I'd like to discuss this. Are you available for a discovery call?`
                           className="text-2xl font-bold text-[#FF4D2E] tracking-tight mb-4 min-h-[2.5rem] flex items-end"
                           aria-live="polite"
                         >
-                          {tier.priceBWP !== null && !ratesAreStale ? (
-                            <>
-                              {symbol}
-                              <AnimatedNumber target={safePrice} />
-                            </>
-                          ) : tier.priceBWP !== null && ratesAreStale ? (
-                            <span className="text-lg text-[#b0b0b0]">
+                          {tier.priceBWP !== null ? (
+                            <span className={ratesAreStale ? "text-lg text-[#b0b0b0]" : ""}>
                               {formatPrice(tier.priceBWP)}
                             </span>
                           ) : (

@@ -12,6 +12,8 @@ import config from '@payload-config'
 export const dynamic = 'force-dynamic'
 export const revalidate = 60
 
+import { SUBSTACK_URL } from '@/lib/constants'
+
 export default async function ResourcesPage() {
   const payload = await getPayload({ config })
   
@@ -120,7 +122,7 @@ export default async function ResourcesPage() {
               </p>
             </div>
             <a
-              href="https://edmnd.substack.com"
+              href={SUBSTACK_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-[#FF4D2E] font-medium hover:gap-3 transition-all group"

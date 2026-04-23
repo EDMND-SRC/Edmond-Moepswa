@@ -81,12 +81,11 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
 
       {/* Scrolling Name Text */}
       <div
-        className="absolute inset-0 z-10 flex items-center pointer-events-none overflow-hidden mix-blend-difference"
+        className="absolute inset-0 z-10 flex items-center pointer-events-none overflow-hidden"
         aria-hidden="true"
       >
         <motion.div
-          className="flex whitespace-nowrap text-white font-bold text-[15vw] tracking-tighter"
-          style={{ textShadow: '0 0 1px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.3)' }}
+          className="flex whitespace-nowrap text-[#1a1a1a]/10 font-bold text-[15vw] tracking-tighter"
           animate={reducedMotion ? {} : { x: ['0%', '-50%'] }}
           transition={
             reducedMotion
@@ -235,14 +234,13 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
         </div>
 
         {/* Hero Text */}
-        <div className="text-right relative mix-blend-difference">
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium tracking-tight leading-[1.1]">
+        <div className="text-right relative">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-medium tracking-tight leading-[1.1] text-[#FF4D2E]">
             // Systems Thinker
             <br />
             &amp; Builder
           </h1>
-          <p className="text-base md:text-lg lg:text-xl text-white/80 mt-3 md:mt-4 max-w-md md:max-w-lg ml-auto leading-relaxed">
+          <p className="text-base md:text-lg lg:text-xl text-[#1a1a1a] mt-3 md:mt-4 max-w-md md:max-w-lg ml-auto leading-relaxed font-medium">
             Web design, development &amp; workflow automation — built for handover.
           </p>
         </div>

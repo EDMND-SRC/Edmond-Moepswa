@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { LinkedinIcon, TwitterIcon } from '@/components/icons/BrandIcons'
 import Link from 'next/link'
+import { LINKEDIN_URL, X_URL } from '@/lib/constants'
 
 export default function SuccessPage() {
   return (
@@ -24,7 +25,7 @@ export default function SuccessPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
             <a
-              href="https://www.linkedin.com/in/edmond-moepswa"
+              href={LINKEDIN_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition-all group"
@@ -36,7 +37,7 @@ export default function SuccessPage() {
               </div>
             </a>
             <a
-              href="https://twitter.com/edmond_moepswa"
+              href={X_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl p-6 transition-all group"

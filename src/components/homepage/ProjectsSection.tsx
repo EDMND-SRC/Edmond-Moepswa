@@ -227,7 +227,7 @@ export default function ProjectsSection() {
     setError(false)
     setIsLoading(true)
     // Optimization: Filter out boilerplate on the server
-    fetch('/api/projects?where[category][not_equals]=boilerplate&limit=100', { signal })
+    fetch('/api/projects?where[category][not_equals]=boilerplate&limit=100&depth=1', { signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
         return res.json()
