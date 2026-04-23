@@ -9,7 +9,6 @@ import { PostHogPageview } from '@/lib/posthog-provider'
 import '@/lib/sentry-client.config' // Initialize Sentry client-side
 import {
   LINKEDIN_URL,
-  GITHUB_URL,
   INSTAGRAM_URL,
   SUBSTACK_URL,
   X_URL,
@@ -131,7 +130,7 @@ const jsonLd = {
         '@type': 'CollegeOrUniversity',
         name: 'University of Canberra',
       },
-      sameAs: [LINKEDIN_URL, GITHUB_URL, INSTAGRAM_URL, SUBSTACK_URL, X_URL, THREADS_URL].filter(
+      sameAs: [LINKEDIN_URL, INSTAGRAM_URL, SUBSTACK_URL, X_URL, THREADS_URL].filter(
         (url): url is string => url !== '' && url !== '#',
       ),
     },

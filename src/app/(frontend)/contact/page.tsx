@@ -12,7 +12,7 @@ import {
   X,
 } from 'lucide-react'
 
-import { GithubIcon, LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
+import { LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
 import {
   PHONE_DISPLAY,
   PHONE_E164,
@@ -24,7 +24,6 @@ import {
   INSTAGRAM_URL,
   THREADS_URL,
   SUBSTACK_URL,
-  GITHUB_URL,
 } from '@/lib/constants'
 import CalEmbed from '@/components/cal/CalEmbed'
 import LeadCaptureForm from '@/components/forms/LeadCaptureForm'
@@ -185,17 +184,7 @@ export default function ContactPage() {
                     Substack
                   </a>
                 )}
-                {GITHUB_URL && (
-                  <a
-                    href={GITHUB_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-sm text-[#b0b0b0] hover:text-white transition-colors min-h-[44px] px-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E]"
-                  >
-                    <GithubIcon className="w-4 h-4" aria-hidden="true" />
-                    GitHub
-                  </a>
-                )}
+
               </div>
             </div>
           </div>
