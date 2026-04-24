@@ -18,10 +18,10 @@ interface UIProject {
 }
 
 const categoryLabels: Record<string, string> = {
-  web: 'Web Design & Development',
-  automation: 'Workflow Automation',
-  'open-source': 'Open Source',
-  seo: 'SEO & GEO',
+  web: 'Digital Platforms & Web',
+  automation: 'AI & Business Automation',
+  'open-source': 'Open Source Initiatives',
+  seo: 'Search & Growth Strategy',
 }
 
 const categories = Object.keys(categoryLabels)
@@ -265,6 +265,16 @@ export default function ProjectsSection() {
       .finally(() => setIsLoading(false))
   }, [])
 
+  const handleCategoryClick = useCallback((cat: string) => {
+    if (containerRef.current) {
+      // Calculate exact top position of the section
+      const topPos = containerRef.current.getBoundingClientRect().top + window.scrollY
+      // Instant scroll to top to prevent the browser from snapping unpredictably as the container shrinks
+      window.scrollTo({ top: topPos, behavior: 'auto' })
+    }
+    setActiveCategory(cat)
+  }, [])
+
   useEffect(() => {
     const controller = new AbortController()
     fetchProjects(controller.signal)
@@ -378,7 +388,7 @@ export default function ProjectsSection() {
         {/* Category Filter Pills */}
         <div className="w-full max-w-[1800px] mx-auto px-6 md:px-10 mb-6 md:mb-8 z-10 flex flex-wrap gap-2">
           <button
-            onClick={() => setActiveCategory('all')}
+            onClick={() => handleCategoryClick('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
               activeCategory === 'all'
                 ? 'bg-[#FF4D2E] text-white'
@@ -391,7 +401,7 @@ export default function ProjectsSection() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => handleCategoryClick(cat)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] ${
                 activeCategory === cat
                   ? 'bg-[#FF4D2E] text-white'
