@@ -47,7 +47,7 @@ async function seed() {
     {
       title: 'Morning Dew Café — Website Redesign',
       slug: 'morning-dew-cafe',
-      category: 'web' as const,
+      category: 'websites' as const,
       year: '2019',
       description: {
         root: {
@@ -81,7 +81,7 @@ async function seed() {
     {
       title: 'HSNV Group — Risk Management Dashboard',
       slug: 'hsnv-risk-dashboard',
-      category: 'web' as const,
+      category: 'applications' as const,
       year: '2025',
       description: {
         root: {
@@ -115,7 +115,7 @@ async function seed() {
     {
       title: 'Gaborone Artisan Marketplace',
       slug: 'gaborone-artisan-marketplace',
-      category: 'web' as const,
+      category: 'applications' as const,
       year: '2026',
       description: {
         root: {
@@ -183,7 +183,7 @@ async function seed() {
     {
       title: 'SaaS Boilerplate — Subscription Management Platform',
       slug: 'saas-boilerplate-subscriptions',
-      category: 'boilerplate' as const,
+      category: 'products' as const,
       year: '2026',
       description: {
         root: {
@@ -217,7 +217,7 @@ async function seed() {
     {
       title: 'Botswana Construction Co. — Corporate Website',
       slug: 'botswana-construction-website',
-      category: 'web' as const,
+      category: 'websites' as const,
       year: '2026',
       description: {
         root: {
@@ -251,7 +251,7 @@ async function seed() {
     {
       title: 'Gaborone Food Hub — Restaurant Booking & Pre-Order System',
       slug: 'gaborone-food-hub',
-      category: 'web' as const,
+      category: 'websites' as const,
       year: '2026',
       description: {
         root: {
@@ -285,7 +285,7 @@ async function seed() {
     {
       title: 'Open Source — Payload CMS Boilerplate for Botswana SMEs',
       slug: 'payload-cms-botswana-sme',
-      category: 'open-source' as const,
+      category: 'products' as const,
       year: '2026',
       description: {
         root: {

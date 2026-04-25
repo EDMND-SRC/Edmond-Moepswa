@@ -26,13 +26,13 @@ export const Projects: CollectionConfig = {
       name: 'category',
       type: 'select',
       options: [
-        { label: 'Web Design & Development', value: 'web' },
-        { label: 'Workflow Automation', value: 'automation' },
-        { label: 'Boilerplate Products', value: 'boilerplate' },
-        { label: 'Open Source', value: 'open-source' },
-        { label: 'SEO & GEO', value: 'seo' },
+        { label: 'Websites', value: 'websites' },
+        { label: 'Web Applications', value: 'applications' },
+        { label: 'Automation & Systems', value: 'automation' },
+        { label: 'Products & Boilerplates', value: 'products' },
       ],
       required: true,
+      index: true,
     },
     {
       name: 'year',

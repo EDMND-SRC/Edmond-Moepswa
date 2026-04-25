@@ -485,7 +485,7 @@ export interface Project {
    */
   generateSlug?: boolean | null;
   slug: string;
-  category: 'web' | 'automation' | 'boilerplate' | 'open-source' | 'seo';
+  category: 'websites' | 'applications' | 'automation' | 'products';
   /**
    * e.g. 2024 or 2023-2024
    */
