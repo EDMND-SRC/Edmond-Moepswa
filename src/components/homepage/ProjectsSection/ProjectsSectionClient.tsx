@@ -40,20 +40,22 @@ const ProjectCard = memo(function ProjectCard({
   const tiltY = useSpring(mX, { stiffness: 150, damping: 25 })
 
   const step = 1 / total
-  const startIn = Math.max(0, (index / total) - step * 0.8)
-  const endIn = Math.max(0, index / total)
-  const startFade = Math.min(1, (index + 1) / total)
-  const endFade = Math.min(1, (index + 1) / total + step * 0.5)
+  const startInRaw = (index / total) - step * 0.8
+  const endInRaw = index / total
+  const startFadeRaw = (index + 1) / total
+  const endFadeRaw = (index + 1) / total + step * 0.5
 
-  // Ensure ranges have at least a tiny width to avoid division by zero in useTransform
-  const safeEndIn = endIn === startIn ? startIn + 0.0001 : endIn
-  const safeEndFade = endFade === startFade ? startFade + 0.0001 : endFade
+  // Robust clamping: ensure [0, 1] and start < end
+  const startIn = Math.max(0, Math.min(0.9999, startInRaw))
+  const endIn = Math.max(startIn + 0.0001, Math.min(1, endInRaw))
+  const startFade = Math.max(0, Math.min(0.9999, startFadeRaw))
+  const endFade = Math.max(startFade + 0.0001, Math.min(1, endFadeRaw))
 
-  const scale = useTransform(scrollYProgress, [startFade, safeEndFade], [1, 0.85])
-  const opacity = useTransform(scrollYProgress, [startFade, safeEndFade], [1, 0])
-  const y = useTransform(scrollYProgress, [startIn, safeEndIn], ['120%', '0%'])
-  const shadowOpacity = useTransform(scrollYProgress, [startFade, safeEndFade], [0.1, 0.4])
-  const kenBurnsScale = useTransform(scrollYProgress, [startFade, safeEndIn], [1, 1.15])
+  const scale = useTransform(scrollYProgress, [startFade, endFade], [1, 0.85])
+  const opacity = useTransform(scrollYProgress, [startFade, endFade], [1, 0])
+  const y = useTransform(scrollYProgress, [startIn, endIn], ['120%', '0%'])
+  const shadowOpacity = useTransform(scrollYProgress, [startFade, endFade], [0.1, 0.4])
+  const kenBurnsScale = useTransform(scrollYProgress, [startFade, endIn], [1, 1.15])
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (reducedMotion || !cardRef.current) return
