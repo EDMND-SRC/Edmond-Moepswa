@@ -21,12 +21,12 @@ import { toast } from 'sonner'
 
 // Tech stack associated with each service category
 const SERVICE_TECH_STACK: Record<string, string[]> = {
-  'web-design': ['Next.js', 'React', 'Tailwind CSS', 'Vercel', 'Payload CMS'],
+  'web-design': ['Next.js', 'React', 'Tailwind CSS', 'Cloudflare Workers', 'Payload CMS'],
   'web-apps': ['Next.js', 'React', 'PostgreSQL', 'Supabase', 'Payload CMS'],
   automation: ['Make.com', 'n8n', 'Node.js'],
   seo: ['Google Search Console', 'Google Analytics 4', 'Cloudflare'],
   advisory: ['Notion', 'Figma'],
-  retainers: ['Sentry', 'Cloudflare', 'Vercel'],
+  retainers: ['Cloudflare', 'PostHog', 'Google Analytics 4'],
 }
 
 // Exchange rates are considered fresh for 1 hour
@@ -85,8 +85,8 @@ export default function CalculatorSection() {
 
       try {
         const geoRes = await fetch('/api/geo')
-        const geoData = await geoRes.json()
-        const detected = detectCurrencyFromCountry(geoData.country_code)
+        const geoData = (await geoRes.json()) as { country_code?: string | null }
+        const detected = detectCurrencyFromCountry(geoData.country_code || undefined)
         if (detected !== 'BWP' && fetchedRates[detected]) {
           setSelectedCurrency(detected)
         }

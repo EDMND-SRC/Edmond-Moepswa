@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
+import { getDodoEnvironment } from '@/utilities/getDodoEnvironment'
 export const revalidate = 60 // Revalidate every 60 seconds
 
 interface DodoProductAPI {
@@ -27,7 +28,7 @@ export async function GET() {
   try {
     const client = new DodoPayments({
       bearerToken: process.env.DODO_PAYMENTS_API_KEY || '',
-      environment: (process.env.DODO_PAYMENTS_ENVIRONMENT as 'test_mode' | 'live_mode') || 'test_mode',
+      environment: getDodoEnvironment(),
     })
 
     // Fetch all products (max limit 100 for Dodo)

@@ -1,14 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
 import { createLexicalEditor } from '@/fields/defaultLexical'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { canTransformMediaURL, getMediaTransformURL } from '@/utilities/getMediaTransformURL'
+import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { getServerSideURL } from '@/utilities/getURL'
 
 import { anyone } from '../access/anyone'
 import { authenticated } from '../access/authenticated'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -32,43 +30,22 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-    staticDir: path.resolve(dirname, '../../public/media'),
-    adminThumbnail: 'thumbnail',
+    adminThumbnail: ({ doc }) => {
+      const sourceURL = getMediaUrl(doc.url as string | undefined)
+
+      if (!sourceURL || !canTransformMediaURL(sourceURL)) {
+        return sourceURL
+      }
+
+      return getMediaTransformURL({
+        baseURL: getServerSideURL(),
+        fit: 'cover',
+        height: 300,
+        sourceURL,
+        width: 300,
+      })
+    },
     focalPoint: true,
     mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml', 'image/gif', 'video/mp4'],
-    imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 300,
-      },
-      {
-        name: 'square',
-        width: 500,
-        height: 500,
-      },
-      {
-        name: 'small',
-        width: 600,
-      },
-      {
-        name: 'medium',
-        width: 900,
-      },
-      {
-        name: 'large',
-        width: 1400,
-      },
-      {
-        name: 'xlarge',
-        width: 1920,
-      },
-      {
-        name: 'og',
-        width: 1200,
-        height: 630,
-        crop: 'center',
-      },
-    ],
   },
 }

@@ -9,7 +9,7 @@
 
 ### Quick Reference
 
-- **Tech Stack**: Next.js 16, Payload CMS 3, PostgreSQL (Neon), Tailwind 4, Sentry, Dodo Payments, PostHog
+- **Tech Stack**: Next.js 16, Payload CMS 3, PostgreSQL (Neon), Tailwind 4, Cloudflare Workers, Dodo Payments, PostHog
 - **Primary Framework**: Next.js (App Router)
 - **CMS**: Payload CMS
 - **Database**: PostgreSQL (via @payloadcms/db-postgres)
@@ -33,7 +33,6 @@ These documents provide deep-dives into how specific tools are leveraged within 
 - [Dodo Payments Strategy](../business-planning/strategy-docs/dodo-payments-strategy.md)
 - [Make.com Strategy](../business-planning/strategy-docs/make-com-strategy.md)
 - [PostHog Strategy](../business-planning/strategy-docs/posthog-strategy.md)
-- [Sentry Strategy](../business-planning/strategy-docs/sentry-strategy.md)
 - [Cal.com Strategy](../business-planning/strategy-docs/cal-com-strategy.md)
 
 ## Getting Started

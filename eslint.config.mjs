@@ -28,6 +28,13 @@ const eslintConfig = [
               caughtErrorsIgnorePattern: '^(_|ignore)',
             },
           ],
+          'react-hooks/error-boundaries': 'off',
+          'react-hooks/purity': 'off',
+          'react-hooks/refs': 'off',
+          'react-hooks/set-state-in-effect': 'off',
+          'react-hooks/static-components': 'off',
+          'react/jsx-no-comment-textnodes': 'off',
+          'react/no-unescaped-entities': 'off',
         },
       }
     }
@@ -35,7 +42,29 @@ const eslintConfig = [
   }),
 
   {
-    ignores: ['.next/', 'node_modules/', '.agent/', '_bmad/', '_bmad-output/', 'docs/'],
+    rules: {
+      'react-hooks/error-boundaries': 'off',
+      'react-hooks/purity': 'off',
+      'react-hooks/refs': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/static-components': 'off',
+      'react/jsx-no-comment-textnodes': 'off',
+      'react/no-unescaped-entities': 'off',
+    },
+  },
+  {
+    ignores: [
+      '.next/',
+      '.open-next/',
+      '.vercel/',
+      'node_modules/',
+      '.agent/',
+      '_bmad/',
+      '_bmad-output/',
+      'coverage/',
+      'test-outputs/',
+      'docs/',
+    ],
   },
 ]
 

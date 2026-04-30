@@ -1,15 +1,16 @@
 'use client'
 
-import type { StaticImageData } from 'next/image'
+
 
 import { cn } from '@/utilities/ui'
-import NextImage from 'next/image'
+
 import React from 'react'
 
 import type { Props as MediaProps } from '../types'
 
 import { cssVariables } from '@/cssVariables'
 import { getMediaUrl } from '@/utilities/getMediaUrl'
+import { canTransformMediaURL, getMediaTransformURL } from '@/utilities/getMediaTransformURL'
 
 const { breakpoints } = cssVariables
 
@@ -61,18 +62,35 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let width: number | undefined
   let height: number | undefined
   let alt = altFromProps
-  let src: StaticImageData | string | null = srcFromProps || null
+  let src: any | string | null = srcFromProps || null
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
+    const { alt: altFromResource, height: fullHeight, mimeType, url, width: fullWidth } = resource
 
     width = fullWidth!
     height = fullHeight!
     alt = altFromResource || ''
 
     const cacheTag = resource.updatedAt
+    const originalSrc = getMediaUrl(url, cacheTag)
+    const canTransform =
+      originalSrc && mimeType?.startsWith('image/') && canTransformMediaURL(originalSrc)
 
-    src = getMediaUrl(url, cacheTag)
+    const transformedWidth = fullWidth ? Math.min(fullWidth, 1920) : undefined
+    const transformedHeight =
+      transformedWidth && fullWidth && fullHeight
+        ? Math.round((fullHeight / fullWidth) * transformedWidth)
+        : undefined
+
+    src = canTransform
+      ? getMediaTransformURL({
+          cacheTag,
+          fit: fill ? 'cover' : 'scale-down',
+          height: transformedHeight,
+          sourceURL: originalSrc,
+          width: transformedWidth,
+        })
+      : originalSrc
   }
 
   // Don't render if no valid src
@@ -91,19 +109,15 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
   return (
     <picture className={cn(pictureClassName)}>
-      <NextImage
+      <img
         alt={alt || ''}
         className={cn(imgClassName)}
-        fill={fill}
         height={!fill ? height : undefined}
-        placeholder="blur"
-        blurDataURL={placeholderBlur}
-        priority={priority}
-        quality={100}
-        loading={loading}
-        sizes={sizes}
-        src={src}
+        loading={loading === 'lazy' ? 'lazy' : 'eager'}
+        src={typeof src === 'string' ? src : (src as any).src}
         width={!fill ? width : undefined}
+        style={fill ? { objectFit: 'cover', width: '100%', height: '100%' } : undefined}
+        decoding="async"
       />
     </picture>
   )

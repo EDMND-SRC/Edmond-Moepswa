@@ -145,7 +145,7 @@ Boris Cherny (creator of Claude Code) keeps his team's file around 100 lines. Un
 - Language and version: TypeScript / Node.js 20+
 - Framework(s): Next.js 16+, Payload CMS 3
 - Package manager: pnpm
-- Runtime / deployment target: Vercel / Node.js
+- Runtime / deployment target: Cloudflare Workers / Node.js
 
 ### Commands
 - Install: `pnpm install`
@@ -199,7 +199,7 @@ You are an expert Payload CMS 3 developer. When working with this codebase, you 
 6. AUTOMATION & INTEGRATION
 - **Dodo Payments**: Handle payment syncing via `afterChange` hooks or dedicated API endpoints.
 - **Make.com**: Use `afterChange` hooks to trigger webhooks for external automation flows.
-- **PostHog/Sentry**: Ensure telemetry and error tracking are initialized in both the Frontend and Payload Admin (via `admin.components.beforeDashboard`).
+- **PostHog**: Ensure analytics is initialized in both the Frontend and Payload Admin (via `admin.components.beforeDashboard`).
 
 7. COMMON GOTCHAS
 - **Default Depth**: The default depth for relationships is `2`. Set to `0` if you only need the ID.

@@ -1,5 +1,5 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
 import { withPayload } from '@payloadcms/next/withPayload'
-import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -8,13 +8,18 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const CLOUDFLARE_WORKER_VARIANT = process.env.CLOUDFLARE_WORKER_VARIANT
 
 const nextConfig: NextConfig = {
   // Disable source maps in production — saves 5-10s on build output
   productionBrowserSourceMaps: false,
+  outputFileTracingIncludes: {
+    '/*': [
+      'node_modules/.pnpm/drizzle-kit@*/node_modules/drizzle-kit/**/*',
+      'node_modules/.pnpm/pg-cloudflare@*/node_modules/pg-cloudflare/**/*',
+    ],
+  },
 
   images: {
     // Generate 2 quality variants instead of just full-size — saves 3-8s
@@ -30,7 +35,13 @@ const nextConfig: NextConfig = {
       }),
     ],
   },
+  assetPrefix: CLOUDFLARE_WORKER_VARIANT === 'payload' ? '/_payload_next' : undefined,
   webpack: (webpackConfig) => {
+    webpackConfig.resolve.alias = {
+      ...(webpackConfig.resolve.alias || {}),
+      'drizzle-kit/api': './src/lib/cloudflare/drizzle-kit-runtime-stub.ts',
+    }
+
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
@@ -60,29 +71,12 @@ const nextConfig: NextConfig = {
   // Turbopack config for dev — also enabled for production via CLI flag
   turbopack: {
     root: path.resolve(dirname),
+    resolveAlias: {
+      'drizzle-kit/api': './src/lib/cloudflare/drizzle-kit-runtime-stub.ts',
+    },
   },
 }
 
-export default withSentryConfig(withPayload(nextConfig, { devBundleServerPackages: false }), {
-  // For all available options, see:
-  // https://github.com/getsentry/sentry-webpack-plugin#options
-  org: process.env.SENTRY_ORG || 'edmond-moepswa',
-  project: process.env.SENTRY_PROJECT || 'edmond-moepswa-website',
+void initOpenNextCloudflareForDev()
 
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
-
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  widenClientFileUpload: true,
-
-  // Automatically tree-shake Sentry debug statements in production
-  telemetry: false,
-
-  // Important: don't fail the build if source map upload fails
-  sourcemaps: {
-    disable: true,
-  },
-})
+export default withPayload(nextConfig, { devBundleServerPackages: false })

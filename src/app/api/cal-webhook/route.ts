@@ -16,6 +16,54 @@ function checkRateLimit(ip: string, max: number, windowMs: number): boolean {
   return true
 }
 
+type CalAttendee = {
+  email?: string
+  name?: string
+  timeZone?: string
+}
+
+type CalWebhookPayload = {
+  attendees?: CalAttendee[]
+  description?: string
+  endTime?: string
+  eventType?: string
+  responses?: unknown
+  startTime?: string
+  title?: string
+}
+
+const getOptionalString = (value: unknown): string | undefined =>
+  typeof value === 'string' ? value : undefined
+
+function parseCalWebhookPayload(value: unknown): CalWebhookPayload {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {}
+  }
+
+  const payload = value as Record<string, unknown>
+  const attendees = Array.isArray(payload.attendees)
+    ? payload.attendees
+        .filter((attendee): attendee is Record<string, unknown> => {
+          return Boolean(attendee) && typeof attendee === 'object' && !Array.isArray(attendee)
+        })
+        .map((attendee) => ({
+          email: getOptionalString(attendee.email),
+          name: getOptionalString(attendee.name),
+          timeZone: getOptionalString(attendee.timeZone),
+        }))
+    : undefined
+
+  return {
+    attendees,
+    description: getOptionalString(payload.description),
+    endTime: getOptionalString(payload.endTime),
+    eventType: getOptionalString(payload.eventType),
+    responses: payload.responses,
+    startTime: getOptionalString(payload.startTime),
+    title: getOptionalString(payload.title),
+  }
+}
+
 // Proxy route for Cal.com booking webhooks.
 // Keeps the Make.com webhook URL server-side only.
 export async function POST(req: Request) {
@@ -40,7 +88,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
     }
 
-    const body = await req.json()
+    const body = parseCalWebhookPayload(await req.json())
 
     // Forward only the essential booking data
     const payload = {
@@ -50,11 +98,7 @@ export async function POST(req: Request) {
       title: body.title,
       description: body.description,
       // Include attendee info for CRM purposes
-      attendees: body.attendees?.map((a: any) => ({
-        name: a.name,
-        email: a.email,
-        timeZone: a.timeZone,
-      })),
+      attendees: body.attendees,
       responses: body.responses,
     }
 

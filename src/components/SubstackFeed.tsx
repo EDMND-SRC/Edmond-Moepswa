@@ -11,6 +11,21 @@ interface SubstackPost {
   contentSnippet: string
 }
 
+function isSubstackPost(value: unknown): value is SubstackPost {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false
+  }
+
+  const post = value as Record<string, unknown>
+
+  return (
+    typeof post.title === 'string' &&
+    typeof post.link === 'string' &&
+    typeof post.pubDate === 'string' &&
+    typeof post.contentSnippet === 'string'
+  )
+}
+
 export const SubstackFeed = () => {
   const [posts, setPosts] = useState<SubstackPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -27,11 +42,18 @@ export const SubstackFeed = () => {
         }
         const data = await res.json()
         // Empty array means feed is disabled (URL set to '#')
-        if (data.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
           setError(true)
           return
         }
-        setPosts(data)
+
+        const parsedPosts = data.filter(isSubstackPost)
+        if (parsedPosts.length === 0) {
+          setError(true)
+          return
+        }
+
+        setPosts(parsedPosts)
       } catch (error) {
         console.error('Failed to fetch posts:', error)
         setError(true)

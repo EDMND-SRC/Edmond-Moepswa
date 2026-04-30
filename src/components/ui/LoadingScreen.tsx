@@ -9,25 +9,12 @@ export default function LoadingScreen() {
   const reducedMotion = useReducedMotion()
 
   useEffect(() => {
-    let mounted = true
-    let listener: (() => void) | null = null
     const minDisplayTimer = setTimeout(() => {
-      if (!mounted) return
-      if (document.readyState === 'complete') {
-        setIsVisible(false)
-      } else {
-        listener = () => {
-          if (mounted) {
-            setIsVisible(false)
-          }
-        }
-        window.addEventListener('load', listener)
-      }
+      setIsVisible(false)
     }, 800)
+
     return () => {
-      mounted = false
       clearTimeout(minDisplayTimer)
-      if (listener) window.removeEventListener('load', listener)
     }
   }, [])
 
@@ -40,7 +27,7 @@ export default function LoadingScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeInOut' }}
-          className="fixed inset-0 z-[var(--z-cursor)] bg-[#0a0a0a] flex items-center justify-center"
+          className="fixed inset-0 z-[var(--z-cursor)] bg-[#0a0a0a] flex items-center justify-center pointer-events-none"
         >
           {reducedMotion ? (
             <div className="w-16 h-16 border-2 border-[#FF4D2E] border-t-transparent rounded-full" />

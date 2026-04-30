@@ -75,7 +75,7 @@ interface CachedRates {
 }
 
 /**
- * Detect currency from country code (from Vercel geo header or ipapi.co)
+ * Detect currency from country code returned by the geo lookup service.
  */
 export function detectCurrencyFromCountry(countryCode: string | undefined): string {
   if (!countryCode) return 'BWP'
@@ -105,7 +105,7 @@ export async function getExchangeRates(): Promise<Record<string, number>> {
   // Fetch fresh rates from free API
   try {
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/BWP')
-    const data = await response.json()
+    const data = (await response.json()) as { rates?: Record<string, number> }
     const rates: Record<string, number> = data.rates || {}
 
     // Cache in localStorage

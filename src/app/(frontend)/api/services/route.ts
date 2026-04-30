@@ -1,9 +1,9 @@
-import { getPayloadSingleton } from '@/lib/payload'
+import configPromise from '@payload-config'
 import { NextResponse } from 'next/server'
-import { unstable_cache } from 'next/cache'
+import { getPayload } from 'payload'
 
 const getServices = async () => {
-  const payload = await getPayloadSingleton()
+  const payload = await getPayload({ config: configPromise })
   const result = await payload.find({
     collection: 'services',
     depth: 0,
@@ -14,14 +14,9 @@ const getServices = async () => {
   return result.docs
 }
 
-const getCachedServices = () =>
-  unstable_cache(async () => getServices(), ['services'], {
-    tags: ['services'],
-  })
-
 export async function GET() {
   try {
-    const services = await getCachedServices()()
+    const services = await getServices()
     return NextResponse.json({ services })
   } catch (error) {
     console.error('Failed to fetch services:', error)

@@ -148,7 +148,7 @@ export default function FAQSection() {
     const fetchFAQs = async () => {
       try {
         const response = await fetch('/api/faqs', { cache: 'no-store' })
-        const data = await response.json()
+        const data = (await response.json()) as { faqs?: FAQ[] }
         setFaqs(data.faqs || [])
       } catch (error) {
         console.error('Failed to fetch FAQs:', error)
@@ -225,6 +225,7 @@ export default function FAQSection() {
   return (
     <section id="faq" className="bg-[#0a0a0a] text-white py-24 md:py-32 border-t border-white/10">
       <Script
+        id="faq-page-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageSchema) }}
         strategy="afterInteractive"

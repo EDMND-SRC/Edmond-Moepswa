@@ -15,7 +15,7 @@ const EXPANDED_CATEGORIES = [
       'Tailwind CSS',
       'Framer Motion',
       'Three.js',
-      'Vercel',
+      'Cloudflare Workers',
     ],
   },
   {
@@ -65,7 +65,7 @@ const COLLAPSED_CATEGORIES = [
   },
   {
     title: 'Monitoring',
-    technologies: ['Sentry', 'Better Stack'],
+    technologies: ['Cloudflare', 'Better Stack'],
   },
   {
     title: 'Analytics & Product Intelligence',

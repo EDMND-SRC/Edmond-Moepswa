@@ -24,21 +24,29 @@ export const getMediaUrl = (
 
   if (!url) return ''
 
-  // Fix Payload 3.x internal URLs if served from public/media
-  if (url.startsWith('/api/media/file/')) {
-    url = url.replace('/api/media/file/', '/media/')
-  }
-
-  if (cacheTag && cacheTag !== '') {
-    cacheTag = encodeURIComponent(cacheTag)
-  }
-
   // Check if URL already has http/https protocol
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    return cacheTag ? `${url}?${cacheTag}` : url
+    if (!cacheTag) {
+      return url
+    }
+
+    const resolvedURL = new URL(url)
+    resolvedURL.searchParams.set('v', cacheTag)
+    return resolvedURL.toString()
   }
 
   // Otherwise prepend client-side URL
   const baseUrl = getClientSideURL()
-  return cacheTag ? `${baseUrl}${url}?${cacheTag}` : `${baseUrl}${url}`
+
+  if (!baseUrl) {
+    return url
+  }
+
+  const resolvedURL = new URL(url, baseUrl)
+
+  if (cacheTag) {
+    resolvedURL.searchParams.set('v', cacheTag)
+  }
+
+  return resolvedURL.toString()
 }

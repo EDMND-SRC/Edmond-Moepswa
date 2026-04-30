@@ -2,22 +2,24 @@
 
 import { useState, useCallback } from 'react'
 import { 
+  Blocks,
+  Code2,
   Loader2, 
   Download,
   ShoppingCart,
-  BookOpen
+  BookOpen,
+  FileText,
+  ListChecks,
 } from 'lucide-react'
-import * as DevIcons from 'developer-icons'
 import type { Product } from '@/payload-types'
-import type { ComponentType } from 'react'
+import type { ComponentType, SVGProps } from 'react'
 
-// Map category slugs to branding icons
-const iconMap: Record<string, ComponentType<any>> = {
-  guide: DevIcons.Markdown,
-  checklist: DevIcons.Bash,
-  ebook: DevIcons.Notion,
-  boilerplate: DevIcons.NextJs,
-  tool: DevIcons.ViteJS,
+const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
+  guide: FileText,
+  checklist: ListChecks,
+  ebook: BookOpen,
+  boilerplate: Code2,
+  tool: Blocks,
 }
 
 interface ResourceCardsProps {
@@ -40,7 +42,7 @@ export function ResourceCards({ products }: ResourceCardsProps) {
         throw new Error('Failed to start checkout')
       }
 
-      const { url } = await res.json()
+      const { url } = (await res.json()) as { url?: string }
       if (url) {
         window.location.href = url
         return

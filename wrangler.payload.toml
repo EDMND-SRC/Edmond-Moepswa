@@ -1,0 +1,66 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "edmond-moepswa-payload"
+main = ".open-next/payload/worker.js"
+workers_dev = false
+compatibility_date = "2026-04-28"
+compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
+base_dir = ".open-next/payload"
+find_additional_modules = true
+
+[[rules]]
+type = "ESModule"
+globs = [
+  "cloudflare/*.js",
+  "cloudflare/*.mjs",
+  "middleware/*.mjs",
+  "server-functions/*/*.mjs",
+  ".build/durable-objects/*.js",
+]
+
+[[rules]]
+type = "CommonJS"
+globs = [
+  "server-functions/*/*.cjs",
+  ".build/*.cjs",
+]
+
+[assets]
+directory = ".open-next/payload/assets"
+binding = "ASSETS"
+
+[images]
+binding = "IMAGES"
+
+[vars]
+PAYLOAD_DB_POOL_MAX = "1"
+PAYLOAD_WORKER_NAME = "edmond-moepswa-payload"
+PUBLIC_WORKER_NAME = "edmond-moepswa"
+WORKERS_DEV_SUFFIX = "edmnd-src.workers.dev"
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "edmond-moepswa-payload"
+
+[[services]]
+binding = "PUBLIC_WORKER"
+service = "edmond-moepswa"
+
+[env.staging]
+name = "edmond-moepswa-payload-staging"
+
+[env.staging.images]
+binding = "IMAGES"
+
+[env.staging.vars]
+PAYLOAD_DB_POOL_MAX = "1"
+PAYLOAD_WORKER_NAME = "edmond-moepswa-payload-staging"
+PUBLIC_WORKER_NAME = "edmond-moepswa-staging"
+WORKERS_DEV_SUFFIX = "edmnd-src.workers.dev"
+
+[[env.staging.services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "edmond-moepswa-payload-staging"
+
+[[env.staging.services]]
+binding = "PUBLIC_WORKER"
+service = "edmond-moepswa-staging"

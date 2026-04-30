@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, type MouseEvent } from 'react'
-import Image from 'next/image'
+
 import Link from 'next/link'
 import { Calendar } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform, type MotionValue } from 'motion/react'
@@ -65,15 +65,12 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
       {/* Background Portrait */}
       <div className="absolute inset-0 z-0">
         {!portraitError && (
-          <Image
+          <img
             src={portraitSrc}
             alt="Edmond Moepswa Portrait"
-            fill
-            className="object-cover pointer-events-none"
-            priority
+            className="object-cover pointer-events-none absolute inset-0 w-full h-full"
             loading="eager"
-            sizes="100vw"
-            quality={100}
+            decoding="async"
             onError={() => setPortraitError(true)}
           />
         )}

@@ -2,49 +2,59 @@
 
 This guide provides instructions for deploying the Edmond Moepswa project to production.
 
-## Target Platform: Vercel
+## Target Platform: Cloudflare Workers
 
-The project is optimized for deployment on Vercel, leveraging its Next.js and Serverless functions capabilities.
+The project is deployed to Cloudflare Workers using OpenNext. The application runtime moves to Cloudflare, while the database remains on Neon PostgreSQL.
 
 ### Prerequisites
 
-- A Vercel account.
+- A Cloudflare account with Workers access.
 - A Neon PostgreSQL database instance.
 - Dodo Payments account.
 - Make.com account.
-- Sentry and PostHog accounts for monitoring and analytics.
+- PostHog account for analytics.
 
 ### Deployment Steps
 
 1.  **Configure Environment Variables**:
-    Set the following variables in your Vercel project dashboard:
+    Set the following variables in your Cloudflare Worker environment or Workers Builds settings:
     - `DATABASE_URL`: Your Neon connection string.
     - `PAYLOAD_SECRET`: A secure random string.
-    - `NEXT_PUBLIC_SERVER_URL`: The production URL of your site.
+    - `NEXT_PUBLIC_SERVER_URL`: `https://edmond-moepswa.edmnd-src.workers.dev`.
+    - `R2_BUCKET`, `R2_REGION`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`: Payload media storage in Cloudflare R2.
     - `DODO_PAYMENTS_API_KEY`: For payment processing.
+    - `DODO_PAYMENTS_ENVIRONMENT`: Keep this at `test_mode` until the Dodo catalog is ready for live traffic.
+    - `DODO_PAYMENTS_WEBHOOK_SECRET`: For webhook signature verification.
     - `MAKE_WEBHOOK_*`: Webhook URLs from your Make.com scenarios.
-    - `SENTRY_DSN`: For error tracking.
-    - `NEXT_PUBLIC_POSTHOG_KEY`: For product analytics.
+    - `NEXT_PUBLIC_POSTHOG_API_KEY`: For product analytics.
 
-2.  **Connect Repository**:
-    Connect your GitHub/GitLab/Bitbucket repository to Vercel.
+2.  **Install and type-check Cloudflare configuration**:
+    - `pnpm install`
+    - `pnpm cf-typegen`
+    - `pnpm generate:types && tsc --noEmit`
 
-3.  **Build Settings**:
-    - **Framework Preset**: Next.js
-    - **Build Command**: `pnpm build`
-    - **Install Command**: `pnpm install`
+3.  **Preview in the Cloudflare runtime**:
+    - `pnpm preview`
+    - Verify the homepage, `/about`, `/search?q=test`, one dynamic `[slug]` page, `/resources`, and `/admin`.
+    - Verify the Payload REST and GraphQL endpoints.
 
-4.  **Post-Deployment**:
-    - Run the database migrations (if not handled by the build script).
-    - Sync Dodo products using the provided scripts.
+4.  **Deploy to Workers**:
+    - `pnpm deploy`
+    - Confirm `https://edmond-moepswa.edmnd-src.workers.dev` loads successfully.
+
+5.  **Post-Deployment**:
+    - Run database migrations if the target environment schema is behind.
+    - Confirm the R2 bucket is receiving new uploads through the Payload admin.
+    - Keep Dodo traffic in `test_mode` until the real products exist, then switch the environment deliberately.
     - Verify webhooks for Cal.com and Dodo Payments.
+    - Confirm admin login, media rendering, and image transforms in the deployed runtime.
 
 ## Monitoring & Operations
 
-- **Error Tracking**: Handled by Sentry. Check the Sentry dashboard for runtime exceptions.
+- **Runtime Diagnostics**: Review Cloudflare deployment logs and Workers Logs for runtime exceptions.
 - **Analytics**: Managed by PostHog and Google Analytics 4.
 - **Uptime Monitoring**: Managed via Better Stack.
-- **Database Backups**: Handled by Neon's native backup and point-in-time recovery features.
+- **Database Backups**: Handled by Neon's native backup and point-in-time recovery features. No D1 database is used in this migration.
 
 ## CI/CD Pipeline
 

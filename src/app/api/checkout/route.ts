@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
+import { getDodoEnvironment } from '@/utilities/getDodoEnvironment'
 
 const client = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY!,
-  environment: process.env.DODO_PAYMENTS_ENVIRONMENT === 'test' ? 'test_mode' : 'live_mode',
+  environment: getDodoEnvironment(),
 })
 
 interface CheckoutRequest {
@@ -30,10 +31,12 @@ export async function POST(req: Request) {
       cartItem.amount = amount
     }
 
+    const returnURL = new URL('/resources/success', req.url).toString()
+
     const session = await client.checkoutSessions.create({
       product_cart: [cartItem],
       customer: customerEmail ? { email: customerEmail } : undefined,
-      return_url: `${process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'}/resources/success`,
+      return_url: returnURL,
     })
 
     return NextResponse.json({ url: session.checkout_url })

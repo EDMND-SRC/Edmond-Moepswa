@@ -121,7 +121,7 @@ export default function ServicesPage() {
                   <li>• Make.com: 1,000 operations/month free</li>
                   <li>• n8n self-hosted: Unlimited, free on your VPS</li>
                   <li>• Zapier: 100 tasks/month free</li>
-                  <li>• Vercel: Hobby tier free for personal projects</li>
+                  <li>• Cloudflare Workers: Free plan available for low-traffic deployments</li>
                   <li>• Supabase: Free tier includes 500MB database</li>
                 </ul>
               </div>
@@ -469,7 +469,11 @@ export default function ServicesPage() {
               },
               { platform: 'Zapier', free: '100 tasks/month', paid: 'From $19.99/month' },
               { platform: 'Supabase', free: '500MB DB, 1GB bandwidth', paid: 'From $25/month' },
-              { platform: 'Vercel', free: 'Hobby tier (personal)', paid: 'From $20/month (Pro)' },
+              {
+                platform: 'Cloudflare Workers',
+                free: 'Free plan available',
+                paid: 'Workers Paid from $5/month',
+              },
               { platform: 'Resend', free: '3,000 emails/month', paid: 'From $20/month' },
               { platform: 'HubSpot', free: 'CRM, 1M contacts', paid: 'From $15/month (Starter)' },
               { platform: 'PostHog', free: '1M events/month', paid: 'From $0 (open-source)' },

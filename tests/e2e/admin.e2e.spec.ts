@@ -1,21 +1,30 @@
 import { test, expect, Page } from '@playwright/test'
+import { resolveAdminUser, shouldUseSmokeUser } from '../helpers/adminUser'
 import { login } from '../helpers/login'
 import { seedTestUser, cleanupTestUser, testUser } from '../helpers/seedUser'
 
 test.describe('Admin Panel', () => {
+  test.describe.configure({ timeout: 120_000 })
   let page: Page
+  const useSmokeUser = shouldUseSmokeUser()
 
-  test.beforeAll(async ({ browser }, testInfo) => {
-    await seedTestUser()
+  test.beforeAll(async ({ browser }) => {
+    if (!useSmokeUser) {
+      await seedTestUser()
+    }
 
     const context = await browser.newContext()
     page = await context.newPage()
 
-    await login({ page, user: testUser })
+    await login({ page, user: useSmokeUser ? resolveAdminUser() : testUser })
   })
 
   test.afterAll(async () => {
-    await cleanupTestUser()
+    if (!useSmokeUser) {
+      await cleanupTestUser()
+    }
+
+    await page.context()?.close()
   })
 
   test('can navigate to dashboard', async () => {

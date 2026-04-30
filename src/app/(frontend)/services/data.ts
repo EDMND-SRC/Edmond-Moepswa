@@ -30,7 +30,6 @@ export function extractTechFromFeature(feature: string): string | null {
   if (/\bstripe\b/.test(lower)) return 'Stripe'
   if (/\bresend\b/.test(lower)) return 'Resend'
   if (/\bsupabase\b/.test(lower)) return 'Supabase'
-  if (/\bvercel\b/.test(lower)) return 'Vercel'
   if (/\bpostgres\b/.test(lower)) return 'PostgreSQL'
   if (/\bcal\.?com\b/.test(lower) || /\bcalendly\b/.test(lower)) return 'Cal.com'
   if (/\bwhatsapp\b/.test(lower)) return 'WhatsApp'
@@ -108,7 +107,7 @@ export const services: Service[] = [
       },
     ],
     notes:
-      'Always included across all configurations: Custom visual design and mobile-first responsive layout, WhatsApp click-to-chat link, one lead capture or contact form, basic SEO foundation, deployment to Vercel, 2 rounds of client revisions. Static/zero-motion design receives a P500 reduction — specify at scoping. Platform fees for third-party services are borne by the client. I default to free tiers first. Delivery timeline clock pauses during client review periods.',
+      'Always included across all configurations: Custom visual design and mobile-first responsive layout, WhatsApp click-to-chat link, one lead capture or contact form, basic SEO foundation, deployment to Cloudflare Workers, 2 rounds of client revisions. Static/zero-motion design receives a P500 reduction — specify at scoping. Platform fees for third-party services are borne by the client. I default to free tiers first. Delivery timeline clock pauses during client review periods.',
   },
   {
     id: '02',

@@ -1,5 +1,7 @@
 import type { Block } from 'payload'
 
+const useCloudflarePayloadTextarea = process.env.CLOUDFLARE_WORKER_VARIANT === 'payload'
+
 export const Code: Block = {
   slug: 'code',
   interfaceName: 'CodeBlock',
@@ -28,7 +30,16 @@ export const Code: Block = {
     },
     {
       name: 'code',
-      type: 'code',
+      ...(useCloudflarePayloadTextarea
+        ? {
+            admin: {
+              rows: 16,
+            },
+            type: 'textarea' as const,
+          }
+        : {
+            type: 'code' as const,
+          }),
       label: false,
       required: true,
     },

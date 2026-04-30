@@ -1,6 +1,6 @@
 # Edmond Moepswa
 
-**Website:** [edmond-moepswa.vercel.app](https://edmond-moepswa.vercel.app)
+**Website:** Set via `NEXT_PUBLIC_SERVER_URL`
 **Substack:** [edmnd.substack.com](https://edmnd.substack.com)
 
 Full-stack developer and systems thinker based in Gaborone, Botswana. Designs and builds custom websites, web applications, and workflow automations for businesses and institutions — from P&L statements to production code.
@@ -28,7 +28,7 @@ A production personal brand website for Edmond Moepswa, an independent software 
 | **Scheduling** | Cal.com embed with webhook automation      |
 | **Automation** | Make.com (Teams plan)                      |
 | **Products**   | Dodo Payments                              |
-| **Hosting**    | Vercel (Team: EDMND-SRC)                   |
+| **Hosting**    | Cloudflare Workers via OpenNext           |
 | **Analytics**  | PostHog, Google Analytics 4                |
 | **Monitoring** | Sentry (errors), Better Stack (uptime)     |
 
@@ -66,7 +66,7 @@ src/
 │   ├── Services.ts           # Service offerings with pricing
 │   ├── Products.ts           # Dodo Payments products
 │   ├── Leads.ts              # Lead capture from forms/calculator
-│   ├── Media.ts              # Image uploads with responsive sizes
+│   ├── Media.ts              # R2-backed image and video uploads
 │   ├── Users/                # Admin users (admin/editor roles)
 │   └── Pages/                # CMS pages with layout builder
 ├── globals/                  # Site-wide settings
@@ -144,6 +144,9 @@ Open `http://localhost:3000` for the site, `http://localhost:3000/admin` for CMS
 pnpm dev                  # Start dev server
 pnpm build                # Production build
 pnpm start                # Run production build
+pnpm preview              # Build and run in the Cloudflare Workers runtime
+pnpm deploy               # Build and deploy to Cloudflare Workers
+pnpm cf-typegen           # Generate Cloudflare env types
 pnpm generate:types       # Regenerate Payload TypeScript types
 pnpm generate:importmap   # Regenerate admin import map
 pnpm lint                 # Run ESLint
@@ -162,12 +165,11 @@ After seeding, upload project thumbnails via the Payload admin panel.
 
 ## Deployment
 
-### Vercel
+### Cloudflare Workers
 
-Deployed to Vercel with Neon PostgreSQL. All environment variables documented in `.env.local`.
+The Cloudflare deployment target is Workers using OpenNext, with Neon PostgreSQL kept in place for the application database and Payload uploads stored in Cloudflare R2.
 
-**URL:** https://edmond-moepswa.vercel.app
-**Team:** EDMND-SRC (`vercel.com/edmnd-src`)
+The current public runtime is `https://edmond-moepswa.edmnd-src.workers.dev`. Keep `NEXT_PUBLIC_SERVER_URL` pointed at that Workers URL until a custom domain is introduced. Media uploads use the `R2_*` environment variables, and Dodo remains in `test_mode` until those products are actually created.
 
 ## Security
 

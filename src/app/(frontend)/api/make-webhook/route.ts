@@ -36,6 +36,18 @@ const ALLOWED_LEAD_FIELDS = new Set([
   'source',
 ])
 
+type WorkflowName = keyof typeof WEBHOOK_URLS
+
+const isWorkflowName = (value: string): value is WorkflowName => value in WEBHOOK_URLS
+
+interface MakeWebhookBody {
+  data?: Record<string, unknown>
+  workflow: WorkflowName
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+
 function sanitizeLeadData(data: Record<string, unknown>): Record<string, unknown> {
   const sanitized: Record<string, unknown> = {}
   for (const key of ALLOWED_LEAD_FIELDS) {
@@ -44,6 +56,24 @@ function sanitizeLeadData(data: Record<string, unknown>): Record<string, unknown
     }
   }
   return sanitized
+}
+
+function parseMakeWebhookBody(value: unknown): MakeWebhookBody | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return null
+  }
+
+  const workflow = (value as Record<string, unknown>).workflow
+  const data = (value as Record<string, unknown>).data
+
+  if (typeof workflow !== 'string' || !isWorkflowName(workflow)) {
+    return null
+  }
+
+  return {
+    data: isRecord(data) ? data : undefined,
+    workflow,
+  }
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
@@ -57,7 +87,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Rate limited' }, { status: 429 })
     }
 
-    const body = await request.json()
+    const body = parseMakeWebhookBody(await request.json())
+    if (!body) {
+      return NextResponse.json({ error: 'Invalid webhook payload' }, { status: 400 })
+    }
+
     const { workflow, data } = body
 
     // Authentication check — allow unauthenticated lead-capture and dodo-download
@@ -78,7 +112,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Sanitize lead-capture data to only pass known fields
-    let forwardedData = data
+    let forwardedData: Record<string, unknown> | undefined = data
     if (workflow === 'lead-capture') {
       forwardedData = sanitizeLeadData(data || {})
     }

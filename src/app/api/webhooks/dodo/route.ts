@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+
 
 /**
  * Dodo Payments Webhook Handler
@@ -10,16 +10,34 @@ import config from '@payload-config'
  * Verifies webhook signatures to ensure authenticity.
  */
 
-function verifyWebhook(payload: string, signature: string, secret: string): boolean {
-  const expectedSignature = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex')
+async function verifyWebhook(payload: string, signature: string, secret: string): Promise<boolean> {
+  const encoder = new TextEncoder()
+  const keyData = encoder.encode(secret)
+  const data = encoder.encode(payload)
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
   )
+
+  const signatureBuffer = await crypto.subtle.sign('HMAC', key, data)
+  const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+
+  // Constant-time comparison
+  if (signature.length !== expectedSignature.length) {
+    return false
+  }
+
+  let result = 0
+  for (let i = 0; i < signature.length; i++) {
+    result |= signature.charCodeAt(i) ^ expectedSignature.charCodeAt(i)
+  }
+  return result === 0
 }
 
 export async function POST(req: Request) {
@@ -43,7 +61,7 @@ export async function POST(req: Request) {
       )
     }
 
-    if (!verifyWebhook(body, signature, webhookSecret)) {
+    if (!(await verifyWebhook(body, signature, webhookSecret))) {
       return NextResponse.json(
         { error: 'Invalid webhook signature' },
         { status: 401 }

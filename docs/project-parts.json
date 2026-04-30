@@ -15,7 +15,7 @@
         "Tailwind CSS 4",
         "shadcn/ui",
         "Motion",
-        "Vercel"
+        "Cloudflare Workers"
       ],
       "entry_points": [
         "src/app/page.tsx",
@@ -28,7 +28,7 @@
         "Dodo Payments",
         "Make.com",
         "PostHog",
-        "Sentry",
+        "Cloudflare R2",
         "Better Stack"
       ]
     }

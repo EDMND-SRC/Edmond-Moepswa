@@ -1,285 +1,173 @@
-/**
- * Technology Icon Registry — Static imports from developer-icons.
- *
- * BUNDLE NOTE: ~60 icons are statically imported to keep the services page
- * as a Server Component. All icons share the same visual style via the
- * developer-icons package. The icon registry maps technology names to their
- * corresponding SVG components.
- *
- * Icon mappings updated:
- * - 'Drizzle ORM' -> PostgreSQL (not Prisma)
- * - Amplitude -> Hotjar (not Datadog)
- * - 'Payload CMS' -> Notion (not GraphQL)
- * - No 'Better Stack' mapping (removed)
- * - PostHog -> Grafana
- */
-
 import type { ComponentType, SVGProps } from 'react'
 import {
-  // Languages
-  TypeScript,
-  JavaScript,
-  // Frontend
-  React,
-  NextJs,
-  TailwindCSS,
-  ThreeJsDark,
-  ViteJS,
-  FramerDark,
-  VueJs,
-  SvelteJS,
-  MaterialUI,
-  ChakraUI,
-  RadixUI,
-  ShadcnUI,
-  HeadlessUI,
-  Sass,
-  CSS3,
-  HTML5,
-  Redux,
-  ReactQuery,
-  ReactRouter,
-  // Backend
-  VercelDark,
-  NodeJs,
-  ExpressJsDark,
-  FastAPI,
-  Django,
-  NestJS,
-  Supabase,
-  Firebase,
-  AWS,
-  GoogleCloud,
-  Netlify,
-  Railway,
-  Render,
-  FlyIo,
-  Heroku,
-  // Database
-  PostgreSQL,
-  MySQL,
-  MongoDB,
-  Redis,
-  Prisma,
-  // Auth
-  Auth0,
-  Clerk,
-  // Email
-  ReSend,
-  // SMS
-  WhatsApp,
-  // Analytics
-  Grafana,
-  Hotjar,
-  // Storage
-  Cloudflare,
-  // Testing
-  Playwright,
-  Vitest,
-  Jest,
-  // DevOps
-  Docker,
-  GitHubDark,
-  Git,
-  ESLint,
-  Prettier,
-  Zod,
-  // Design
-  Figma,
-  // Productivity
-  Notion,
-  Slack,
-  Discord,
-  Jira,
-  VisualStudioCode,
-  // AI
-  OpenAI,
-  ClaudeAI,
-  // Browsers
-  Chrome,
-  Firefox,
-  Safari,
-  Edge,
-  // Social
-  LinkedIn,
-  Instagram,
-  XDark,
-  YouTube,
-  Telegram,
-  // Others
-  WordPress,
-  GraphQL,
-} from 'developer-icons'
+  Atom,
+  BarChart3,
+  Blocks,
+  Bot,
+  Braces,
+  CheckCheck,
+  Cloud,
+  Code2,
+  Container,
+  Database,
+  FileCode2,
+  GitBranch,
+  Globe,
+  Layers3,
+  Link,
+  Mail,
+  MessageCircle,
+  NotebookPen,
+  PenTool,
+  Server,
+  ShieldCheck,
+  ShoppingCart,
+  TestTube2,
+  Wind,
+} from 'lucide-react'
 
-type IconComponent = ComponentType<SVGProps<SVGElement>>
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>
 
-// Icon registry mapping technology names to static icon components
 export const ICON_REGISTRY: Record<string, IconComponent> = {
-  // Languages
-  TypeScript,
-  JavaScript,
-  // Frontend
-  React,
-  'Next.js': NextJs,
-  'Tailwind CSS': TailwindCSS,
-  'Three.js': ThreeJsDark,
-  Vite: ViteJS,
-  'Framer Motion': FramerDark,
-  Vue: VueJs,
-  'Vue.js': VueJs,
-  Svelte: SvelteJS,
-  'Svelte.js': SvelteJS,
-  'Material UI': MaterialUI,
-  'Chakra UI': ChakraUI,
-  'Radix UI': RadixUI,
-  'shadcn/ui': ShadcnUI,
-  'Headless UI': HeadlessUI,
-  Sass,
-  CSS: CSS3,
-  HTML: HTML5,
-  Redux,
-  'React Query': ReactQuery,
-  'React Router': ReactRouter,
-  // Backend
-  Vercel: VercelDark,
-  'Node.js': NodeJs,
-  'Express.js': ExpressJsDark,
-  FastAPI,
-  Django,
-  NestJS,
-  Supabase,
-  Firebase,
-  AWS,
-  'Google Cloud': GoogleCloud,
-  Netlify,
-  Railway,
-  Render,
-  'Fly.io': FlyIo,
-  Heroku,
-  // Database
-  PostgreSQL,
-  Neon: PostgreSQL,
-  'Neon (Serverless PostgreSQL)': PostgreSQL,
-  MySQL,
-  MongoDB,
-  Redis,
-  Prisma,
-  'Drizzle ORM': PostgreSQL,
-  // Auth
-  Auth0,
-  Clerk,
-  Kinde: Clerk,
-  // Email
-  Resend: ReSend,
-  'AWS SES': AWS,
-  'Customer.io': ReSend,
-  // SMS
-  Twilio: WhatsApp,
-  // Analytics
-  PostHog: Grafana,
-  Amplitude: Hotjar,
-  // SEO
-  'Google Search Console': GoogleCloud,
-  'Google Analytics 4': GoogleCloud,
-  'Google Business Profile': GoogleCloud,
-  'Ahrefs Webmaster Tools': GoogleCloud,
-  'schema.org': GoogleCloud,
-  // Storage
-  Cloudflare,
-  'Cloudflare Pages': Cloudflare,
-  'Cloudflare Workers': Cloudflare,
-  'Cloudflare R2': Cloudflare,
-  'AWS S3': AWS,
-  // Testing
-  Playwright,
-  Vitest,
-  Jest,
-  // DevOps
-  Docker,
-  GitHub: GitHubDark,
-  Git,
-  ESLint,
-  Prettier,
-  Zod,
-  // Design
-  Figma,
-  // Productivity
-  Notion,
-  Slack,
-  Discord,
-  Jira,
-  'VS Code': VisualStudioCode,
-  // AI
-  OpenAI,
-  Claude: ClaudeAI,
-  // Browsers
-  Chrome,
-  Firefox,
-  Safari,
-  Edge,
-  // Social
-  WhatsApp,
-  LinkedIn,
-  Instagram,
-  Twitter: XDark,
-  X: XDark,
-  YouTube,
-  Telegram,
-  // Others
-  WordPress,
-  GraphQL,
-  'Payload CMS': Notion,
-  Keystatic: Notion,
-  'Make.com': Notion,
-  n8n: Notion,
-  'DPO PayGate': GraphQL,
-  'Orange Money': GraphQL,
-  'Dodo Payments': GraphQL,
-  'Lemon Squeezy': GraphQL,
-  Paddle: GraphQL,
-  Gumroad: GraphQL,
-  Shopify: GraphQL,
-  'AWS SNS': AWS,
-  'Cal.com': Notion,
-  Sentry: GraphQL,
-  HubSpot: GraphQL,
-  Stripe: GraphQL,
+  TypeScript: Code2,
+  JavaScript: FileCode2,
+  React: Atom,
+  'Next.js': Layers3,
+  'Tailwind CSS': Wind,
+  'Three.js': Blocks,
+  Vite: Layers3,
+  'Framer Motion': Wind,
+  Vue: Atom,
+  'Vue.js': Atom,
+  Svelte: Atom,
+  'Svelte.js': Atom,
+  'Material UI': Blocks,
+  'Chakra UI': Blocks,
+  'Radix UI': Blocks,
+  'shadcn/ui': Blocks,
+  'Headless UI': Blocks,
+  Sass: Wind,
+  CSS: Wind,
+  HTML: FileCode2,
+  Redux: Layers3,
+  'React Query': Database,
+  'React Router': Link,
+  'Node.js': Server,
+  'Express.js': Server,
+  FastAPI: Server,
+  Django: Server,
+  NestJS: Server,
+  Supabase: Database,
+  Firebase: Database,
+  AWS: Cloud,
+  'Google Cloud': Cloud,
+  Netlify: Cloud,
+  Railway: Cloud,
+  Render: Cloud,
+  'Fly.io': Cloud,
+  Heroku: Cloud,
+  PostgreSQL: Database,
+  Neon: Database,
+  'Neon (Serverless PostgreSQL)': Database,
+  MySQL: Database,
+  MongoDB: Database,
+  Redis: Database,
+  Prisma: Database,
+  'Drizzle ORM': Database,
+  Auth0: ShieldCheck,
+  Clerk: ShieldCheck,
+  Kinde: ShieldCheck,
+  Resend: Mail,
+  'AWS SES': Mail,
+  'Customer.io': Mail,
+  Twilio: MessageCircle,
+  'AWS SNS': MessageCircle,
+  WhatsApp: MessageCircle,
+  Telegram: MessageCircle,
+  PostHog: BarChart3,
+  Amplitude: BarChart3,
+  Hotjar: BarChart3,
+  'Better Stack': BarChart3,
+  'Google Search Console': BarChart3,
+  'Google Analytics 4': BarChart3,
+  'Google Business Profile': BarChart3,
+  'Ahrefs Webmaster Tools': BarChart3,
+  'schema.org': Braces,
+  Cloudflare: Cloud,
+  'Cloudflare Pages': Cloud,
+  'Cloudflare Workers': Cloud,
+  'Cloudflare R2': Cloud,
+  'AWS S3': Cloud,
+  Playwright: TestTube2,
+  Vitest: TestTube2,
+  Jest: TestTube2,
+  Docker: Container,
+  GitHub: GitBranch,
+  Git: GitBranch,
+  ESLint: CheckCheck,
+  Prettier: CheckCheck,
+  Zod: CheckCheck,
+  Figma: PenTool,
+  Notion: NotebookPen,
+  Slack: MessageCircle,
+  Discord: MessageCircle,
+  Jira: NotebookPen,
+  'VS Code': FileCode2,
+  OpenAI: Bot,
+  Claude: Bot,
+  Chrome: Globe,
+  Firefox: Globe,
+  Safari: Globe,
+  Edge: Globe,
+  LinkedIn: Link,
+  Instagram: Link,
+  Twitter: Link,
+  X: Link,
+  YouTube: Link,
+  WordPress: Globe,
+  GraphQL: Braces,
+  'Payload CMS': NotebookPen,
+  Keystatic: NotebookPen,
+  'Make.com': NotebookPen,
+  n8n: NotebookPen,
+  'DPO PayGate': ShoppingCart,
+  'Orange Money': ShoppingCart,
+  'Dodo Payments': ShoppingCart,
+  'Lemon Squeezy': ShoppingCart,
+  Paddle: ShoppingCart,
+  Gumroad: ShoppingCart,
+  Shopify: ShoppingCart,
+  HubSpot: Link,
+  Stripe: ShoppingCart,
+  'Cal.com': Link,
 }
 
-// Cache for resolved icon components (null means a previous miss)
 const iconCache = new Map<string, IconComponent | null>()
+const keyMatchers: Array<[string, RegExp]> = Object.entries(ICON_REGISTRY).map(([key]) => [
+  key,
+  new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'),
+])
 
-// Pre-compiled regex matchers for word-boundary matching
-const keyMatchers: Array<[string, RegExp]> = Object.entries(ICON_REGISTRY).map(
-  ([key]) =>
-    [key, new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i')] as [
-      string,
-      RegExp,
-    ],
-)
-
-/**
- * Get an icon component for a technology name.
- * Matching: exact -> case-insensitive -> word-boundary regex.
- * Returns null if no match found.
- */
 export function getTechIcon(techName: string): IconComponent | null {
   const trimmed = techName.trim()
-  if (!trimmed) return null
 
-  // Check cache
+  if (!trimmed) {
+    return null
+  }
+
   if (iconCache.has(trimmed)) {
     return iconCache.get(trimmed) ?? null
   }
 
-  // Level 1: Exact match
-  if (ICON_REGISTRY[trimmed]) {
-    iconCache.set(trimmed, ICON_REGISTRY[trimmed])
-    return ICON_REGISTRY[trimmed]
+  const exactMatch = ICON_REGISTRY[trimmed]
+
+  if (exactMatch) {
+    iconCache.set(trimmed, exactMatch)
+    return exactMatch
   }
 
-  // Level 2: Case-insensitive match
   const lowerName = trimmed.toLowerCase()
+
   for (const [key, component] of Object.entries(ICON_REGISTRY)) {
     if (key.toLowerCase() === lowerName) {
       iconCache.set(trimmed, component)
@@ -287,24 +175,19 @@ export function getTechIcon(techName: string): IconComponent | null {
     }
   }
 
-  // Level 3: Word-boundary regex match
-  for (const [_key, regex] of keyMatchers) {
+  for (const [key, regex] of keyMatchers) {
     if (regex.test(trimmed)) {
-      const component = ICON_REGISTRY[_key]
+      const component = ICON_REGISTRY[key]
+
       iconCache.set(trimmed, component)
       return component
     }
   }
 
-  // Cache the miss
   iconCache.set(trimmed, null)
   return null
 }
 
-/**
- * TechIcon component with automatic fallback to text.
- * Renders an icon when found; otherwise falls back to the technology name as text.
- */
 interface TechIconProps {
   tech: string
   showLabel?: boolean
@@ -320,10 +203,12 @@ export function TechIcon({
   ...props
 }: TechIconProps) {
   const trimmed = tech.trim()
+
   if (!trimmed) {
     if (fallbackToText && showLabel) {
       return <span className={className}>&nbsp;</span>
     }
+
     return null
   }
 
@@ -333,6 +218,7 @@ export function TechIcon({
     if (fallbackToText && showLabel) {
       return <span className={className}>{trimmed}</span>
     }
+
     return null
   }
 
@@ -345,12 +231,13 @@ export function TechIcon({
     )
   }
 
-  const { className: _cn, ...restProps } = props as Record<string, unknown>
+  const { className: _className, ...restProps } = props as SVGProps<SVGSVGElement>
+
   return (
     <Icon
       className={`w-4 h-4 shrink-0 ${className}`}
       aria-label={trimmed}
-      {...(restProps as SVGProps<SVGElement>)}
+      {...restProps}
     />
   )
 }

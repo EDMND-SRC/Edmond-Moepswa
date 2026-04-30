@@ -19,7 +19,6 @@ function checkRateLimit(ip: string, max: number, windowMs: number): boolean {
 /**
  * Server-side geo detection proxy.
  * Avoids CORS issues with ipapi.co by fetching from the server.
- * Also respects Vercel's built-in geo headers when available.
  */
 export async function GET(request: Request) {
   // Rate limiting (30 requests per minute per IP for geo)
@@ -27,9 +26,6 @@ export async function GET(request: Request) {
   if (!checkRateLimit(ip, 30, 60000)) {
     return NextResponse.json({ error: 'Rate limited' }, { status: 429 })
   }
-
-  // Try Vercel geo headers first (free, no CORS issues)
-  const headers = new Headers()
 
   try {
     const response = await fetch('https://ipapi.co/json/', {
@@ -40,7 +36,12 @@ export async function GET(request: Request) {
     })
 
     if (response.ok) {
-      const data = await response.json()
+      const data = (await response.json()) as {
+        city?: string | null
+        country_code?: string | null
+        country_name?: string | null
+        region?: string | null
+      }
       return NextResponse.json({
         country_code: data.country_code || null,
         country_name: data.country_name || null,

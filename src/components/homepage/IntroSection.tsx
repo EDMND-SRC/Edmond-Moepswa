@@ -17,6 +17,36 @@ interface EmphasisPhrase {
   text: string
 }
 
+function RevealToken({
+  progress,
+  rangeWidth,
+  scrollYProgress,
+  token,
+}: {
+  progress: number
+  rangeWidth: number
+  scrollYProgress: ReturnType<typeof useScroll>['scrollYProgress']
+  token: { type: 'emphasis' | 'plain'; word: string }
+}) {
+  const start = progress
+  const end = start + rangeWidth
+  const emphasisInput = [start, start + rangeWidth * 0.5, end]
+  const emphasisOutput = ['#595959', '#FF4D2E', '#FFFFFF']
+  const plainInput = [start, end]
+  const plainOutput = ['#595959', '#FFFFFF']
+  const color = useTransform(
+    scrollYProgress,
+    token.type === 'emphasis' ? emphasisInput : plainInput,
+    token.type === 'emphasis' ? emphasisOutput : plainOutput,
+  )
+
+  return (
+    <motion.span style={{ color }} className="inline">
+      {token.word}
+    </motion.span>
+  )
+}
+
 function ScrollColorRevealParagraph({
   text,
   wordOffset,
@@ -90,37 +120,19 @@ function ScrollColorRevealParagraph({
           return <span key={i}>{token.word}</span>
         }
 
-        // Calculate this token's position among non-whitespace tokens
         const nonWsIndex = nonWsTokens.indexOf(token)
         const globalIndex = wordOffset + nonWsIndex
         const progress = globalIndex / totalWords
         const rangeWidth = 0.5 / totalWords
 
-        if (token.type === 'emphasis') {
-          // 3-stage: dark gray → brand orange → light gray
-          const start = progress
-          const mid = start + rangeWidth * 0.5
-          const end = start + rangeWidth
-          const color = useTransform(
-            scrollYProgress,
-            [start, mid, end],
-            ['#595959', '#FF4D2E', '#FFFFFF'],
-          )
-          return (
-            <motion.span key={i} style={{ color }} className="inline">
-              {token.word}
-            </motion.span>
-          )
-        }
-
-        // 2-stage: dark gray → light gray
-        const start = progress
-        const end = start + rangeWidth
-        const color = useTransform(scrollYProgress, [start, end], ['#595959', '#FFFFFF'])
         return (
-          <motion.span key={i} style={{ color }} className="inline">
-            {token.word}
-          </motion.span>
+          <RevealToken
+            key={i}
+            progress={progress}
+            rangeWidth={rangeWidth}
+            scrollYProgress={scrollYProgress}
+            token={token}
+          />
         )
       })}
     </p>

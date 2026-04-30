@@ -44,11 +44,11 @@ export default function HorizontalScroll({ children, className = '' }: Horizonta
     offset: ['start start', 'end end'],
   })
 
+  const x = useTransform(scrollYProgress, [0, 1], scrollRange)
+
   if (reducedMotion) {
     return <div className={className}>{children}</div>
   }
-
-  const x = useTransform(scrollYProgress, [0, 1], scrollRange)
 
   return (
     <div ref={containerRef} className="relative">

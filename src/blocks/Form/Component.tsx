@@ -53,7 +53,7 @@ export const FormBlock: React.FC<
 
   const [isLoading, setIsLoading] = useState(false)
   const [hasSubmitted, setHasSubmitted] = useState<boolean>()
-  const [error, setError] = useState<{ message: string; status?: string } | undefined>()
+  const [error, setError] = useState<{ message: string; status?: number | string } | undefined>()
   const router = useRouter()
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -93,7 +93,7 @@ export const FormBlock: React.FC<
             method: 'POST',
           })
 
-          const res = await req.json()
+          const res = (await req.json()) as { status?: number }
 
           clearTimeout(loadingTimerRef.current)
 

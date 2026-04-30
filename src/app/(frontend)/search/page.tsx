@@ -1,6 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
+import { CardPostData } from '@/components/Card'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -9,7 +10,6 @@ export const revalidate = 3600
 import React from 'react'
 import { Search } from '@/search/Component'
 import PageClient from './page.client'
-import { CardPostData } from '@/components/Card'
 
 type Args = {
   searchParams: Promise<{
@@ -18,61 +18,58 @@ type Args = {
 }
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q: query } = await searchParamsPromise
-  const payload = await getPayload({ config: configPromise })
+  const normalizedQuery = query?.trim().toLowerCase() ?? ''
 
-  const posts = await payload.find({
-    collection: 'search',
-    depth: 1,
-    limit: 12,
-    select: {
-      title: true,
-      slug: true,
-      categories: true,
-      meta: true,
-    },
-    pagination: false,
-    ...(query
-      ? {
-          where: {
-            or: [
-              {
-                title: {
-                  contains: query,
-                },
-              },
-              {
-                'meta.description': {
-                  contains: query,
-                },
-              },
-              {
-                'meta.title': {
-                  contains: query,
-                },
-              },
-              {
-                slug: {
-                  contains: query,
-                },
-              },
-            ],
-          },
-        }
-      : {}),
+  const searchResults = normalizedQuery
+    ? await (await getPayload({ config: configPromise })).find({
+        collection: 'search',
+        depth: 0,
+        limit: 100,
+        overrideAccess: false,
+        sort: '-updatedAt',
+        select: {
+          doc: true,
+          meta: true,
+          slug: true,
+          title: true,
+        },
+        pagination: false,
+      })
+    : { docs: [] }
+
+  const filteredDocs = normalizedQuery
+    ? searchResults.docs.filter((doc) => {
+        return [doc.title, doc.meta?.title, doc.meta?.description, doc.slug].some((value) => {
+          return typeof value === 'string' && value.toLowerCase().includes(normalizedQuery)
+        })
+      })
+    : searchResults.docs
+
+  const mappedPosts: CardPostData[] = filteredDocs.slice(0, 12).map((doc) => {
+    const href =
+      doc.doc.relationTo === 'pages'
+        ? doc.slug === 'home'
+          ? '/'
+          : doc.slug
+            ? `/${doc.slug}`
+            : null
+        : null
+
+    return {
+      categories: null,
+      href,
+      id: doc.id,
+      meta: doc.meta
+        ? {
+            description: doc.meta.description ?? null,
+            image: doc.meta.image ?? null,
+            title: doc.meta.title ?? null,
+          }
+        : null,
+      slug: doc.slug ?? null,
+      title: doc.title ?? null,
+    }
   })
-
-  const mappedPosts: CardPostData[] = posts.docs.map((doc) => ({
-    slug: doc.slug ?? null,
-    title: doc.title ?? null,
-    meta: doc.meta
-      ? {
-          title: doc.meta.title ?? null,
-          description: doc.meta.description ?? null,
-          image: doc.meta.image ?? null,
-        }
-      : null,
-    categories: doc.categories?.map((cat) => ({ title: cat.title ?? null })) ?? null,
-  }))
 
   return (
     <div className="pt-24 pb-24">

@@ -1,15 +1,12 @@
 import { getServerSideSitemap } from 'next-sitemap'
 import { getPayloadSingleton } from '@/lib/payload'
-import { unstable_cache } from 'next/cache'
+import { unstable_cache } from 'next/cache.js'
+import { toBufferedResponse } from '@/utilities/toBufferedResponse'
 
 const getPagesSitemap = unstable_cache(
   async () => {
     const payload = await getPayloadSingleton()
-    const SITE_URL =
-      process.env.NEXT_PUBLIC_SERVER_URL ||
-      (process.env.VERCEL_PROJECT_PRODUCTION_URL
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-        : 'https://example.com')
+    const SITE_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
     const results = await payload.find({
       collection: 'pages',
@@ -60,5 +57,5 @@ const getPagesSitemap = unstable_cache(
 export async function GET() {
   const sitemap = await getPagesSitemap()
 
-  return getServerSideSitemap(sitemap)
+  return toBufferedResponse(await getServerSideSitemap(sitemap))
 }

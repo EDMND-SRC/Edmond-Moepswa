@@ -51,8 +51,9 @@ export default function PrivacyPolicyPage() {
           Google Analytics 4 (GA4).
         </li>
         <li>
-          <strong>Technical logs:</strong> server request logs, error reports, and performance
-          metrics collected by Vercel hosting infrastructure.
+          <strong>Technical logs:</strong> server request logs, operational diagnostics, and
+          performance metrics collected by Cloudflare hosting infrastructure and the application
+          runtime.
         </li>
       </ul>
 
@@ -119,12 +120,12 @@ export default function PrivacyPolicyPage() {
       <h2>6. Third-Party Services and Data Sharing</h2>
       <div className="flex flex-col gap-6 mb-12">
         <div className="p-4 rounded-xl border border-white/10 bg-white/5">
-          <h3 className="text-white font-medium mb-1">Vercel Inc. (Hosting)</h3>
+          <h3 className="text-white font-medium mb-1">Cloudflare, Inc. (Hosting &amp; CDN)</h3>
           <p className="text-[#b0b0b0] text-sm leading-relaxed mb-3">
-            Server infrastructure and edge functions. Vercel is SOC 2 Type II compliant.
+            Application hosting, edge delivery, media serving, and request processing.
           </p>
-          <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
-            Vercel Privacy Policy →
+          <a href="https://www.cloudflare.com/privacypolicy" target="_blank" rel="noopener noreferrer" className="text-[#FF4D2E] text-xs hover:underline">
+            Cloudflare Privacy Policy →
           </a>
         </div>
 
@@ -221,8 +222,9 @@ export default function PrivacyPolicyPage() {
           retained for 14 months (default setting).
         </li>
         <li>
-          <strong>Server logs (Vercel):</strong> retained for 14 days as per Vercel&apos;s default
-          retention policy.
+          <strong>Server logs and diagnostics:</strong> retained according to active Cloudflare and
+          application logging settings, and only for operational security, debugging, and service
+          reliability.
         </li>
         <li>
           <strong>Store purchase records:</strong> retained by Dodo Payments as merchant of record per
@@ -267,10 +269,10 @@ export default function PrivacyPolicyPage() {
 
       <h2>10. International Data Transfers</h2>
       <p>
-        Because I use cloud-based services (Vercel, Neon, Supabase, Make.com, Dodo Payments, PostHog,
-        Google), your data may be transferred to and processed in countries outside Botswana,
-        including the United States and European Union. These transfers are governed by the
-        third-party services&apos; own data transfer mechanisms (e.g., EU Standard Contractual
+        Because I use cloud-based services (Cloudflare, Neon, Supabase, Make.com, Dodo Payments,
+        PostHog, Google), your data may be transferred to and processed in countries outside
+        Botswana, including the United States and European Union. These transfers are governed by
+        the third-party services&apos; own data transfer mechanisms (e.g., EU Standard Contractual
         Clauses). I do not independently transfer data across borders outside of these service
         relationships.
       </p>

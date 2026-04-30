@@ -2,6 +2,7 @@ import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin, Field } from 'payload'
 import { fieldAffectsData } from 'payload/shared'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
@@ -13,6 +14,8 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 import { Page } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
+const useCloudflarePayloadAdminBuild = process.env.CLOUDFLARE_WORKER_VARIANT === 'payload'
+
 const generateTitle: GenerateTitle<any> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Edmond Moepswa` : 'Edmond Moepswa — Web Designer & Developer'
 }
@@ -23,6 +26,22 @@ const generateURL: GenerateURL<any> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
+  s3Storage({
+    enabled: Boolean(process.env.R2_BUCKET),
+    collections: {
+      media: true,
+    },
+    bucket: process.env.R2_BUCKET || '',
+    config: {
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+      },
+      endpoint: process.env.R2_ENDPOINT,
+      forcePathStyle: true,
+      region: process.env.R2_REGION || 'auto',
+    },
+  }),
   redirectsPlugin({
     collections: ['pages'],
     overrides: {
@@ -44,11 +63,15 @@ export const plugins: Plugin[] = [
       },
     },
   }),
-  seoPlugin({
-    collections: ['pages', 'services', 'projects'],
-    generateTitle,
-    generateURL,
-  }),
+  ...(!useCloudflarePayloadAdminBuild
+    ? [
+        seoPlugin({
+          collections: ['pages', 'services', 'projects'],
+          generateTitle,
+          generateURL,
+        }),
+      ]
+    : []),
   formBuilderPlugin({
     fields: {
       payment: false,

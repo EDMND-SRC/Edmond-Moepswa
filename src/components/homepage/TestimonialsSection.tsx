@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
-import Image from 'next/image'
+
 
 // ─── PLACEHOLDER TESTIMONIALS ───
 // These are fictional testimonials based on seeded project data.
@@ -171,13 +171,14 @@ export default function TestimonialsSection() {
                   {avatarError ? (
                     <span className="text-lg font-medium text-[#b0b0b0]">{current.initials}</span>
                   ) : (
-                    <Image
+                    <img
                       src={current.avatarPath}
                       alt={`Portrait of ${current.name}`}
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
                       onError={() => setAvatarError(true)}
+                      decoding="async"
                     />
                   )}
                 </div>

@@ -49,8 +49,11 @@
   ],
   "exclude": [
     "node_modules",
+    "cloudflare-env.d.ts",
+    "migrations_backup",
     "scripts/seed-dodo-products.ts",
     "scripts/seed-dodo-products-api.ts",
-    "seed-project-thumbnails.ts"
+    "seed-project-thumbnails.ts",
+    "scratch"
   ]
 }

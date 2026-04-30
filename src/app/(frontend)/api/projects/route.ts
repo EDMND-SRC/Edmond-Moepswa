@@ -1,11 +1,12 @@
-import { getPayloadSingleton } from '@/lib/payload'
+import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
 
 const VALID_CATEGORIES = ['websites', 'applications', 'automation', 'products']
 
 export async function GET(req: NextRequest) {
   try {
-    const payload = await getPayloadSingleton()
+    const payload = await getPayload({ config: configPromise })
     const { searchParams } = req.nextUrl
 
     // Parse and validate limit

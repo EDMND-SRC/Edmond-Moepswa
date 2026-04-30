@@ -2,18 +2,30 @@ import type { Metadata } from 'next'
 
 import type { Media, Page, Config } from '../payload-types'
 
+import { canTransformMediaURL, getMediaTransformURL } from './getMediaTransformURL'
+import { getMediaUrl } from './getMediaUrl'
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
 
 const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()
 
-  let url = serverUrl + '/website-template-OG.webp'
+  let url = serverUrl + '/og-image'
 
   if (image && typeof image === 'object' && 'url' in image) {
-    const ogUrl = image.sizes?.og?.url
+    const imageURL = getMediaUrl(image.url)
 
-    url = ogUrl ? serverUrl + ogUrl : serverUrl + image.url
+    if (imageURL) {
+      url = canTransformMediaURL(imageURL)
+        ? getMediaTransformURL({
+            baseURL: serverUrl,
+            fit: 'cover',
+            height: 630,
+            sourceURL: imageURL,
+            width: 1200,
+          })
+        : imageURL
+    }
   }
 
   return url

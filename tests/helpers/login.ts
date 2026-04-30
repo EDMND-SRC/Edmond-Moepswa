@@ -15,7 +15,7 @@ export interface LoginOptions {
  */
 export async function login({
   page,
-  serverURL = 'http://localhost:3000',
+  serverURL = process.env.E2E_BASE_URL || 'http://localhost:3000',
   user,
 }: LoginOptions): Promise<void> {
   await page.goto(`${serverURL}/admin/login`)
@@ -26,7 +26,10 @@ export async function login({
   await page.fill('input[name="password"]', user.password)
   await page.click('button[type="submit"]')
 
-  await page.waitForURL(`${serverURL}/admin`)
+  await page.waitForURL(
+    (url) => url.origin === serverURL && (url.pathname === '/admin' || url.pathname === '/admin/'),
+    { timeout: 60_000, waitUntil: 'domcontentloaded' },
+  )
 
   const dashboardArtifact = page.locator('span[title="Dashboard"]')
   await expect(dashboardArtifact).toBeVisible()

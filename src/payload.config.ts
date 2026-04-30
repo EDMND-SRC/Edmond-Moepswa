@@ -1,5 +1,4 @@
-import { postgresAdapter } from '@payloadcms/db-postgres'
-import sharp from 'sharp'
+import { postgresAdapter, type PostgresAdapterArgs } from '@payloadcms/db-postgres'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
@@ -19,10 +18,15 @@ import { Header } from './Header/config'
 import { Footer } from './Footer/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
+import { workerSafePg } from '@/lib/cloudflare/workerSafePg'
 import { getServerSideURL } from './utilities/getURL'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const payloadDbPoolMax = Number.parseInt(process.env.PAYLOAD_DB_POOL_MAX || '', 10)
+const useWorkerSafePg = process.env.PAYLOAD_DB_POOL_MAX === '1'
+const useCloudflarePayloadAdminBuild = process.env.CLOUDFLARE_WORKER_VARIANT === 'payload'
+const runtimePg = useWorkerSafePg ? (workerSafePg as unknown as PostgresAdapterArgs['pg']) : undefined
 
 export default buildConfig({
   admin: {
@@ -38,46 +42,48 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
-    livePreview: {
-      breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
-      ],
-    },
+    ...(useCloudflarePayloadAdminBuild
+      ? {}
+      : {
+          livePreview: {
+            breakpoints: [
+              {
+                label: 'Mobile',
+                name: 'mobile',
+                width: 375,
+                height: 667,
+              },
+              {
+                label: 'Tablet',
+                name: 'tablet',
+                width: 768,
+                height: 1024,
+              },
+              {
+                label: 'Desktop',
+                name: 'desktop',
+                width: 1440,
+                height: 900,
+              },
+            ],
+          },
+        }),
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: postgresAdapter({
+    ...(runtimePg ? { pg: runtimePg } : {}),
     pool: {
       connectionString: process.env.DATABASE_URL || '',
+      ...(Number.isFinite(payloadDbPoolMax) ? { max: payloadDbPoolMax } : {}),
     },
     push: false,
   }),
   collections: [Pages, Services, Projects, Testimonials, FAQs, Media, Leads, Users, Orders, Products],
-  cors: [
-    getServerSideURL(),
-    process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : '',
-  ].filter(Boolean),
+  cors: [getServerSideURL()],
   globals: [Header, Footer, SiteSettings],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
-  sharp,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -91,7 +97,7 @@ export default buildConfig({
         if (!secret) return false
 
         // If there is no logged in user, then check
-        // for the Vercel Cron secret to be present as an
+        // for the scheduled job secret to be present as an
         // Authorization header:
         const authHeader = req.headers.get('authorization')
         return authHeader === `Bearer ${secret}`

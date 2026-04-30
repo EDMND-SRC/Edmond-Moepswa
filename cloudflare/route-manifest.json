@@ -1,0 +1,102 @@
+{
+  "publicExactRoutes": [
+    "/api/cal-webhook",
+    "/api/checkout",
+    "/api/dodo-products",
+    "/api/faqs",
+    "/api/geo",
+    "/api/make-webhook",
+    "/api/media/transform",
+    "/api/pages",
+    "/api/projects",
+    "/api/services",
+    "/api/substack",
+    "/api/testimonials",
+    "/api/webhooks/dodo",
+    "/next/exit-preview",
+    "/next/preview",
+    "/og-image",
+    "/pages-sitemap.xml"
+  ],
+  "publicRootApiRoutes": [
+    "/api/cal-webhook",
+    "/api/checkout",
+    "/api/dodo-products",
+    "/api/geo",
+    "/api/media/transform",
+    "/api/substack",
+    "/api/webhooks/dodo"
+  ],
+  "publicRouteMethods": {
+    "/pages-sitemap.xml": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/faqs": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/make-webhook": [
+      "POST"
+    ],
+    "/api/pages": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/projects": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/services": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/testimonials": [
+      "GET",
+      "HEAD"
+    ],
+    "/next/exit-preview": [
+      "GET",
+      "HEAD"
+    ],
+    "/next/preview": [
+      "GET",
+      "HEAD"
+    ],
+    "/og-image": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/cal-webhook": [
+      "POST"
+    ],
+    "/api/checkout": [
+      "POST"
+    ],
+    "/api/dodo-products": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/geo": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/media/transform": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/substack": [
+      "GET",
+      "HEAD"
+    ],
+    "/api/webhooks/dodo": [
+      "POST"
+    ]
+  },
+  "payloadRoutes": [
+    "/api/[...slug]",
+    "/api/graphql",
+    "/api/graphql-playground"
+  ],
+  "schemaVersion": 1
+}

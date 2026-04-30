@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import Parser from 'rss-parser'
 
 // ── Rate limiter ──────────────────────────────────────────────────────────────
 
@@ -33,15 +32,22 @@ export async function GET(request: Request) {
     return NextResponse.json([])
   }
 
-  const parser = new Parser()
   try {
-    const feed = await parser.parseURL(SUBSTACK_FEED_URL)
-    const posts = feed.items.slice(0, 3).map((item) => ({
-      title: item.title,
-      link: item.link,
-      pubDate: item.pubDate,
-      contentSnippet: item.contentSnippet?.slice(0, 150) + '...',
-    }))
+    const response = await fetch(SUBSTACK_FEED_URL)
+    if (!response.ok) throw new Error('Failed to fetch feed')
+    const xml = await response.text()
+
+    // Simple XML extraction for Substack RSS items
+    const items = xml.split('<item>').slice(1)
+    const posts = items.slice(0, 3).map((item) => {
+      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || item.match(/<title>(.*?)<\/title>/)?.[1] || ''
+      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || ''
+      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || ''
+      const contentSnippet = (item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] || item.match(/<description>(.*?)<\/description>/)?.[1] || '').replace(/<[^>]*>?/gm, '').slice(0, 150) + '...'
+      
+      return { title, link, pubDate, contentSnippet }
+    })
+
     return NextResponse.json(posts)
   } catch (error) {
     console.error('Error fetching Substack feed:', error)

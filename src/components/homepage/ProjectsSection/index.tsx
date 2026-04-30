@@ -28,7 +28,7 @@ export default function ProjectsSection() {
     fetch('/api/projects?limit=100', { signal })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-        return res.json()
+        return res.json() as Promise<{ docs?: Record<string, unknown>[] }>
       })
       .then((data) => {
         const docs = data.docs || []

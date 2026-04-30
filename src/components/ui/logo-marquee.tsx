@@ -3,33 +3,42 @@
 import { motion } from 'motion/react'
 import { useReducedMotion } from 'motion/react'
 import {
-  React,
-  NextJs,
-  TypeScript,
-  TailwindCSS,
-  NodeJs,
-  PostgreSQL,
-  VercelDark,
-  Docker,
-  Figma,
-  Supabase,
-} from 'developer-icons'
+  Atom,
+  Cloud,
+  Database,
+  Layers3,
+  Server,
+  SquareTerminal,
+  Wind,
+} from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
-const technologies: { name: string; Icon: ComponentType<SVGProps<SVGElement>> }[] = [
-  { name: 'React', Icon: React },
-  { name: 'Next.js', Icon: NextJs },
-  { name: 'TypeScript', Icon: TypeScript },
-  { name: 'Tailwind CSS', Icon: TailwindCSS },
-  { name: 'Node.js', Icon: NodeJs },
-  { name: 'PostgreSQL', Icon: PostgreSQL },
-  { name: 'Vercel', Icon: VercelDark },
-  { name: 'Docker', Icon: Docker },
-  { name: 'Figma', Icon: Figma },
-  { name: 'Supabase', Icon: Supabase },
+function FigmaIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" {...props}>
+      <rect x="7" y="3" width="6" height="6" rx="3" />
+      <rect x="7" y="9" width="6" height="6" rx="3" />
+      <path d="M10 15a3 3 0 1 0 0 6c1.7 0 3-1.3 3-3v-3h-3Z" />
+      <path d="M13 3h1a3 3 0 1 1 0 6h-1V3Z" />
+      <path d="M13 9h1a3 3 0 1 1 0 6h-1V9Z" />
+    </svg>
+  )
+}
+
+const technologies: { name: string; Icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
+  { name: 'React', Icon: Atom },
+  { name: 'Next.js', Icon: Layers3 },
+  { name: 'TypeScript', Icon: SquareTerminal },
+  { name: 'Tailwind CSS', Icon: Wind },
+  { name: 'Node.js', Icon: Server },
+  { name: 'PostgreSQL', Icon: Database },
+  { name: 'Cloudflare', Icon: Cloud },
+  { name: 'Docker', Icon: Layers3 },
+  { name: 'Figma', Icon: FigmaIcon },
+  { name: 'Supabase', Icon: Database },
 ]
 
-function TechIcon({ Icon, name }: { Icon: ComponentType<SVGProps<SVGElement>>; name: string }) {
+function TechIcon({ Icon, name }: { Icon: ComponentType<SVGProps<SVGSVGElement>>; name: string }) {
   return (
     <div className="group flex items-center justify-center gap-2 text-[#595959] hover:text-[#b0b0b0] transition-colors duration-300 text-sm md:text-base font-medium whitespace-nowrap">
       <Icon

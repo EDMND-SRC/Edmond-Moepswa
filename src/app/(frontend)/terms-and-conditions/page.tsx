@@ -100,7 +100,8 @@ export default function TermsAndConditionsPage() {
       <h2>5. Third-Party Platform Costs</h2>
       <p>
         All third-party platform costs are <strong>borne by the client</strong>. This includes
-        hosting (Vercel, Netlify), databases (Neon, Supabase), CRMs (HubSpot), automation
+        hosting (Cloudflare Workers, Netlify), databases (Neon, Supabase), CRMs (HubSpot),
+        automation
         tools (Make.com, n8n), email services (Resend, Beehiiv), analytics (PostHog, GA4),
         payment gateways, SMS services, and any other external service.
       </p>
@@ -269,7 +270,7 @@ export default function TermsAndConditionsPage() {
         terms (except payment obligations) due to causes beyond their reasonable control,
         including but not limited to: acts of God, war, terrorism, civil unrest, government
         action, labour disputes, pandemics, natural disasters, power outages, internet
-        infrastructure failures, or third-party service provider outages (including Vercel,
+        infrastructure failures, or third-party service provider outages (including Cloudflare,
         Neon, or payment gateway downtime). If a force majeure event continues for more than
         30 days, either party may terminate the engagement, with the Client paying for all
         work completed up to the termination date.

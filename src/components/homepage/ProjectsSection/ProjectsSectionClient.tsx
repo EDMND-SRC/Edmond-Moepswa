@@ -246,6 +246,11 @@ export function ProjectsSectionClient({ projects }: { projects: ProjectItem[] })
       ? 'No projects in this category'
       : `Showing ${N} project${N !== 1 ? 's' : ''}`
 
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end end'],
+  })
+
   /* ── Reduced motion: static grid ── */
   if (reducedMotion) {
     return (
@@ -308,12 +313,6 @@ export function ProjectsSectionClient({ projects }: { projects: ProjectItem[] })
       </section>
     )
   }
-
-  /* ── Standard: sticky scroll stack ── */
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end end'],
-  })
 
   return (
     <section

@@ -1,12 +1,12 @@
 import './globals.css'
 import type { Metadata } from 'next'
+
 import SkipToContent from '@/components/ui/SkipToContent'
 import PageTransition from '@/components/ui/PageTransition'
 import Script from 'next/script'
 import { ThemeProvider } from 'next-themes'
 import { Suspense } from 'react'
 import { PostHogPageview } from '@/lib/posthog-provider'
-import '@/lib/sentry-client.config' // Initialize Sentry client-side
 import {
   LINKEDIN_URL,
   INSTAGRAM_URL,
@@ -15,7 +15,7 @@ import {
   THREADS_URL,
 } from '@/lib/constants'
 
-const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'https://edmond-moepswa.vercel.app'
+const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-LLR99YRCV1'
 
 export const metadata: Metadata = {
@@ -65,7 +65,7 @@ export const metadata: Metadata = {
     'SEO',
     'automation specialist',
   ],
-  authors: [{ name: 'Edmond Moepswa', url: 'https://edmondmoepswa.com' }],
+  authors: [{ name: 'Edmond Moepswa', url: SERVER_URL }],
   creator: 'Edmond Moepswa',
   publisher: 'Edmond Moepswa',
   metadataBase: new URL(SERVER_URL),

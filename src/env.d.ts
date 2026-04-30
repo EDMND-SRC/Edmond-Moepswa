@@ -7,10 +7,11 @@ declare global {
       PAYLOAD_SECRET: string
       PAYLOAD_ADMIN_EMAIL?: string
       PAYLOAD_ADMIN_PASSWORD?: string
+      SMOKE_ADMIN_EMAIL?: string
+      SMOKE_ADMIN_PASSWORD?: string
       // Server
       NEXT_PUBLIC_SERVER_URL?: string
-      VERCEL_PROJECT_PRODUCTION_URL?: string
-      VERCEL_URL?: string
+      CLOUDFLARE_ACCOUNT_ID?: string
       // Cal.com
       CAL_WEBHOOK_URL?: string
       CAL_USERNAME?: string

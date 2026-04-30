@@ -26,14 +26,17 @@ jobs:
       - name: Generate Payload import map
         run: pnpm generate:importmap
 
+      - name: Generate Cloudflare env types
+        run: pnpm cf-typegen
+
       - name: Lint
         run: pnpm lint
 
       - name: Type check
-        run: pnpm tsc --noEmit
+        run: pnpm typecheck
 
-      - name: Build
-        run: pnpm build
+      - name: Build for Cloudflare
+        run: pnpm run cf:build
         env:
           DATABASE_URL: postgresql://test:test@localhost/test
           PAYLOAD_SECRET: test-secret-key-for-ci

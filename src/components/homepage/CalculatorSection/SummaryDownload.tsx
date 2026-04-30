@@ -30,7 +30,7 @@ interface SummaryDownloadProps {
   }
 }
 
-type FormatType = 'markdown' | 'text' | 'csv' | 'pdf'
+type FormatType = 'markdown' | 'text' | 'csv'
 
 function generateMarkdown(s: SummaryDownloadProps['selections']): string {
   const lines: string[] = []
@@ -168,7 +168,6 @@ const FORMAT_CONFIG: Record<FormatType, { label: string; extension: string; mime
   markdown: { label: 'Markdown', extension: 'md', mime: 'text/markdown' },
   text: { label: 'Plain Text', extension: 'txt', mime: 'text/plain' },
   csv: { label: 'CSV', extension: 'csv', mime: 'text/csv' },
-  pdf: { label: 'PDF Quote', extension: 'pdf', mime: 'application/pdf' },
 }
 
 export default function SummaryDownload({ isOpen, onClose, selections }: SummaryDownloadProps) {
@@ -223,8 +222,6 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
         return generatePlainText(selections)
       case 'csv':
         return generateCSV(selections)
-      case 'pdf':
-        return '' // PDF content is handled via API
       default:
         return ''
     }
@@ -243,39 +240,6 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
 
   const handleDownload = async () => {
     const config = FORMAT_CONFIG[format]
-    
-    if (format === 'pdf') {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
-      
-      try {
-        const response = await fetch('/api/quote-pdf', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ selections }),
-          signal: controller.signal,
-        })
-        
-        clearTimeout(timeoutId)
-        
-        if (!response.ok) throw new Error('Failed to generate PDF')
-        
-        const blob = await response.blob()
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `service-summary-${selections.service}-${selections.tier}.pdf`
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-        toast.success('PDF downloaded!')
-      } catch (err) {
-        toast.error('Failed to generate PDF summary.')
-        console.error(err)
-      }
-      return
-    }
 
     const blob = new Blob([generatedContent], { type: config.mime })
     const url = URL.createObjectURL(blob)
@@ -343,7 +307,7 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
             <div>
               <span className="text-sm text-[#b0b0b0] mb-2 block">Format</span>
               <div className="grid grid-cols-2 gap-2">
-                {(['markdown', 'text', 'csv', 'pdf'] as FormatType[]).map((f) => {
+                {(['markdown', 'text', 'csv'] as FormatType[]).map((f) => {
                   const isActive = format === f
                   return (
                     <button

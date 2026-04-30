@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+
 import Link from 'next/link'
 import { motion } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -36,14 +36,13 @@ export default function HomePageFooter() {
           {portraitError ? (
             <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]" />
           ) : (
-            <Image
+            <img
               src="/edmond-portrait-hero.webp"
               alt="Edmond Moepswa Portrait"
-              fill
-              className="object-cover pointer-events-none"
+              className="object-cover pointer-events-none absolute inset-0 w-full h-full"
               style={{ transform: 'scaleX(-1)' }}
-              sizes="100vw"
               onError={() => setPortraitError(true)}
+              decoding="async"
             />
           )}
         </div>
