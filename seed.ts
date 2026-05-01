@@ -204,7 +204,7 @@ async function seed() {
               version: 1,
               children: [
                 {
-                  text: 'Features include Clerk authentication, role-based access control, Dodo Payments integration for subscription billing (with adaptive currency across 80+ currencies), admin dashboard with PostHog analytics, Resend email integration for transactional emails, and full deployment pipeline to Vercel. Available for purchase as a boilerplate product.',
+                  text: 'Features include Clerk authentication, role-based access control, Dodo Payments integration for subscription billing (with adaptive currency across 80+ currencies), admin dashboard with PostHog analytics, Resend email integration for transactional emails, and a production deployment pipeline to Cloudflare Workers. Available for purchase as a boilerplate product.',
                 },
               ],
             },
@@ -306,7 +306,7 @@ async function seed() {
               version: 1,
               children: [
                 {
-                  text: 'Stack: Next.js 16, TypeScript, Tailwind CSS, Payload CMS, PostgreSQL (Neon), Drizzle ORM, Resend, PostHog. Deployed on Vercel with one-click setup. Available on GitHub under MIT license at github.com/edmnd-src.',
+                  text: 'Stack: Next.js 16, TypeScript, Tailwind CSS, Payload CMS, PostgreSQL (Neon), Drizzle ORM, Resend, PostHog. Deployed on Cloudflare Workers via OpenNext. Available on GitHub under MIT license at github.com/edmnd-src.',
                 },
               ],
             },
@@ -356,7 +356,7 @@ async function seed() {
     {
       question: 'Do you work with clients outside Botswana?',
       answer:
-        "Yes. While I'm based in Gaborone, I work with clients globally. Communication happens via WhatsApp, email, or video calls. For international clients, payment can be processed through Dodo Payments (Merchant of Record with adaptive currency across 150+ countries), PayPal, or other international gateways. All of my builds are deployed on Vercel's global edge network, so performance is excellent regardless of your location.",
+        "Yes. While I'm based in Gaborone, I work with clients globally. Communication happens via WhatsApp, email, or video calls. For international clients, payment can be processed through Dodo Payments (Merchant of Record with adaptive currency across 150+ countries), PayPal, or other international gateways. All of my builds are deployed on Cloudflare's global network, so performance is excellent regardless of your location.",
       category: 'general' as const,
       order: 2,
       isActive: true,
@@ -434,7 +434,7 @@ async function seed() {
     {
       question: 'Do third-party platform costs count towards your fee?',
       answer:
-        'No. Platform fees — for hosting (Vercel, Netlify), databases (Supabase, Neon), CRMs (HubSpot), automation tools (Make.com, n8n), email services (Resend, Beehiiv), analytics (PostHog, GA4), and any third-party service — are borne by the client. This is standard industry practice. My default approach is to design around the best available free tier first, and to recommend a paid upgrade only when your needs genuinely require it. Where a paid tier is necessary, its cost is disclosed at scoping — not after build.',
+        'No. Platform fees — for hosting (Cloudflare Workers, Netlify), databases (Supabase, Neon), CRMs (HubSpot), automation tools (Make.com, n8n), email services (Resend, Beehiiv), analytics (PostHog, GA4), and any third-party service — are borne by the client. This is standard industry practice. My default approach is to design around the best available free tier first, and to recommend a paid upgrade only when your needs genuinely require it. Where a paid tier is necessary, its cost is disclosed at scoping — not after build.',
       category: 'pricing' as const,
       order: 31,
       isActive: true,
@@ -484,7 +484,7 @@ async function seed() {
     {
       question: 'How do you handle data security and hosting?',
       answer:
-        'All websites and applications I build are deployed on Vercel, which provides enterprise-grade security: SOC 2 Type II compliance, automatic HTTPS, DDoS protection, and encrypted data in transit and at rest. Databases are hosted on Neon or Supabase (PostgreSQL), both of which provide encryption at rest, automated backups, and role-based access control. I never store client data on personal devices or unencrypted storage. For clients with specific data residency requirements (e.g., EU GDPR), I can configure hosting regions accordingly. I do not act as a data processor -- your hosting accounts, database accounts, and analytics accounts are all in your name. I manage them on your behalf during the project and hand over full access on completion. I also recommend enabling two-factor authentication on all platforms and provide a security checklist during handover.',
+        'All websites and applications I build are deployed on Cloudflare, which provides automatic HTTPS, DDoS protection, and global edge delivery. Databases are hosted on Neon or Supabase (PostgreSQL), both of which provide encryption at rest, automated backups, and role-based access control. I never store client data on personal devices or unencrypted storage. For clients with specific data residency requirements (e.g., EU GDPR), I can configure hosting regions accordingly. I do not act as a data processor -- your hosting accounts, database accounts, and analytics accounts are all in your name. I manage them on your behalf during the project and hand over full access on completion. I also recommend enabling two-factor authentication on all platforms and provide a security checklist during handover.',
       category: 'technical' as const,
       order: 51,
       isActive: true,

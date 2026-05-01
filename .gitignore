@@ -12,7 +12,6 @@ node_modules
 .wrangler
 .wrangler-bundle/
 next-env.d.ts
-.vercel
 cloudflare-env.d.ts
 
 # Payload default media upload directory

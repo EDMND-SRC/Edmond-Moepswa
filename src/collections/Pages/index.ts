@@ -21,6 +21,30 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+const useCloudflarePayloadAdminBuild = process.env.CLOUDFLARE_WORKER_VARIANT === 'payload'
+
+const seoTabFields = useCloudflarePayloadAdminBuild
+  ? []
+  : [
+      OverviewField({
+        titlePath: 'meta.title',
+        descriptionPath: 'meta.description',
+        imagePath: 'meta.image',
+      }),
+      MetaTitleField({
+        hasGenerateFn: true,
+      }),
+      MetaImageField({
+        relationTo: 'media',
+      }),
+      MetaDescriptionField({}),
+      PreviewField({
+        hasGenerateFn: true,
+        titlePath: 'meta.title',
+        descriptionPath: 'meta.description',
+      }),
+    ]
+
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
@@ -38,14 +62,18 @@ export const Pages: CollectionConfig<'pages'> = {
   },
   admin: {
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    livePreview: {
-      url: ({ data, req }) =>
-        generatePreviewPath({
-          slug: data?.slug,
-          collection: 'pages',
-          req,
+    ...(useCloudflarePayloadAdminBuild
+      ? {}
+      : {
+          livePreview: {
+            url: ({ data, req }) =>
+              generatePreviewPath({
+                slug: data?.slug,
+                collection: 'pages',
+                req,
+              }),
+          },
         }),
-    },
     preview: (data, { req }) =>
       generatePreviewPath({
         slug: data?.slug as string,
@@ -84,29 +112,7 @@ export const Pages: CollectionConfig<'pages'> = {
         {
           name: 'meta',
           label: 'SEO',
-          fields: [
-            OverviewField({
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-              imagePath: 'meta.image',
-            }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
-            MetaDescriptionField({}),
-            PreviewField({
-              // if the `generateUrl` function is configured
-              hasGenerateFn: true,
-
-              // field paths to match the target field for data
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-            }),
-          ],
+          fields: seoTabFields,
         },
       ],
     },
@@ -127,7 +133,7 @@ export const Pages: CollectionConfig<'pages'> = {
   versions: {
     drafts: {
       autosave: {
-        interval: 100, // We set this interval for optimal live preview
+        interval: useCloudflarePayloadAdminBuild ? 2000 : 100,
       },
       schedulePublish: true,
       validate: false,

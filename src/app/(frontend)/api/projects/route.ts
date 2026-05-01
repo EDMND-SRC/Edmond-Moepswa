@@ -1,12 +1,53 @@
-import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
+import pg from 'pg'
 
 const VALID_CATEGORIES = ['websites', 'applications', 'automation', 'products']
 
+type ProjectRow = {
+  id: number | string
+  title: string | null
+  category: string | null
+  year: string | null
+  description: string | null
+  thumbnail_id: number | string | null
+  link: string | null
+}
+
+type MediaRow = {
+  id: number | string
+  alt: string | null
+  url: string | null
+  width: number | string | null
+  height: number | string | null
+  mime_type: string | null
+  updated_at: Date | string | null
+}
+
+function toNumber(value: number | string | null | undefined): number | null {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10)
+    return Number.isNaN(parsed) ? null : parsed
+  }
+
+  return null
+}
+
+function toUpdatedAt(value: Date | string | null | undefined): string {
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  return typeof value === 'string' ? value : ''
+}
+
 export async function GET(req: NextRequest) {
+  let client: pg.Client | null = null
+
   try {
-    const payload = await getPayload({ config: configPromise })
     const { searchParams } = req.nextUrl
 
     // Parse and validate limit
@@ -22,29 +63,99 @@ export async function GET(req: NextRequest) {
       whereQuery.category = { equals: category }
     }
 
-    const result = await payload.find({
-      collection: 'projects',
-      depth: 1,
-      limit,
-      sort: '-createdAt',
-      where: whereQuery,
-      overrideAccess: false,
+    client = new pg.Client({
+      connectionString: process.env.DATABASE_URL || '',
     })
+    await client.connect()
 
-    // Diagnostic logging for thumbnails
-    const projectsWithThumbnails = result.docs.filter((p) => p.thumbnail).length
-    console.log(
-      `[API/Projects] Fetched ${result.docs.length} projects. ${projectsWithThumbnails} have thumbnails.`,
-    )
+    const queryValues: Array<number | string> = []
+    let projectQuery = `
+      select
+        id,
+        title,
+        category,
+        year,
+        description #>> '{root,children,0,children,0,text}' as description,
+        thumbnail_id,
+        link
+      from projects
+    `
 
-    if (projectsWithThumbnails < result.docs.length) {
-      const missing = result.docs.filter((p) => !p.thumbnail).map((p) => p.title)
-      console.warn(`[API/Projects] Missing thumbnails for:`, missing)
+    if (whereQuery.category?.equals) {
+      queryValues.push(whereQuery.category.equals)
+      projectQuery += ` where category = $${queryValues.length}`
     }
 
-    return NextResponse.json({ docs: result.docs })
+    queryValues.push(limit)
+    projectQuery += ` order by created_at desc limit $${queryValues.length}`
+
+    const result = (await client.query<ProjectRow>(projectQuery, queryValues)) as {
+      rows: ProjectRow[]
+    }
+
+    const thumbnailIds = Array.from(
+      new Set(
+        result.rows.flatMap((row) => {
+          const thumbnailId = toNumber(row.thumbnail_id)
+          return thumbnailId === null ? [] : [thumbnailId]
+        }),
+      ),
+    )
+
+    const thumbnails =
+      thumbnailIds.length > 0
+        ? ((await client.query<MediaRow>(
+            `
+              select
+                id,
+                alt,
+                url,
+                width,
+                height,
+                mime_type,
+                updated_at
+              from media
+              where id = any($1::int[])
+            `,
+            [thumbnailIds],
+          )) as { rows: MediaRow[] })
+        : { rows: [] as MediaRow[] }
+
+    const thumbnailById = new Map(
+      thumbnails.rows.map((thumbnail) => [
+        toNumber(thumbnail.id),
+        {
+          alt: thumbnail.alt ?? '',
+          height: toNumber(thumbnail.height),
+          mimeType: thumbnail.mime_type ?? '',
+          updatedAt: toUpdatedAt(thumbnail.updated_at),
+          url: thumbnail.url ?? '',
+          width: toNumber(thumbnail.width),
+        },
+      ]),
+    )
+
+    const docs = result.rows.map((doc) => {
+      const thumbnailId = toNumber(doc.thumbnail_id)
+
+      return {
+        category: doc.category ?? '',
+        description: doc.description ?? '',
+        id: toNumber(doc.id) ?? 0,
+        link: doc.link ?? '#',
+        thumbnail: thumbnailId === null ? null : (thumbnailById.get(thumbnailId) ?? null),
+        title: doc.title ?? '',
+        year: doc.year ?? '',
+      }
+    })
+
+    return NextResponse.json({ docs })
   } catch (error) {
     console.error('Failed to fetch projects:', error)
     return NextResponse.json({ docs: [] }, { status: 500 })
+  } finally {
+    if (client) {
+      await client.end().catch(() => undefined)
+    }
   }
 }

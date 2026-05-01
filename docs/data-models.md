@@ -1,82 +1,240 @@
 # Data Models
 
-This document defines the core data structures used by the application, managed via Payload CMS.
+Generated: `2026-05-01T07:42:21+0200`
+
+This document summarizes the primary Payload collections and globals defined directly in the repository.
 
 ## Collections
 
-### 1. Projects (`projects`)
-Demo work and portfolio items.
-- `title` (text, required)
-- `description` (rich text)
-- `slug` (text, unique)
-- `thumbnail` (upload -> media)
-- `technologies` (array -> text)
-- `links` (array -> link)
-- `featured` (checkbox)
+### `pages`
 
-### 2. Services (`services`)
-Service offerings and pricing.
-- `title` (text, required)
-- `description` (textarea, required)
-- `price` (number, base price in BWP)
-- `features` (array -> text)
-- `icon` (text, Lucide icon name)
-- `dodoProductId` (text, linked ID)
+Location: `src/collections/Pages/index.ts`
 
-### 3. Products (`products`)
-Digital downloads and boilerplates.
-- `title` (text, required)
-- `priceCents` (number, price in cents)
-- `currency` (text, default USD)
-- `dodoProductId` (text, required)
-- `type` (select: free, paid)
-- `category` (select: guide, checklist, ebook, boilerplate, tool)
-- `thumbnail` (upload -> media)
+- Purpose: CMS-managed marketing and content pages
+- Access:
+  - read: authenticated or published
+  - write: authenticated
+- Main fields:
+  - `title`
+  - tabbed hero/content/SEO structure
+  - `layout` blocks
+  - `publishedAt`
+  - `slug`
+- Hooks:
+  - `populatePublishedAt`
+  - `revalidatePage`
+  - `revalidateDelete`
+- Drafts:
+  - enabled
+  - autosave interval differs for payload-worker build
 
-### 4. Leads (`leads`)
-Captured inquiries and calculator data.
-- `name` (text)
-- `email` (email, required)
-- `source` (select: contact, calculator, gumroad)
-- `message` (textarea)
-- `calculatorData` (json)
-- `status` (select: new, contacted, qualified, closed)
+### `services`
 
-### 5. Testimonials (`testimonials`)
-Client feedback.
-- `clientName` (text, required)
-- `clientRole` (text)
-- `content` (textarea, required)
-- `rating` (number, 1-5)
-- `avatar` (upload -> media)
+Location: `src/collections/Services.ts`
 
-### 6. Orders (`orders`)
-Transaction ledger for Dodo Payments.
-- `dodoPaymentId` (text, unique)
-- `customerEmail` (email)
-- `amount` (number)
-- `currency` (text)
-- `status` (select: succeeded, failed, refunded, cancelled)
+- Purpose: service catalogue and pricing records
+- Access:
+  - public read
+  - authenticated write
+- Main fields:
+  - `title`
+  - `description`
+  - `price`
+  - `features[]`
+  - `icon`
+  - `dodoProductId`
 
-### 7. Media (`media`)
-Asset management with image optimization.
-- `alt` (text, required)
-- `sizes` (tablet, mobile, thumbnail)
+### `projects`
 
-### 8. Pages (`pages`)
-Flexible layout builder.
-- `title` (text, required)
-- `layout` (blocks: Content, Archive, CTA, Form, Media, Code)
+Location: `src/collections/Projects.ts`
+
+- Purpose: showcase portfolio and productized project cards
+- Access:
+  - public read
+  - authenticated write
+- Main fields:
+  - `title`
+  - `slug`
+  - `category`
+  - `year`
+  - `description`
+  - `thumbnail`
+  - `images[]`
+  - `link`
+  - `featured`
+
+### `testimonials`
+
+Location: `src/collections/Testimonials.ts`
+
+- Purpose: social proof entries for the public site
+- Main fields:
+  - `clientName`
+  - `clientRole`
+  - `content`
+  - `avatar`
+  - `rating`
+
+### `faqs`
+
+Location: `src/collections/FAQs.ts`
+
+- Purpose: FAQ data powering contact and homepage sections plus public API output
+- Main fields:
+  - `question`
+  - `answer`
+  - `category`
+  - `order`
+  - `isActive`
+- Default sort: `order`
+
+### `media`
+
+Location: `src/collections/Media.ts`
+
+- Purpose: uploaded image and video assets
+- Access:
+  - public read
+  - authenticated write
+- Main fields:
+  - `alt`
+  - `caption`
+- Upload behavior:
+  - folders enabled
+  - focal point enabled
+  - image and video mime types allowed
+  - admin thumbnail generated through transform utilities
+
+### `leads`
+
+Location: `src/collections/Leads.ts`
+
+- Purpose: inbound lead capture and CRM-lite status tracking
+- Access:
+  - create: anyone
+  - read/update/delete: authenticated
+- Main fields:
+  - honeypot `website`
+  - `name`
+  - `email`
+  - `source`
+  - `message`
+  - `calculatorData`
+  - `status`
+- Hook behavior:
+  - basic email format validation
+  - string trimming for `name`
+
+### `users`
+
+Location: `src/collections/Users/index.ts`
+
+- Purpose: Payload admin users
+- Access:
+  - authenticated admin surface
+  - delete and role updates restricted to admins
+- Auth:
+  - enabled
+- Main fields:
+  - `name`
+  - `roles[]`
+
+### `orders`
+
+Location: `src/collections/Orders.ts`
+
+- Purpose: webhook-driven commerce ledger for Dodo events
+- Access:
+  - read/update/delete: authenticated
+  - create: open in collection config, but intended to be protected by route-level webhook validation
+- Main fields:
+  - `dodoPaymentId`
+  - `dodoSubscriptionId`
+  - `customerEmail`
+  - `productName`
+  - `productId`
+  - `amount`
+  - `currency`
+  - `status`
+  - `metadata`
+
+### `products`
+
+Location: `src/collections/Products.ts`
+
+- Purpose: locally managed representation of Dodo-backed digital products/resources
+- Access:
+  - public read
+  - authenticated write
+- Main fields:
+  - `title`
+  - `description`
+  - `priceCents`
+  - `currency`
+  - `dodoProductId`
+  - `type`
+  - `category`
+  - `thumbnail`
+  - `featured`
+  - `slug`
 
 ## Globals
 
-### 1. Site Settings (`site-settings`)
-- `siteTitle`
-- `siteDescription`
-- `contactEmail`
-- `socialLinks` (LinkedIn, Twitter, GitHub, Substack, etc.)
+### `header`
 
-### 2. Header & Footer
-- `navItems` (array -> link)
-- `copyright`
-- `logo`
+Location: `src/Header/config.ts`
+
+- Purpose: top navigation links
+- Main fields:
+  - `navItems[]` using shared link field
+- Hook:
+  - `revalidateHeader`
+
+### `footer`
+
+Location: `src/Footer/config.ts`
+
+- Purpose: footer navigation links
+- Main fields:
+  - `navItems[]`
+- Hook:
+  - `revalidateFooter`
+
+### `site-settings`
+
+Location: `src/globals/SiteSettings.ts`
+
+- Purpose: site-wide profile and contact settings
+- Main fields:
+  - `siteTitle`
+  - `siteDescription`
+  - `logo`
+  - `contactEmail`
+  - `contactPhone`
+  - `whatsappNumber`
+  - `socialLinks` group
+
+## Plugin-Driven Data Effects
+
+Defined in `src/plugins/index.ts`:
+
+- `redirectsPlugin`
+  - adds redirect management behavior and revalidation hook integration
+- `seoPlugin`
+  - enabled only outside the payload worker variant
+- `formBuilderPlugin`
+  - extends form capabilities for CMS-driven forms
+- `searchPlugin`
+  - adds search indexing behavior and custom search field overrides
+- `s3Storage`
+  - binds `media` to R2-compatible storage
+
+## Access Model Summary
+
+The repo keeps access helpers intentionally small:
+
+- `anyone`
+- `authenticated`
+- `authenticatedOrPublished`
+
+Most public content collections expose read access to everyone and reserve write operations for authenticated users. `users` is the only clearly role-sensitive collection in the authored source.

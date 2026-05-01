@@ -1,64 +1,170 @@
 # Deployment Guide
 
-This guide provides instructions for deploying the Edmond Moepswa project to production.
+Generated: `2026-05-01T07:42:21+0200`
 
-## Target Platform: Cloudflare Workers
+## Deployment Model
 
-The project is deployed to Cloudflare Workers using OpenNext. The application runtime moves to Cloudflare, while the database remains on Neon PostgreSQL.
+The application deploys to Cloudflare Workers as two coordinated worker services:
 
-### Prerequisites
+- public worker
+  - config: `wrangler.public.toml`
+  - entry: `.open-next/public/worker.js`
+- payload worker
+  - config: `wrangler.payload.toml`
+  - entry: `.open-next/payload/worker.js`
 
-- A Cloudflare account with Workers access.
-- A Neon PostgreSQL database instance.
-- Dodo Payments account.
-- Make.com account.
-- PostHog account for analytics.
+The public worker proxies payload-owned routes to the payload worker, including `/admin/*`.
 
-### Deployment Steps
+## Core Commands
 
-1.  **Configure Environment Variables**:
-    Set the following variables in your Cloudflare Worker environment or Workers Builds settings:
-    - `DATABASE_URL`: Your Neon connection string.
-    - `PAYLOAD_SECRET`: A secure random string.
-    - `NEXT_PUBLIC_SERVER_URL`: `https://edmond-moepswa.edmnd-src.workers.dev`.
-    - `R2_BUCKET`, `R2_REGION`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ENDPOINT`: Payload media storage in Cloudflare R2.
-    - `DODO_PAYMENTS_API_KEY`: For payment processing.
-    - `DODO_PAYMENTS_ENVIRONMENT`: Keep this at `test_mode` until the Dodo catalog is ready for live traffic.
-    - `DODO_PAYMENTS_WEBHOOK_SECRET`: For webhook signature verification.
-    - `MAKE_WEBHOOK_*`: Webhook URLs from your Make.com scenarios.
-    - `NEXT_PUBLIC_POSTHOG_API_KEY`: For product analytics.
+### Build
 
-2.  **Install and type-check Cloudflare configuration**:
-    - `pnpm install`
-    - `pnpm cf-typegen`
-    - `pnpm generate:types && tsc --noEmit`
+```bash
+pnpm cf:build:workers
+```
 
-3.  **Preview in the Cloudflare runtime**:
-    - `pnpm preview`
-    - Verify the homepage, `/about`, `/search?q=test`, one dynamic `[slug]` page, `/resources`, and `/admin`.
-    - Verify the Payload REST and GraphQL endpoints.
+Equivalent entrypoint:
 
-4.  **Deploy to Workers**:
-    - `pnpm deploy`
-    - Confirm `https://edmond-moepswa.edmnd-src.workers.dev` loads successfully.
+```bash
+node ./src/scripts/cloudflare-workers.mjs build --target local
+```
 
-5.  **Post-Deployment**:
-    - Run database migrations if the target environment schema is behind.
-    - Confirm the R2 bucket is receiving new uploads through the Payload admin.
-    - Keep Dodo traffic in `test_mode` until the real products exist, then switch the environment deliberately.
-    - Verify webhooks for Cal.com and Dodo Payments.
-    - Confirm admin login, media rendering, and image transforms in the deployed runtime.
+### Local worker runtime
 
-## Monitoring & Operations
+```bash
+pnpm cf:dev:workers
+```
 
-- **Runtime Diagnostics**: Review Cloudflare deployment logs and Workers Logs for runtime exceptions.
-- **Analytics**: Managed by PostHog and Google Analytics 4.
-- **Uptime Monitoring**: Managed via Better Stack.
-- **Database Backups**: Handled by Neon's native backup and point-in-time recovery features. No D1 database is used in this migration.
+### Staging deploy
 
-## CI/CD Pipeline
+```bash
+pnpm cf:deploy:staging
+```
 
-The project includes a GitHub Actions workflow (`.github/workflows/ci.yml`) that performs the following on every pull request:
-- Lints the codebase.
-- Runs unit and integration tests.
-- Ensures the project builds successfully.
+### Production deploy
+
+```bash
+pnpm cf:deploy:prod
+```
+
+### Verification
+
+```bash
+pnpm cf:verify:staging
+pnpm cf:verify:prod
+```
+
+Or directly:
+
+```bash
+node ./src/scripts/cloudflare-workers.mjs verify --env staging
+node ./src/scripts/cloudflare-workers.mjs verify --env production
+```
+
+## What The Cloudflare Deployment Script Actually Does
+
+Entry point: `src/scripts/cloudflare-workers.mjs`
+
+Key responsibilities:
+
+- build public and payload worker variants
+- upload worker versions
+- deploy version splits
+- capture deployment baselines before rollout
+- store deployment state under `scratch/cloudflare-workers/`
+- verify that the public worker references the intended payload worker version
+- run smoke-user setup and cleanup
+- tail worker logs during verification
+
+This is more than a thin wrapper around Wrangler. It is the repo's deployment control plane.
+
+## Worker Build Pipeline
+
+The Cloudflare build pipeline is implemented in `src/scripts/lib/cloudflare-workers/workspace.mjs`.
+
+Key steps:
+
+1. copy the repo into per-variant scratch workspaces
+2. prune variant-specific source paths
+3. patch OpenNext Cloudflare support
+4. build each variant with variant-specific env
+5. copy generated `.open-next` output back into the main repo build area
+6. patch generated worker files
+7. sync payload static assets into the public worker asset tree
+
+## Route Ownership
+
+Source of truth:
+
+- `cloudflare/route-manifest.json`
+- `src/scripts/lib/cloudflare-workers/routes.mjs`
+
+Important behavior:
+
+- public exact routes stay on the public worker
+- `/admin/*` and payload APIs go to the payload worker
+- `/_payload_next/*` is used as the payload asset prefix
+
+## Secrets and Environment Handling
+
+Relevant files:
+
+- `.env.example`
+- `wrangler.public.toml`
+- `wrangler.payload.toml`
+- `src/scripts/cloudflare-sync-secrets.mjs`
+- `src/scripts/lib/cloudflare-workers/config.mjs`
+
+The config module also tracks a long list of runtime secrets used during sync and deploy operations.
+
+## Deployment State and Rollback
+
+Important output location:
+
+- `scratch/cloudflare-workers/`
+
+Key artifacts:
+
+- `last-deploy-<target>.json`
+- `last-deploy-<target>.baseline.json`
+
+The baseline capture is important because rollback commands are derived from the version state observed before rollout.
+
+## Verification Workflow
+
+`verifyWorkers(targetName)` in `src/scripts/cloudflare-workers.mjs` performs the main verification flow:
+
+- confirm deployed versions match expected state
+- seed or resolve smoke user
+- clean old smoke artifacts
+- run targeted Playwright smoke coverage
+- tail worker logs
+- fail verification if worker error logs are detected
+
+This is why a deployment can have green surface routes but still fail verify.
+
+## Current Operational Notes
+
+The repository contains active rollout handovers in `_bmad-output/`, especially:
+
+- `_bmad-output/cloudflare-migration-handover-2026-04-30-rollout.md`
+
+That handover should be treated as the live operational companion to this document. It contains:
+
+- latest staging versions and deployment IDs
+- currently supported staging readiness checks
+- known verify failures
+- production gating rules
+
+## Practical Rollout Discipline
+
+When operating this repo:
+
+1. build locally in worker mode
+2. validate the specific changed behavior locally
+3. deploy staging only
+4. recheck the supported public routes
+5. run full verify
+6. stop at a checkpoint before production if staging has only just recovered
+
+That sequencing matches the current codebase reality better than a naive `deploy and hope` workflow.

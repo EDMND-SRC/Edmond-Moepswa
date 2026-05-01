@@ -56,7 +56,6 @@ const eslintConfig = [
     ignores: [
       '.next/',
       '.open-next/',
-      '.vercel/',
       'node_modules/',
       '.agent/',
       '_bmad/',
