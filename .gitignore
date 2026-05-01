@@ -2,13 +2,22 @@ build
 dist / media
 node_modules
 .DS_Store
+.*
+!.editorconfig
 .env
 .env.local
 .env.*.local
 .env.test
+!.env.example
+!.github/
+!.github/**
+!.gitignore
 *.log
 .next
 .open-next
+!.npmrc
+!.prettierignore
+!.prettierrc.json
 .wrangler
 .wrangler-bundle/
 next-env.d.ts
