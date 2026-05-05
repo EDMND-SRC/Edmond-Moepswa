@@ -1,249 +1,149 @@
-# Edmond Moepswa
+# edmond
 
-Production website, CMS, and automation hub for Edmond Moepswa's personal brand and digital services business.
+Public website and digital product storefront for Edmond Moepswa.
 
-This repository powers:
+This repo now ships as a **public-only Cloudflare Worker**. There is no live Payload admin, no payload worker, and no CMS runtime in the deployed architecture. Public content comes from a mix of typed launch content, direct PostgreSQL reads, Dodo Payments, Make.com automations, Cal.com webhooks, and Cloudflare R2 media delivery.
 
-- the public marketing site
-- the Payload CMS admin and APIs
-- digital product checkout and webhook handling
-- lead capture and booking workflows
-- Cloudflare Workers deployment and verification tooling
+## Current architecture
 
-## Architecture At A Glance
-
-- Monolith repository
-- Public frontend: Next.js 16 App Router
-- CMS/admin: Payload CMS 3
+- Framework: Next.js 16 on Cloudflare Workers via OpenNext
+- Deployed worker: `edmond` on [edmond.bridgearc.workers.dev](https://edmond.bridgearc.workers.dev)
 - Database: PostgreSQL
-- Hosting target: Cloudflare Workers via OpenNext
-- Media storage: Cloudflare R2 through `@payloadcms/storage-s3`
 - Payments: Dodo Payments
-- Automation: Make.com
-- Booking: Cal.com
+- Automations: Make.com and Cal.com webhooks
+- Media: Cloudflare R2 plus the image transform route
+- PDF quotes: `pdf-lib`
 
-The deployed runtime is intentionally split into two workers:
+### Content sources
 
-- public worker
-  - serves the public Next.js app
-  - owns public APIs and proxies payload-owned routes
-- payload worker
-  - serves `/admin/*`
-  - serves generated Payload REST and GraphQL routes
+- Typed launch content: `src/content/launchSnapshot.ts`, `src/content/launchServices.ts`
+- Direct SQL APIs:
+  - `src/app/(frontend)/api/faqs/route.ts`
+  - `src/app/(frontend)/api/projects/route.ts`
+- Public integrations:
+  - `src/app/api/checkout/route.ts`
+  - `src/app/api/dodo-products/route.ts`
+  - `src/app/api/webhooks/dodo/route.ts`
+  - `src/app/(frontend)/api/make-webhook/route.ts`
+  - `src/app/api/cal-webhook/route.ts`
+- App-owned persistence helpers:
+  - `src/lib/server/postgres.ts`
+  - `src/lib/server/app-persistence.ts`
 
-## Tech Stack
+## What is intentionally not here anymore
 
-| Layer | Technology |
-| --- | --- |
-| Framework | Next.js `16.2.3` |
-| CMS | Payload `3.82.0` |
-| Language | TypeScript `6.0.2` |
-| Database | PostgreSQL via `@payloadcms/db-postgres` |
-| Deployment | `@opennextjs/cloudflare` + Wrangler |
-| Styling | Tailwind CSS 4 |
-| UI | custom components + Radix primitives |
-| Animation | Motion, GSAP, Lenis |
-| Payments | Dodo Payments |
-| Analytics | PostHog + Google Analytics |
-| Testing | Playwright + Vitest |
+- No Payload CMS runtime
+- No `/admin` launch path
+- No payload worker
+- No live preview workflow
+- No generated Payload types or schema-driven local API
 
-## What The App Contains
+## Local setup
 
-- public pages for homepage, about, services, contact, resources, search, and policy/legal content
-- CMS-driven pages via `src/app/(frontend)/[slug]`
-- 10 Payload collections:
-  - `pages`
-  - `services`
-  - `projects`
-  - `testimonials`
-  - `faqs`
-  - `media`
-  - `leads`
-  - `users`
-  - `orders`
-  - `products`
-- 3 Payload globals:
-  - `header`
-  - `footer`
-  - `site-settings`
-- public API routes for content, geo, media transforms, checkout, and webhooks
-- Cloudflare deploy/verify scripts under `src/scripts/`
-
-## Repository Layout
-
-```text
-src/
-  app/
-    (frontend)/      public site pages and public content APIs
-    (payload)/       Payload admin, REST, and GraphQL
-    api/             integration routes and webhook handlers
-  collections/       Payload collection configs
-  components/        public UI, admin helpers, section components
-  scripts/           Cloudflare build/deploy/verify tooling
-  lib/cloudflare/    worker-specific runtime support
-  utilities/         shared helpers
-public/              static assets and media
-tests/               Playwright + Vitest suites
-docs/                generated brownfield project documentation
-business-planning/   strategy and service artifacts
-_bmad-output/        rollout handovers and generated operations docs
-```
-
-## Local Development
-
-### Prerequisites
-
-- Node.js `20+`
-- pnpm `9+` or `10+`
-- PostgreSQL
-- `.env.local` populated from `.env.example`
-
-### Install
+1. Install dependencies:
 
 ```bash
 pnpm install
-pnpm generate:importmap
-pnpm generate:types
 ```
 
-### Run Standard Local Dev
+2. Copy env values into `.env.local` from `.env.example`.
+
+3. Apply the app-owned launch migration before testing webhook persistence:
+
+```bash
+pnpm db:migrate:launch
+```
+
+4. Run the site locally:
 
 ```bash
 pnpm dev
 ```
 
-Default URLs:
-
-- public app: `http://localhost:3000`
-- admin: `http://localhost:3000/admin`
-
-### Run In Cloudflare Worker Mode
+5. Run the Cloudflare worker locally:
 
 ```bash
 pnpm cf:dev:workers
 ```
 
-Use this mode when you need to validate:
-
-- public vs payload route ownership
-- worker-specific runtime behavior
-- Cloudflare deploy/verify regressions
-
-## Useful Commands
-
-### Core
+## Verification
 
 ```bash
-pnpm dev
-pnpm build
-pnpm start
-pnpm lint
 pnpm typecheck
-pnpm test
-```
-
-### Payload
-
-```bash
-pnpm generate:importmap
-pnpm generate:types
-pnpm payload
-```
-
-### Cloudflare
-
-```bash
-pnpm cf:build:workers
-pnpm cf:dev:workers
-pnpm cf:deploy:staging
-pnpm cf:deploy:prod
-pnpm cf:verify:staging
-pnpm cf:verify:prod
-pnpm cf:sync-secrets
-pnpm cf-typegen
-```
-
-### Smoke / Ops Helpers
-
-```bash
-pnpm cf:ensure-smoke-user
-pnpm cf:cleanup-smoke-data
-pnpm exec tsx ./src/scripts/measure-admin-performance.ts --base-url http://127.0.0.1:8787
-```
-
-## Testing
-
-### E2E
-
-```bash
-pnpm test:e2e
-```
-
-Playwright config:
-
-- tests live in `tests/e2e`
-- base URL defaults to `http://localhost:3000`
-- uses `pnpm dev` as the default local web server unless skipped by env
-
-### Integration / Unit
-
-```bash
+pnpm lint
 pnpm test:int
+pnpm cf:build:workers
 ```
 
-Vitest covers:
+For remote verification:
 
-- Payload Local API integration checks
-- selected collection behavior
-- unit behavior for shared utilities such as the icon registry
+```bash
+pnpm cf:deploy:staging
+pnpm cf:verify:staging
+pnpm cf:deploy:prod
+pnpm cf:verify:prod
+```
 
-## Data And Content Notes
+## Environment variables
 
-- `projects` powers the homepage portfolio and selected public API responses
-- `products` and `orders` support Dodo-backed digital product flows
-- `leads` captures direct form and purchase-adjacent lead information
-- `media` uses R2-compatible storage and Cloudflare-backed transform helpers
-- `pages` uses a block-based layout builder and hero variants
+The repo now cares about these groups:
 
-## Cloudflare Notes
+- App / Cloudflare:
+  - `NEXT_PUBLIC_SERVER_URL`
+  - `PREVIEW_SECRET`
+  - `CLOUDFLARE_ACCOUNT_ID`
+  - `CLOUDFLARE_API_TOKEN`
+  - `CRON_SECRET`
+- Database:
+  - `DATABASE_URL`
+- Dodo Payments:
+  - `DODO_PAYMENTS_API_KEY`
+  - `DODO_PAYMENTS_ENVIRONMENT`
+  - `DODO_PAYMENTS_WEBHOOK_SECRET`
+  - optional `DODO_PRODUCT_*` overrides
+- Make.com:
+  - `MAKE_WEBHOOK_LEAD_CAPTURE`
+  - `MAKE_WEBHOOK_CALCULATOR_QUOTE`
+  - `MAKE_WEBHOOK_RESOURCE_DOWNLOAD`
+  - `MAKE_WEBHOOK_DODO_PAYMENTS`
+- Cal.com:
+  - `CAL_WEBHOOK_URL`
+  - `CAL_USERNAME`
+  - `CAL_NAMESPACE`
+- R2 / media:
+  - `R2_BUCKET`
+  - `R2_REGION`
+  - `R2_ACCESS_KEY_ID`
+  - `R2_SECRET_ACCESS_KEY`
+  - `R2_ENDPOINT`
+  - `R2_PUBLIC_URL`
+- Analytics / social:
+  - `NEXT_PUBLIC_POSTHOG_API_HOST`
+  - `NEXT_PUBLIC_POSTHOG_API_KEY`
+  - `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+  - `NEXT_PUBLIC_INSTAGRAM_URL`
+  - `NEXT_PUBLIC_LINKEDIN_URL`
+  - `NEXT_PUBLIC_SUBSTACK_URL`
+  - `NEXT_PUBLIC_THREADS_URL`
+  - `NEXT_PUBLIC_X_URL`
+  - `SUBSTACK_FEED_URL`
 
-The Cloudflare deployment system is not a thin wrapper. The repo contains real deployment orchestration in:
+## Make.com and webhook truth
 
-- `src/scripts/cloudflare-workers.mjs`
-- `src/scripts/lib/cloudflare-workers/config.mjs`
-- `src/scripts/lib/cloudflare-workers/process.mjs`
-- `src/scripts/lib/cloudflare-workers/routes.mjs`
-- `src/scripts/lib/cloudflare-workers/workspace.mjs`
+- `/api/make-webhook` accepts:
+  - `lead-capture`
+  - `calculator-quote`
+  - `resource-download`
+- `/api/cal-webhook` stays server-side only.
+- `/api/webhooks/dodo` verifies the Dodo signature, persists orders and mirrored leads through direct Postgres, and optionally forwards the event to `MAKE_WEBHOOK_DODO_PAYMENTS`.
 
-These scripts:
+## Operational truth
 
-- build separate public and payload worker variants
-- write the route manifest used for worker ownership checks
-- patch generated worker bundles
-- capture deployment baselines and rollback data
-- run post-deploy verification
-
-## Documentation
-
-Generated project documentation lives in `docs/`:
-
-- `docs/project-overview.md`
-- `docs/architecture-main.md`
-- `docs/source-tree-analysis.md`
-- `docs/component-inventory.md`
-- `docs/api-contracts.md`
-- `docs/data-models.md`
-- `docs/development-guide.md`
-- `docs/deployment-guide.md`
-
-## Operational Guidance
-
-For live rollout status and current Cloudflare migration state, check the latest handover in `_bmad-output/`, especially:
-
-- `_bmad-output/cloudflare-migration-handover-2026-04-30-rollout.md`
-
-That file is the live operational companion to this repository and is more current than a static README for staging/production readiness.
-
-## License
-
-MIT
+- Overview: `docs/project-overview.md`
+- Architecture: `docs/architecture-main.md`
+- Deployment: `docs/deployment-guide.md`
+- Development: `docs/development-guide.md`
+- APIs: `docs/api-contracts.md`
+- Data model: `docs/data-models.md`
+- Current project context: `_bmad-output/project-context.md`
+- Rollout / handover log: `_bmad-output/cloudflare-migration-handover-2026-04-30-rollout.md`

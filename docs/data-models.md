@@ -1,240 +1,86 @@
 # Data Models
 
-Generated: `2026-05-01T07:42:21+0200`
+## Launch snapshot data
 
-This document summarizes the primary Payload collections and globals defined directly in the repository.
+Committed launch content lives in:
 
-## Collections
+- `src/content/launchSnapshot.ts`
+- `src/content/launchServices.ts`
 
-### `pages`
+That snapshot currently owns:
 
-Location: `src/collections/Pages/index.ts`
+- pages
+- header
+- footer
+- site settings
+- redirects
+- testimonials
+- products
+- search inputs derived from the same content
 
-- Purpose: CMS-managed marketing and content pages
-- Access:
-  - read: authenticated or published
-  - write: authenticated
-- Main fields:
-  - `title`
-  - tabbed hero/content/SEO structure
-  - `layout` blocks
-  - `publishedAt`
-  - `slug`
-- Hooks:
-  - `populatePublishedAt`
-  - `revalidatePage`
-  - `revalidateDelete`
-- Drafts:
-  - enabled
-  - autosave interval differs for payload-worker build
-
-### `services`
-
-Location: `src/collections/Services.ts`
-
-- Purpose: service catalogue and pricing records
-- Access:
-  - public read
-  - authenticated write
-- Main fields:
-  - `title`
-  - `description`
-  - `price`
-  - `features[]`
-  - `icon`
-  - `dodoProductId`
-
-### `projects`
-
-Location: `src/collections/Projects.ts`
-
-- Purpose: showcase portfolio and productized project cards
-- Access:
-  - public read
-  - authenticated write
-- Main fields:
-  - `title`
-  - `slug`
-  - `category`
-  - `year`
-  - `description`
-  - `thumbnail`
-  - `images[]`
-  - `link`
-  - `featured`
-
-### `testimonials`
-
-Location: `src/collections/Testimonials.ts`
-
-- Purpose: social proof entries for the public site
-- Main fields:
-  - `clientName`
-  - `clientRole`
-  - `content`
-  - `avatar`
-  - `rating`
+## PostgreSQL tables still used by the app
 
 ### `faqs`
 
-Location: `src/collections/FAQs.ts`
+Read-only in the public app through `/api/faqs`.
 
-- Purpose: FAQ data powering contact and homepage sections plus public API output
-- Main fields:
-  - `question`
-  - `answer`
-  - `category`
-  - `order`
-  - `isActive`
-- Default sort: `order`
+### `projects`
+
+Read-only in the public app through `/api/projects`.
 
 ### `media`
 
-Location: `src/collections/Media.ts`
-
-- Purpose: uploaded image and video assets
-- Access:
-  - public read
-  - authenticated write
-- Main fields:
-  - `alt`
-  - `caption`
-- Upload behavior:
-  - folders enabled
-  - focal point enabled
-  - image and video mime types allowed
-  - admin thumbnail generated through transform utilities
+Used for project thumbnail joins and media URL resolution.
 
 ### `leads`
 
-Location: `src/collections/Leads.ts`
+App-owned lead persistence table.
 
-- Purpose: inbound lead capture and CRM-lite status tracking
-- Access:
-  - create: anyone
-  - read/update/delete: authenticated
-- Main fields:
-  - honeypot `website`
-  - `name`
-  - `email`
-  - `source`
-  - `message`
-  - `calculatorData`
-  - `status`
-- Hook behavior:
-  - basic email format validation
-  - string trimming for `name`
+Current app usage:
 
-### `users`
+- `source = 'contact'` for contact form submissions
+- `source = 'calculator'` for quote calculator submissions
+- optional mirrored Dodo leads also persist here with direct SQL
 
-Location: `src/collections/Users/index.ts`
+Expected columns after `20260505_extract_payload_runtime.sql`:
 
-- Purpose: Payload admin users
-- Access:
-  - authenticated admin surface
-  - delete and role updates restricted to admins
-- Auth:
-  - enabled
-- Main fields:
-  - `name`
-  - `roles[]`
+- `id`
+- `name`
+- `email`
+- `source`
+- `message`
+- `calculator_data`
+- `status`
+- `website`
+- `company`
+- `project_type`
+- `budget_range`
+- `phone`
+- `metadata`
+- `created_at`
+- `updated_at`
 
 ### `orders`
 
-Location: `src/collections/Orders.ts`
+App-owned Dodo order persistence table.
 
-- Purpose: webhook-driven commerce ledger for Dodo events
-- Access:
-  - read/update/delete: authenticated
-  - create: open in collection config, but intended to be protected by route-level webhook validation
-- Main fields:
-  - `dodoPaymentId`
-  - `dodoSubscriptionId`
-  - `customerEmail`
-  - `productName`
-  - `productId`
-  - `amount`
-  - `currency`
-  - `status`
-  - `metadata`
+Expected columns:
 
-### `products`
+- `id`
+- `dodo_payment_id`
+- `dodo_subscription_id`
+- `customer_email`
+- `product_name`
+- `product_id`
+- `amount`
+- `currency`
+- `status`
+- `metadata`
+- `created_at`
+- `updated_at`
 
-Location: `src/collections/Products.ts`
+## Migration source of truth
 
-- Purpose: locally managed representation of Dodo-backed digital products/resources
-- Access:
-  - public read
-  - authenticated write
-- Main fields:
-  - `title`
-  - `description`
-  - `priceCents`
-  - `currency`
-  - `dodoProductId`
-  - `type`
-  - `category`
-  - `thumbnail`
-  - `featured`
-  - `slug`
+- `database/migrations/20260505_extract_payload_runtime.sql`
 
-## Globals
-
-### `header`
-
-Location: `src/Header/config.ts`
-
-- Purpose: top navigation links
-- Main fields:
-  - `navItems[]` using shared link field
-- Hook:
-  - `revalidateHeader`
-
-### `footer`
-
-Location: `src/Footer/config.ts`
-
-- Purpose: footer navigation links
-- Main fields:
-  - `navItems[]`
-- Hook:
-  - `revalidateFooter`
-
-### `site-settings`
-
-Location: `src/globals/SiteSettings.ts`
-
-- Purpose: site-wide profile and contact settings
-- Main fields:
-  - `siteTitle`
-  - `siteDescription`
-  - `logo`
-  - `contactEmail`
-  - `contactPhone`
-  - `whatsappNumber`
-  - `socialLinks` group
-
-## Plugin-Driven Data Effects
-
-Defined in `src/plugins/index.ts`:
-
-- `redirectsPlugin`
-  - adds redirect management behavior and revalidation hook integration
-- `seoPlugin`
-  - enabled only outside the payload worker variant
-- `formBuilderPlugin`
-  - extends form capabilities for CMS-driven forms
-- `searchPlugin`
-  - adds search indexing behavior and custom search field overrides
-- `s3Storage`
-  - binds `media` to R2-compatible storage
-
-## Access Model Summary
-
-The repo keeps access helpers intentionally small:
-
-- `anyone`
-- `authenticated`
-- `authenticatedOrPublished`
-
-Most public content collections expose read access to everyone and reserve write operations for authenticated users. `users` is the only clearly role-sensitive collection in the authored source.
+This migration replaces the old CMS-driven expectation that schema changes would come from Payload.

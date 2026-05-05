@@ -1,212 +1,76 @@
 # API Contracts
 
-Generated: `2026-05-01T07:42:21+0200`
+## Public content APIs
 
-This document covers the hand-authored public API surface plus the generated Payload APIs that live behind the payload worker.
+### `GET /api/pages`
 
-## Public Route Manifest
+- source: typed launch snapshot
+- response: paginated shape with `docs`, `limit`, `totalDocs`, `totalPages`
 
-Source of truth: `cloudflare/route-manifest.json`
+### `GET /api/services`
 
-### Public exact routes
+- source: typed launch services
+- response: `{ services: Service[] }`
 
-| Route | Methods | Purpose |
-| --- | --- | --- |
-| `/api/cal-webhook` | `POST` | Authenticated Cal.com webhook proxy to hidden Make.com URL |
-| `/api/checkout` | `POST` | Create Dodo checkout sessions |
-| `/api/dodo-products` | `GET`, `HEAD` | Read Dodo product catalogue for storefront use |
-| `/api/faqs` | `GET`, `HEAD` | Return active FAQs sorted by `order` |
-| `/api/geo` | `GET`, `HEAD` | Server-side geo lookup proxy |
-| `/api/make-webhook` | `POST` | Forward selected automation payloads to Make.com |
-| `/api/media/transform` | `GET`, `HEAD` | Cloudflare image transformation proxy |
-| `/api/pages` | `GET`, `HEAD` | Return published pages for the public site |
-| `/api/projects` | `GET`, `HEAD` | Return homepage project cards |
-| `/api/services` | `GET`, `HEAD` | Return service catalogue data |
-| `/api/substack` | `GET`, `HEAD` | Parse Substack RSS into JSON |
-| `/api/testimonials` | `GET`, `HEAD` | Return trimmed testimonial records |
-| `/api/webhooks/dodo` | `POST` | Validate and process Dodo webhook events |
-| `/next/exit-preview` | `GET`, `HEAD` | Exit preview mode |
-| `/next/preview` | `GET`, `HEAD` | Enter preview mode |
-| `/og-image` | `GET`, `HEAD` | Generate OG image |
-| `/pages-sitemap.xml` | `GET`, `HEAD` | Serve page sitemap |
+### `GET /api/testimonials`
 
-## Payload Worker Routes
+- source: typed launch snapshot
+- response: `{ testimonials: Testimonial[] }`
 
-| Route | Methods | Purpose |
-| --- | --- | --- |
-| `/api/[...slug]` | REST verbs | Generated Payload REST API |
-| `/api/graphql` | `POST`, `OPTIONS` | Payload GraphQL endpoint |
-| `/api/graphql-playground` | `GET` | Payload GraphQL playground |
-| `/admin/*` | browser routes | Payload admin UI |
+### `GET /api/faqs`
 
-## Route-by-Route Notes
+- source: PostgreSQL
+- response: `{ faqs: Array<{ id, question, answer, category, order, isActive }> }`
 
-### `/api/projects`
+### `GET /api/projects`
 
-File: `src/app/(frontend)/api/projects/route.ts`
+- source: PostgreSQL plus media join
+- response: `{ docs: Project[] }`
 
-Current behavior:
+## Automation APIs
 
-- accepts `limit`
-- accepts exact `category` filter from a fixed allowlist
-- runs direct SQL against `projects`
-- fetches related media in a second query
-- returns `{ docs }`
+### `POST /api/make-webhook`
 
-Response shape per item:
-
-```json
-{
-  "id": 1,
-  "title": "Example",
-  "category": "websites",
-  "year": "2026",
-  "description": "Short summary",
-  "thumbnail": {
-    "alt": "Example",
-    "url": "/media/example.webp",
-    "width": 900,
-    "height": 600,
-    "mimeType": "image/webp",
-    "updatedAt": "2026-04-30T00:00:00.000Z"
-  },
-  "link": "https://example.com"
-}
-```
-
-### `/api/pages`
-
-File: `src/app/(frontend)/api/pages/route.ts`
-
-Current behavior:
-
-- Payload Local API query
-- `overrideAccess: false`
-- `depth: 0`
-- bounded `limit`
-- paginated result returned directly
-
-Selected fields:
-
-- `title`
-- `slug`
-- `meta`
-- `publishedAt`
-- `updatedAt`
-
-### `/api/services`
-
-Returns `result.docs` as `{ services }` without additional reshaping.
-
-### `/api/testimonials`
-
-Returns a trimmed array under `{ testimonials }` with:
-
-- `id`
-- `clientName`
-- `clientRole`
-- `content`
-- `rating`
-- `updatedAt`
-
-### `/api/faqs`
-
-Returns `{ faqs }` by querying Payload for active records sorted by `order`.
-
-Operational note:
-
-- this route is currently important in Cloudflare verification because it has appeared in worker-runtime hang investigations
-
-### `/api/make-webhook`
-
-Workflows currently recognized:
+Accepted workflows:
 
 - `lead-capture`
 - `calculator-quote`
-- `dodo-download`
-- `cal-booking`
+- `resource-download`
 
-Important behaviors:
+Behavior:
 
-- in-memory rate limiting
-- selective unauthenticated flows
-- lead data allowlist sanitization
-- server-side concealment of Make.com webhook URLs
+- persists contact and calculator leads to PostgreSQL
+- forwards the sanitized workflow payload to the matching Make.com webhook
+- returns `500` if the matching Make.com webhook URL is not configured
 
-### `/api/cal-webhook`
+### `POST /api/cal-webhook`
 
-Important behaviors:
+- requires `Authorization: Bearer <CRON_SECRET>`
+- forwards Cal booking payloads to `CAL_WEBHOOK_URL`
 
-- bearer-token gate via `CRON_SECRET`
-- in-memory rate limiting
-- payload narrowing before forwarding
+### `POST /api/webhooks/dodo`
 
-### `/api/checkout`
+- verifies `x-dodo-signature`
+- upserts orders in PostgreSQL
+- mirrors qualifying customer leads in PostgreSQL
+- optionally forwards the verified event to `MAKE_WEBHOOK_DODO_PAYMENTS`
 
-Accepts:
+## Commerce APIs
 
-```json
-{
-  "productId": "prod_x",
-  "customerEmail": "optional@example.com",
-  "amount": 5000
-}
-```
+### `POST /api/checkout`
 
-Returns:
+- creates or resolves a Dodo checkout URL for a product
 
-```json
-{
-  "url": "https://checkout..."
-}
-```
+### `GET /api/dodo-products`
 
-### `/api/dodo-products`
+- returns public product/catalog data used by the storefront
 
-Normalizes Dodo SDK responses into storefront JSON with:
+### `POST /api/quote-pdf`
 
-- `id`
-- `name`
-- `description`
-- `priceCents`
-- `currency`
-- `type`
-- `pwywEnabled`
-- `pwywMinCents`
-- `pwywSuggestedCents`
-- `imageUrl`
-- `taxCategory`
+- returns an Edmond Moepswa-branded PDF quote
+- public-only implementation using `pdf-lib`
 
-### `/api/media/transform`
+## Intentional non-contracts
 
-Input query params:
-
-- `src` required
-- `w` optional
-- `h` optional
-- `q` optional
-- `fit` optional, allowlisted
-
-Security features:
-
-- blocks recursive self-calls
-- restricts hostnames to known safe origins
-- falls back to original fetch if transformed request is not usable
-
-### `/api/webhooks/dodo`
-
-Important behaviors:
-
-- validates `x-dodo-signature` with HMAC SHA-256
-- creates or updates `orders`
-- may create `leads`
-- handles `payment.succeeded`, `payment.failed`, `subscription.active`, `subscription.cancelled`, `refund.succeeded`
-
-## Generated Payload APIs
-
-Payload REST and GraphQL routes are generated wrappers, but two implementation details matter:
-
-- REST and GraphQL are wrapped through `toBufferedResponse(...)`
-- the generated admin and API surface depends on the current `importMap.js`
-
-Those details are operationally significant under Cloudflare Workers.
+- `/admin` is not a supported launch path
+- `/next/preview` and `/next/exit-preview` intentionally return `404`
