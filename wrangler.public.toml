@@ -1,5 +1,5 @@
 "$schema" = "./node_modules/wrangler/config-schema.json"
-name = "edmond-moepswa"
+name = "edmond"
 main = ".open-next/public/worker.js"
 workers_dev = true
 compatibility_date = "2026-04-28"
@@ -32,37 +32,25 @@ binding = "ASSETS"
 binding = "IMAGES"
 
 [vars]
-PAYLOAD_DB_POOL_MAX = "1"
-PUBLIC_WORKER_NAME = "edmond-moepswa"
-PAYLOAD_WORKER_NAME = "edmond-moepswa-payload"
-PAYLOAD_WORKER_VERSION_ID = ""
-WORKERS_DEV_SUFFIX = "edmnd-src.workers.dev"
+CLOUDFLARE_WORKER_VARIANT = "public"
+PUBLIC_WORKER_NAME = "edmond"
+WORKERS_DEV_SUFFIX = "bridgearc.workers.dev"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "edmond-moepswa"
-
-[[services]]
-binding = "PAYLOAD_WORKER"
-service = "edmond-moepswa-payload"
+service = "edmond"
 
 [env.staging]
-name = "edmond-moepswa-staging"
+name = "edmond-staging"
 
 [env.staging.images]
 binding = "IMAGES"
 
 [env.staging.vars]
-PAYLOAD_DB_POOL_MAX = "1"
-PUBLIC_WORKER_NAME = "edmond-moepswa-staging"
-PAYLOAD_WORKER_NAME = "edmond-moepswa-payload-staging"
-PAYLOAD_WORKER_VERSION_ID = ""
-WORKERS_DEV_SUFFIX = "edmnd-src.workers.dev"
+CLOUDFLARE_WORKER_VARIANT = "public"
+PUBLIC_WORKER_NAME = "edmond-staging"
+WORKERS_DEV_SUFFIX = "bridgearc.workers.dev"
 
 [[env.staging.services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "edmond-moepswa-staging"
-
-[[env.staging.services]]
-binding = "PAYLOAD_WORKER"
-service = "edmond-moepswa-payload-staging"
+service = "edmond-staging"

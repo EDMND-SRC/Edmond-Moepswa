@@ -9,6 +9,7 @@
     "/api/media/transform",
     "/api/pages",
     "/api/projects",
+    "/api/quote-pdf",
     "/api/services",
     "/api/substack",
     "/api/testimonials",
@@ -46,6 +47,9 @@
     "/api/projects": [
       "GET",
       "HEAD"
+    ],
+    "/api/quote-pdf": [
+      "POST"
     ],
     "/api/services": [
       "GET",
@@ -93,10 +97,5 @@
       "POST"
     ]
   },
-  "payloadRoutes": [
-    "/api/[...slug]",
-    "/api/graphql",
-    "/api/graphql-playground"
-  ],
   "schemaVersion": 1
 }

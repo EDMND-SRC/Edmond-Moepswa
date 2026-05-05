@@ -6,29 +6,12 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { X, Loader2, Send } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatCurrency, convertBWP } from '@/lib/currency'
+import type { CalculatorSelections } from './types'
 
 interface QuoteModalProps {
   isOpen: boolean
   onClose: () => void
-  selections: {
-    service: string
-    serviceLabel: string
-    tier: string
-    tierLabel: string
-    tierPriceBWP: number
-    addons: { id: string; name: string; qty: number; priceBWP: number }[]
-    addonsSubtotalBWP: number
-    deliveryCostBWP: number
-    delivery: string
-    deliveryLabel: string
-    deliveryMultiplier: number
-    staticDiscount: boolean
-    staticDiscountBWP: number
-    estimatedTotalBWP: number
-    formattedTotal: string
-    formattedBase: string
-    currency: string
-  }
+  selections: CalculatorSelections
 }
 
 const SCOPE_OPTIONS = [

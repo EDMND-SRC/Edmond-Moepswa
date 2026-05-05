@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import pg from 'pg'
+import { withPostgresClient } from '@/lib/server/postgres'
 
 const VALID_CATEGORIES = ['websites', 'applications', 'automation', 'products']
 
@@ -45,8 +45,6 @@ function toUpdatedAt(value: Date | string | null | undefined): string {
 }
 
 export async function GET(req: NextRequest) {
-  let client: pg.Client | null = null
-
   try {
     const { searchParams } = req.nextUrl
 
@@ -63,63 +61,62 @@ export async function GET(req: NextRequest) {
       whereQuery.category = { equals: category }
     }
 
-    client = new pg.Client({
-      connectionString: process.env.DATABASE_URL || '',
+    const { result, thumbnails } = await withPostgresClient(async (client) => {
+      const queryValues: Array<number | string> = []
+      let projectQuery = `
+        select
+          id,
+          title,
+          category,
+          year,
+          description #>> '{root,children,0,children,0,text}' as description,
+          thumbnail_id,
+          link
+        from projects
+      `
+
+      if (whereQuery.category?.equals) {
+        queryValues.push(whereQuery.category.equals)
+        projectQuery += ` where category = $${queryValues.length}`
+      }
+
+      queryValues.push(limit)
+      projectQuery += ` order by created_at desc limit $${queryValues.length}`
+
+      const result = (await client.query<ProjectRow>(projectQuery, queryValues)) as {
+        rows: ProjectRow[]
+      }
+
+      const thumbnailIds = Array.from(
+        new Set(
+          result.rows.flatMap((row) => {
+            const thumbnailId = toNumber(row.thumbnail_id)
+            return thumbnailId === null ? [] : [thumbnailId]
+          }),
+        ),
+      )
+
+      const thumbnails =
+        thumbnailIds.length > 0
+          ? ((await client.query<MediaRow>(
+              `
+                select
+                  id,
+                  alt,
+                  url,
+                  width,
+                  height,
+                  mime_type,
+                  updated_at
+                from media
+                where id = any($1::int[])
+              `,
+              [thumbnailIds],
+            )) as { rows: MediaRow[] })
+          : { rows: [] as MediaRow[] }
+
+      return { result, thumbnails }
     })
-    await client.connect()
-
-    const queryValues: Array<number | string> = []
-    let projectQuery = `
-      select
-        id,
-        title,
-        category,
-        year,
-        description #>> '{root,children,0,children,0,text}' as description,
-        thumbnail_id,
-        link
-      from projects
-    `
-
-    if (whereQuery.category?.equals) {
-      queryValues.push(whereQuery.category.equals)
-      projectQuery += ` where category = $${queryValues.length}`
-    }
-
-    queryValues.push(limit)
-    projectQuery += ` order by created_at desc limit $${queryValues.length}`
-
-    const result = (await client.query<ProjectRow>(projectQuery, queryValues)) as {
-      rows: ProjectRow[]
-    }
-
-    const thumbnailIds = Array.from(
-      new Set(
-        result.rows.flatMap((row) => {
-          const thumbnailId = toNumber(row.thumbnail_id)
-          return thumbnailId === null ? [] : [thumbnailId]
-        }),
-      ),
-    )
-
-    const thumbnails =
-      thumbnailIds.length > 0
-        ? ((await client.query<MediaRow>(
-            `
-              select
-                id,
-                alt,
-                url,
-                width,
-                height,
-                mime_type,
-                updated_at
-              from media
-              where id = any($1::int[])
-            `,
-            [thumbnailIds],
-          )) as { rows: MediaRow[] })
-        : { rows: [] as MediaRow[] }
 
     const thumbnailById = new Map(
       thumbnails.rows.map((thumbnail) => [
@@ -153,9 +150,5 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Failed to fetch projects:', error)
     return NextResponse.json({ docs: [] }, { status: 500 })
-  } finally {
-    if (client) {
-      await client.end().catch(() => undefined)
-    }
   }
 }

@@ -30,7 +30,7 @@ export async function GET(request: Request) {
   try {
     const response = await fetch('https://ipapi.co/json/', {
       headers: {
-        'User-Agent': 'Edmond-Moepswa/1.0',
+        'User-Agent': 'edmond/1.0',
       },
       next: { revalidate: 3600 }, // Cache for 1 hour
     })

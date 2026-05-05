@@ -3,36 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { X, Copy, Download, Check } from 'lucide-react'
+import { X, Copy, Download, Check, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { CalculatorSelections } from './types'
 
 interface SummaryDownloadProps {
   isOpen: boolean
   onClose: () => void
-  selections: {
-    service: string
-    serviceLabel: string
-    tier: string
-    tierLabel: string
-    tierPriceBWP: number
-    addons: { id: string; name: string; qty: number; priceBWP: number }[]
-    addonsSubtotalBWP: number
-    delivery: string
-    deliveryLabel: string
-    deliveryCostBWP: number
-    deliveryMultiplier: number
-    staticDiscount: boolean
-    staticDiscountBWP: number
-    estimatedTotalBWP: number
-    formattedTotal: string
-    formattedBase: string
-    currency: string
-  }
+  selections: CalculatorSelections
 }
 
-type FormatType = 'markdown' | 'text' | 'csv'
+type FormatType = 'markdown' | 'text' | 'csv' | 'pdf'
 
-function generateMarkdown(s: SummaryDownloadProps['selections']): string {
+function generateMarkdown(s: CalculatorSelections): string {
   const lines: string[] = []
   lines.push(`# Service Package Summary`)
   lines.push('')
@@ -86,7 +69,7 @@ function generateMarkdown(s: SummaryDownloadProps['selections']): string {
   return lines.join('\n')
 }
 
-function generatePlainText(s: SummaryDownloadProps['selections']): string {
+function generatePlainText(s: CalculatorSelections): string {
   const lines: string[] = []
   lines.push('Service Package Summary')
   lines.push('=========================')
@@ -138,7 +121,7 @@ function generatePlainText(s: SummaryDownloadProps['selections']): string {
   return lines.join('\n')
 }
 
-function generateCSV(s: SummaryDownloadProps['selections']): string {
+function generateCSV(s: CalculatorSelections): string {
   const rows: string[] = []
   rows.push('Section,Item,Quantity,Price BWP')
   rows.push(`Service,${s.serviceLabel} - ${s.tierLabel},1,${s.tierPriceBWP}`)
@@ -168,11 +151,13 @@ const FORMAT_CONFIG: Record<FormatType, { label: string; extension: string; mime
   markdown: { label: 'Markdown', extension: 'md', mime: 'text/markdown' },
   text: { label: 'Plain Text', extension: 'txt', mime: 'text/plain' },
   csv: { label: 'CSV', extension: 'csv', mime: 'text/csv' },
+  pdf: { label: 'PDF Quote', extension: 'pdf', mime: 'application/pdf' },
 }
 
 export default function SummaryDownload({ isOpen, onClose, selections }: SummaryDownloadProps) {
   const [format, setFormat] = useState<FormatType>('markdown')
   const [copied, setCopied] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const modalRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
 
@@ -222,10 +207,21 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
         return generatePlainText(selections)
       case 'csv':
         return generateCSV(selections)
+      case 'pdf':
+        return generatePlainText(selections)
       default:
         return ''
     }
   })()
+
+  const getDownloadFilename = (contentDisposition: string | null): string | null => {
+    if (!contentDisposition) {
+      return null
+    }
+
+    const match = contentDisposition.match(/filename=\"?([^\";]+)\"?/)
+    return match?.[1] ?? null
+  }
 
   const handleCopy = async () => {
     try {
@@ -241,16 +237,45 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
   const handleDownload = async () => {
     const config = FORMAT_CONFIG[format]
 
-    const blob = new Blob([generatedContent], { type: config.mime })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `service-summary-${selections.service}-${selections.tier}.${config.extension}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-    toast.success('File downloaded!')
+    try {
+      setIsDownloading(true)
+
+      let blob: Blob
+      let filename = `service-summary-${selections.service}-${selections.tier}.${config.extension}`
+
+      if (format === 'pdf') {
+        const response = await fetch('/api/quote-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ selections }),
+        })
+
+        if (!response.ok) {
+          throw new Error('PDF generation failed')
+        }
+
+        blob = await response.blob()
+        filename =
+          getDownloadFilename(response.headers.get('content-disposition')) ??
+          `edmond-quote-${selections.service}-${selections.tier}.pdf`
+      } else {
+        blob = new Blob([generatedContent], { type: config.mime })
+      }
+
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast.success(format === 'pdf' ? 'PDF downloaded!' : 'File downloaded!')
+    } catch {
+      toast.error(format === 'pdf' ? 'Failed to generate PDF.' : 'Failed to download file.')
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   if (!isOpen) return null
@@ -307,7 +332,7 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
             <div>
               <span className="text-sm text-[#b0b0b0] mb-2 block">Format</span>
               <div className="grid grid-cols-2 gap-2">
-                {(['markdown', 'text', 'csv'] as FormatType[]).map((f) => {
+                {(['markdown', 'text', 'csv', 'pdf'] as FormatType[]).map((f) => {
                   const isActive = format === f
                   return (
                     <button
@@ -351,17 +376,26 @@ export default function SummaryDownload({ isOpen, onClose, selections }: Summary
               ) : (
                 <>
                   <Copy className="w-4 h-4" aria-hidden="true" />
-                  Copy to Clipboard
+                  {format === 'pdf' ? 'Copy Summary Text' : 'Copy to Clipboard'}
                 </>
               )}
             </button>
             <button
               type="button"
               onClick={handleDownload}
+              disabled={isDownloading}
               className="w-full flex items-center justify-center gap-2 py-3.5 px-6 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a1a]"
             >
-              <Download className="w-4 h-4" aria-hidden="true" />
-              Download .{FORMAT_CONFIG[format].extension}
+              {isDownloading ? (
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Download className="w-4 h-4" aria-hidden="true" />
+              )}
+              {isDownloading
+                ? 'Generating PDF...'
+                : format === 'pdf'
+                  ? 'Download PDF Quote'
+                  : `Download .${FORMAT_CONFIG[format].extension}`}
             </button>
           </div>
         </motion.div>

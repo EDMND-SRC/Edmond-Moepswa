@@ -16,6 +16,7 @@ import { SERVICE_CATEGORIES } from './data'
 import type { PricingTier } from './data'
 import QuoteModal from './QuoteModal'
 import SummaryDownload from './SummaryDownload'
+import type { CalculatorSelections } from './types'
 import { CurrencySelector } from '@/components/ui/CurrencySelector'
 import { toast } from 'sonner'
 
@@ -95,7 +96,6 @@ export default function CalculatorSection() {
       }
     }
     init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Reset tier when service changes
@@ -163,7 +163,7 @@ I'd like to discuss this. Are you available for a discovery call?`
   }
 
   // Build selections object for modals
-  const selections = useMemo(() => {
+  const selections = useMemo<CalculatorSelections>(() => {
     return {
       service: selectedService,
       serviceLabel: currentService?.label ?? '',

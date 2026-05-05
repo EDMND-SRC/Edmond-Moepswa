@@ -1,5 +1,5 @@
 "$schema" = "./node_modules/wrangler/config-schema.json"
-name = "edmond-moepswa"
+name = "edmond"
 main = ".open-next/worker.js"
 workers_dev = true
 compatibility_date = "2026-04-28"
@@ -30,7 +30,7 @@ binding = "ASSETS"
 
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "edmond-moepswa"
+service = "edmond"
 
 [images]
 binding = "IMAGES"

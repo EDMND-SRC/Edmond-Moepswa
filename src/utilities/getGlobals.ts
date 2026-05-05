@@ -1,26 +1,29 @@
-import type { Config } from 'src/payload-types'
+import type { Config } from '@/payload-types'
 
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { launchFooter, launchHeader, launchSiteSettings } from '@/content/launchSnapshot'
 import { unstable_cache } from 'next/cache.js'
 
 type Global = keyof Config['globals']
 
-async function getGlobal(slug: Global, depth = 0) {
-  const payload = await getPayload({ config: configPromise })
+async function getGlobal<T extends Global>(slug: T, depth = 0): Promise<Config['globals'][T]> {
+  void depth
 
-  const global = await payload.findGlobal({
-    slug,
-    depth,
-  })
-
-  return global
+  switch (slug) {
+    case 'header':
+      return launchHeader as Config['globals'][T]
+    case 'footer':
+      return launchFooter as Config['globals'][T]
+    case 'site-settings':
+      return launchSiteSettings as Config['globals'][T]
+    default:
+      throw new Error(`Unsupported launch global: ${String(slug)}`)
+  }
 }
 
 /**
  * Returns a unstable_cache function mapped with the cache tag for the slug
  */
-export const getCachedGlobal = (slug: Global, depth = 0) =>
+export const getCachedGlobal = <T extends Global>(slug: T, depth = 0) =>
   unstable_cache(async () => getGlobal(slug, depth), [slug], {
     tags: [`global_${slug}`],
   })

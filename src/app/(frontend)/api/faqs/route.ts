@@ -1,25 +1,38 @@
-import configPromise from '@payload-config'
 import { NextResponse } from 'next/server'
-import { getPayload } from 'payload'
+import { withPostgresClient } from '@/lib/server/postgres'
 
-const getFAQs = async () => {
-  const payload = await getPayload({ config: configPromise })
-  const result = await payload.find({
-    collection: 'faqs',
-    where: {
-      isActive: { equals: true },
-    },
-    sort: 'order',
-    limit: 100,
-    overrideAccess: false,
-  })
-
-  return result.docs
+type FAQRow = {
+  id: number | string
+  question: string | null
+  answer: string | null
+  category: string | null
+  order: number | string | null
+  is_active: boolean | null
 }
 
 export async function GET() {
   try {
-    const faqs = await getFAQs()
+    const result = await withPostgresClient(async (client) => {
+      return (await client.query<FAQRow>(
+        `
+          select id, question, answer, category, "order", is_active
+          from faqs
+          where is_active = true
+          order by "order" asc
+          limit 100
+        `,
+      )) as { rows: FAQRow[] }
+    })
+
+    const faqs = result.rows.map((row) => ({
+      answer: row.answer ?? '',
+      category: row.category ?? 'general',
+      id: row.id,
+      isActive: row.is_active ?? true,
+      order: typeof row.order === 'number' ? row.order : 0,
+      question: row.question ?? '',
+    }))
+
     return NextResponse.json({ faqs })
   } catch (error) {
     console.error('Failed to fetch FAQs:', error)

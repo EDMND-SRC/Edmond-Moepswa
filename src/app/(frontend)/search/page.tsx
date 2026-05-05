@@ -1,9 +1,7 @@
 import type { Metadata } from 'next/types'
 
 import { CollectionArchive } from '@/components/CollectionArchive'
-import { CardPostData } from '@/components/Card'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { searchLaunchDocuments } from '@/content/launchSnapshot'
 
 // ISR: Revalidate search results every hour
 export const revalidate = 3600
@@ -19,57 +17,7 @@ type Args = {
 export default async function Page({ searchParams: searchParamsPromise }: Args) {
   const { q: query } = await searchParamsPromise
   const normalizedQuery = query?.trim().toLowerCase() ?? ''
-
-  const searchResults = normalizedQuery
-    ? await (await getPayload({ config: configPromise })).find({
-        collection: 'search',
-        depth: 0,
-        limit: 100,
-        overrideAccess: false,
-        sort: '-updatedAt',
-        select: {
-          doc: true,
-          meta: true,
-          slug: true,
-          title: true,
-        },
-        pagination: false,
-      })
-    : { docs: [] }
-
-  const filteredDocs = normalizedQuery
-    ? searchResults.docs.filter((doc) => {
-        return [doc.title, doc.meta?.title, doc.meta?.description, doc.slug].some((value) => {
-          return typeof value === 'string' && value.toLowerCase().includes(normalizedQuery)
-        })
-      })
-    : searchResults.docs
-
-  const mappedPosts: CardPostData[] = filteredDocs.slice(0, 12).map((doc) => {
-    const href =
-      doc.doc.relationTo === 'pages'
-        ? doc.slug === 'home'
-          ? '/'
-          : doc.slug
-            ? `/${doc.slug}`
-            : null
-        : null
-
-    return {
-      categories: null,
-      href,
-      id: doc.id,
-      meta: doc.meta
-        ? {
-            description: doc.meta.description ?? null,
-            image: doc.meta.image ?? null,
-            title: doc.meta.title ?? null,
-          }
-        : null,
-      slug: doc.slug ?? null,
-      title: doc.title ?? null,
-    }
-  })
+  const mappedPosts = normalizedQuery ? searchLaunchDocuments(normalizedQuery) : []
 
   return (
     <div className="pt-24 pb-24">

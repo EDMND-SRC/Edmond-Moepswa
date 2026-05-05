@@ -2,11 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
 
-import {
-  cloudflarePaths,
-  getTargetConfig,
-  getWranglerArgs,
-} from './lib/cloudflare-workers/config.mjs'
+import { cloudflarePaths, getTargetConfig, getWranglerArgs } from './lib/cloudflare-workers/config.mjs'
 import {
   createWranglerEnv,
   runCommand,
@@ -48,18 +44,17 @@ function createDeploymentBaselineFile(targetName) {
   return path.join(cloudflarePaths.scratchDir, `last-deploy-${targetName}.baseline.json`)
 }
 
-function writeDeploymentState(targetName, state) {
-  const filePath = createDeploymentStateFile(targetName)
-
+function writeJSON(filePath, value) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true })
-  fs.writeFileSync(filePath, `${JSON.stringify(state, null, 2)}\n`)
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`)
+}
+
+function writeDeploymentState(targetName, state) {
+  writeJSON(createDeploymentStateFile(targetName), state)
 }
 
 function writeDeploymentBaseline(targetName, state) {
-  const filePath = createDeploymentBaselineFile(targetName)
-
-  fs.mkdirSync(path.dirname(filePath), { recursive: true })
-  fs.writeFileSync(filePath, `${JSON.stringify(state, null, 2)}\n`)
+  writeJSON(createDeploymentBaselineFile(targetName), state)
 }
 
 function readDeploymentState(targetName) {
@@ -76,16 +71,6 @@ function getWorkerStatus(configPath, targetName) {
   const output = runWranglerCommandCapture(
     'pnpm',
     ['exec', 'wrangler', 'deployments', 'status', '--json', ...getWranglerArgs(configPath, targetName)],
-    { env: createWranglerEnv(process.env) },
-  )
-
-  return JSON.parse(output)
-}
-
-function listWorkerVersions(configPath, targetName) {
-  const output = runWranglerCommandCapture(
-    'pnpm',
-    ['exec', 'wrangler', 'versions', 'list', '--json', ...getWranglerArgs(configPath, targetName)],
     { env: createWranglerEnv(process.env) },
   )
 
@@ -113,116 +98,6 @@ function extractWorkerVersionId(output) {
   return match[1]
 }
 
-function parseVersionSpec(versionSpec) {
-  const match = versionSpec.match(/^([0-9a-f-]+)@(\d+)%$/i)
-
-  if (!match) {
-    throw new Error(`Unexpected Wrangler version spec: ${versionSpec}`)
-  }
-
-  return {
-    percentage: Number.parseInt(match[2], 10),
-    versionId: match[1],
-  }
-}
-
-function deploymentMatchesVersionSplit(status, versionSpecs) {
-  const actualVersions = new Map(
-    (status.versions ?? []).map((version) => [version.version_id, Number(version.percentage)]),
-  )
-
-  return versionSpecs.every((versionSpec) => {
-    const expected = parseVersionSpec(versionSpec)
-    return actualVersions.get(expected.versionId) === expected.percentage
-  })
-}
-
-function findVersionIdByMessage(configPath, targetName, message) {
-  const versions = listWorkerVersions(configPath, targetName)
-  const matchingVersion = versions.find((version) => version.annotations?.['workers/message'] === message)
-
-  return matchingVersion?.id ?? null
-}
-
-function createPublicWranglerConfigWithPayloadVersion(targetName, payloadVersionId) {
-  const tempConfigFile = path.join(
-    cloudflarePaths.rootDir,
-    `.wrangler.public.${targetName}.versioned.toml`,
-  )
-  const configSource = fs.readFileSync(cloudflarePaths.publicWranglerConfig, 'utf8')
-  const nextConfigSource = configSource.replaceAll(
-    'PAYLOAD_WORKER_VERSION_ID = ""',
-    `PAYLOAD_WORKER_VERSION_ID = "${payloadVersionId}"`,
-  )
-
-  fs.mkdirSync(path.dirname(tempConfigFile), { recursive: true })
-  fs.writeFileSync(tempConfigFile, nextConfigSource)
-
-  return tempConfigFile
-}
-
-function uploadWorkerVersion(configPath, targetName, message) {
-  const output = runWranglerCommandCapture(
-    'pnpm',
-    [
-      'exec',
-      'wrangler',
-      'versions',
-      'upload',
-      '--no-bundle',
-      ...getWranglerArgs(configPath, targetName),
-      '--message',
-      message,
-    ],
-    {
-      beforeRetry: () => {
-        const recoveredVersionId = findVersionIdByMessage(configPath, targetName, message)
-
-        if (!recoveredVersionId) {
-          return null
-        }
-
-        return {
-          handled: true,
-          stdout: `Worker Version ID: ${recoveredVersionId}\n`,
-        }
-      },
-      env: createWranglerEnv(process.env),
-    },
-  )
-
-  return extractWorkerVersionId(output)
-}
-
-function deployVersionSplit(configPath, targetName, versionSpecs, message) {
-  runWranglerCommand(
-    'pnpm',
-    [
-      'exec',
-      'wrangler',
-      'versions',
-      'deploy',
-      ...versionSpecs,
-      '--message',
-      message,
-      '-y',
-      ...getWranglerArgs(configPath, targetName),
-    ],
-    {
-      beforeRetry: () => {
-        const status = getWorkerStatus(configPath, targetName)
-
-        if (!deploymentMatchesVersionSplit(status, versionSpecs)) {
-          return null
-        }
-
-        return { handled: true }
-      },
-      env: createWranglerEnv(process.env),
-    },
-  )
-}
-
 function workerExists(configPath, targetName) {
   try {
     getWorkerStatus(configPath, targetName)
@@ -240,41 +115,22 @@ function formatRollbackCommand(configPath, targetName, versionId, message) {
 
 function captureDeploymentBaseline(targetName) {
   const publicStatus = getWorkerStatus(cloudflarePaths.publicWranglerConfig, targetName)
-  const payloadStatus = workerExists(cloudflarePaths.payloadWranglerConfig, targetName)
-    ? getWorkerStatus(cloudflarePaths.payloadWranglerConfig, targetName)
-    : null
+  const publicVersionId = getActiveVersionId(cloudflarePaths.publicWranglerConfig, targetName)
 
   writeDeploymentBaseline(targetName, {
     capturedAt: new Date().toISOString(),
-    payload: payloadStatus
-      ? {
-          createdOn: payloadStatus.created_on,
-          deploymentId: payloadStatus.id,
-          versionId: getActiveVersionId(cloudflarePaths.payloadWranglerConfig, targetName),
-        }
-      : null,
     public: {
       createdOn: publicStatus.created_on,
       deploymentId: publicStatus.id,
-      versionId: getActiveVersionId(cloudflarePaths.publicWranglerConfig, targetName),
+      versionId: publicVersionId,
     },
     rollbackCommands: [
       formatRollbackCommand(
         cloudflarePaths.publicWranglerConfig,
         targetName,
-        getActiveVersionId(cloudflarePaths.publicWranglerConfig, targetName),
+        publicVersionId,
         `restore public ${targetName} baseline ${new Date().toISOString().slice(0, 10)}`,
       ),
-      ...(payloadStatus
-        ? [
-            formatRollbackCommand(
-              cloudflarePaths.payloadWranglerConfig,
-              targetName,
-              getActiveVersionId(cloudflarePaths.payloadWranglerConfig, targetName),
-              `restore payload ${targetName} baseline ${new Date().toISOString().slice(0, 10)}`,
-            ),
-          ]
-        : []),
     ],
     target: targetName,
   })
@@ -283,38 +139,57 @@ function captureDeploymentBaseline(targetName) {
 function bootstrapWorker(configPath, targetName) {
   runWranglerCommand(
     'pnpm',
-    [
-      'exec',
-      'wrangler',
-      'deploy',
-      '--no-bundle',
-      ...getWranglerArgs(configPath, targetName),
-    ],
-    {
-      beforeRetry: () => {
-        if (!workerExists(configPath, targetName)) {
-          return null
-        }
-
-        return { handled: true }
-      },
-      env: createWranglerEnv(process.env),
-    },
+    ['exec', 'wrangler', 'deploy', '--no-bundle', ...getWranglerArgs(configPath, targetName)],
+    { env: createWranglerEnv(process.env) },
   )
 }
 
 function bootstrapWorkers(targetName) {
-  bootstrapWorker(cloudflarePaths.payloadWranglerConfig, targetName)
   bootstrapWorker(cloudflarePaths.publicWranglerConfig, targetName)
 
   const deploymentState = {
-    payloadVersionId: getActiveVersionId(cloudflarePaths.payloadWranglerConfig, targetName),
     publicVersionId: getActiveVersionId(cloudflarePaths.publicWranglerConfig, targetName),
   }
 
   writeDeploymentState(targetName, deploymentState)
-
   return deploymentState
+}
+
+function uploadWorkerVersion(configPath, targetName, message) {
+  const output = runWranglerCommandCapture(
+    'pnpm',
+    [
+      'exec',
+      'wrangler',
+      'versions',
+      'upload',
+      '--no-bundle',
+      ...getWranglerArgs(configPath, targetName),
+      '--message',
+      message,
+    ],
+    { env: createWranglerEnv(process.env) },
+  )
+
+  return extractWorkerVersionId(output)
+}
+
+function deployVersion(configPath, targetName, versionId, message) {
+  runWranglerCommand(
+    'pnpm',
+    [
+      'exec',
+      'wrangler',
+      'versions',
+      'deploy',
+      `${versionId}@100%`,
+      '--message',
+      message,
+      '-y',
+      ...getWranglerArgs(configPath, targetName),
+    ],
+    { env: createWranglerEnv(process.env) },
+  )
 }
 
 function deployWorkers(targetName) {
@@ -322,57 +197,29 @@ function deployWorkers(targetName) {
     captureDeploymentBaseline(targetName)
   }
 
-  const payloadExists = workerExists(cloudflarePaths.payloadWranglerConfig, targetName)
-  const publicExists = workerExists(cloudflarePaths.publicWranglerConfig, targetName)
-
-  if (!payloadExists || !publicExists) {
+  if (!workerExists(cloudflarePaths.publicWranglerConfig, targetName)) {
     return bootstrapWorkers(targetName)
   }
 
-  const newPayloadVersionId = uploadWorkerVersion(
-    cloudflarePaths.payloadWranglerConfig,
+  const newPublicVersionId = uploadWorkerVersion(
+    cloudflarePaths.publicWranglerConfig,
     targetName,
-    `payload rollout ${new Date().toISOString()}`,
+    `public rollout ${new Date().toISOString()}`,
   )
-  const currentPayloadVersionId = getActiveVersionId(cloudflarePaths.payloadWranglerConfig, targetName)
-  const publicConfigWithVersion = createPublicWranglerConfigWithPayloadVersion(targetName, newPayloadVersionId)
-  try {
-    const newPublicVersionId = uploadWorkerVersion(
-      publicConfigWithVersion,
-      targetName,
-      `public rollout ${new Date().toISOString()}`,
-    )
 
-    deployVersionSplit(
-      cloudflarePaths.payloadWranglerConfig,
-      targetName,
-      [`${currentPayloadVersionId}@100%`, `${newPayloadVersionId}@0%`],
-      'prepare payload gradual rollout',
-    )
-    deployVersionSplit(
-      publicConfigWithVersion,
-      targetName,
-      [`${newPublicVersionId}@100%`],
-      'promote public worker',
-    )
-    deployVersionSplit(
-      cloudflarePaths.payloadWranglerConfig,
-      targetName,
-      [`${newPayloadVersionId}@100%`],
-      'promote payload worker',
-    )
+  deployVersion(
+    cloudflarePaths.publicWranglerConfig,
+    targetName,
+    newPublicVersionId,
+    'promote public worker',
+  )
 
-    const deploymentState = {
-      payloadVersionId: newPayloadVersionId,
-      publicVersionId: newPublicVersionId,
-    }
-
-    writeDeploymentState(targetName, deploymentState)
-
-    return deploymentState
-  } finally {
-    fs.rmSync(publicConfigWithVersion, { force: true })
+  const deploymentState = {
+    publicVersionId: newPublicVersionId,
   }
+
+  writeDeploymentState(targetName, deploymentState)
+  return deploymentState
 }
 
 function startTail(configPath, targetName) {
@@ -399,9 +246,7 @@ function startTail(configPath, targetName) {
   return {
     async stop() {
       child.kill('SIGINT')
-
       await new Promise((resolve) => child.once('close', resolve))
-
       return { stderr, stdout }
     },
   }
@@ -415,41 +260,22 @@ function verifyDeploymentVersions(targetName) {
   }
 
   const currentPublicVersionId = getActiveVersionId(cloudflarePaths.publicWranglerConfig, targetName)
-  const currentPayloadVersionId = getActiveVersionId(cloudflarePaths.payloadWranglerConfig, targetName)
 
   if (currentPublicVersionId !== expectedState.publicVersionId) {
     throw new Error(
       `Public worker version mismatch: expected ${expectedState.publicVersionId}, got ${currentPublicVersionId}`,
     )
   }
-
-  if (currentPayloadVersionId !== expectedState.payloadVersionId) {
-    throw new Error(
-      `Payload worker version mismatch: expected ${expectedState.payloadVersionId}, got ${currentPayloadVersionId}`,
-    )
-  }
-}
-
-function runSmokeUserScript(scriptPath) {
-  runCommand('pnpm', ['exec', 'tsx', scriptPath], {
-    env: {
-      ...process.env,
-      NODE_OPTIONS: '--no-deprecation',
-    },
-  })
 }
 
 async function verifyWorkers(targetName) {
   const target = getTargetConfig(targetName)
   const isRemote = targetName === 'staging' || targetName === 'production'
   const publicTail = isRemote ? startTail(cloudflarePaths.publicWranglerConfig, targetName) : null
-  const payloadTail = isRemote ? startTail(cloudflarePaths.payloadWranglerConfig, targetName) : null
 
   try {
     if (isRemote) {
       verifyDeploymentVersions(targetName)
-      runSmokeUserScript('src/scripts/ensure-cloudflare-smoke-user.ts')
-      runSmokeUserScript('src/scripts/cleanup-cloudflare-smoke-data.ts')
     }
 
     runCommand(
@@ -459,7 +285,6 @@ async function verifyWorkers(targetName) {
         'playwright',
         'test',
         'tests/e2e/frontend.e2e.spec.ts',
-        'tests/e2e/admin.e2e.spec.ts',
         'tests/e2e/cloudflare.smoke.e2e.spec.ts',
         '--config',
         'playwright.config.ts',
@@ -475,30 +300,23 @@ async function verifyWorkers(targetName) {
           ...process.env,
           E2E_BASE_URL: target.buildPublicURL,
           E2E_SKIP_WEBSERVER: '1',
-          E2E_USE_SMOKE_USER: isRemote ? '1' : '0',
           NODE_OPTIONS: '--no-deprecation --import=tsx/esm',
         },
       },
     )
   } finally {
-    if (isRemote) {
-      runSmokeUserScript('src/scripts/cleanup-cloudflare-smoke-data.ts')
+    const tailOutput = await publicTail?.stop()
+
+    if (!tailOutput) {
+      return
     }
 
-    const tailOutputs = await Promise.all([publicTail?.stop(), payloadTail?.stop()])
+    if (tailOutput.stderr.trim()) {
+      throw new Error(`Wrangler tail error output:\n${tailOutput.stderr}`)
+    }
 
-    for (const tailOutput of tailOutputs) {
-      if (!tailOutput) {
-        continue
-      }
-
-      if (tailOutput.stderr.trim()) {
-        throw new Error(`Wrangler tail error output:\n${tailOutput.stderr}`)
-      }
-
-      if (tailOutput.stdout.trim()) {
-        throw new Error(`Worker error logs detected during smoke verification:\n${tailOutput.stdout}`)
-      }
+    if (tailOutput.stdout.trim()) {
+      throw new Error(`Worker error logs detected during smoke verification:\n${tailOutput.stdout}`)
     }
   }
 }
@@ -510,9 +328,7 @@ function syncSecrets(targetName, dryRun) {
     args.push('--dry-run')
   }
 
-  runCommand(process.execPath, args, {
-    env: process.env,
-  })
+  runCommand(process.execPath, args, { env: process.env })
 }
 
 async function main() {
@@ -520,33 +336,32 @@ async function main() {
   ensureCommand(args.command)
 
   switch (args.command) {
-    case 'build': {
+    case 'build':
       buildCloudflareWorkers(args.target, { skipSizeCheck: args.skipSizeCheck })
       return
-    }
-
-    case 'cleanup-smoke-data': {
-      runSmokeUserScript('src/scripts/cleanup-cloudflare-smoke-data.ts')
-      return
-    }
-
     case 'deploy': {
       if (!args.skipBuild) {
         buildCloudflareWorkers(args.target, { skipSizeCheck: args.skipSizeCheck })
+      }
+
+      const publicExists = workerExists(cloudflarePaths.publicWranglerConfig, args.target)
+      const needsBootstrap = !args.dryRun && !publicExists
+
+      if (needsBootstrap) {
+        bootstrapWorkers(args.target)
       }
 
       if (!args.skipSecrets) {
         syncSecrets(args.target, args.dryRun)
       }
 
-      if (args.dryRun) {
+      if (args.dryRun || needsBootstrap) {
         return
       }
 
       deployWorkers(args.target)
       return
     }
-
     case 'dev': {
       buildCloudflareWorkers('local', { skipSizeCheck: false })
       runCommand(
@@ -557,8 +372,6 @@ async function main() {
           'dev',
           '-c',
           path.relative(cloudflarePaths.rootDir, cloudflarePaths.publicWranglerConfig),
-          '-c',
-          path.relative(cloudflarePaths.rootDir, cloudflarePaths.payloadWranglerConfig),
           '--port',
           '8787',
         ],
@@ -566,22 +379,12 @@ async function main() {
       )
       return
     }
-
-    case 'ensure-smoke-user': {
-      runSmokeUserScript('src/scripts/ensure-cloudflare-smoke-user.ts')
-      return
-    }
-
-    case 'sync-secrets': {
+    case 'sync-secrets':
       syncSecrets(args.target, args.dryRun)
       return
-    }
-
-    case 'verify': {
+    case 'verify':
       await verifyWorkers(args.target)
       return
-    }
-
     default:
       throw new Error(`Unsupported cloudflare-workers command: ${args.command}`)
   }

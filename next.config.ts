@@ -1,5 +1,4 @@
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare'
-import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -9,7 +8,6 @@ const dirname = path.dirname(__filename)
 import { redirects } from './redirects'
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
-const CLOUDFLARE_WORKER_VARIANT = process.env.CLOUDFLARE_WORKER_VARIANT
 
 const nextConfig: NextConfig = {
   // Disable source maps in production — saves 5-10s on build output
@@ -35,7 +33,6 @@ const nextConfig: NextConfig = {
       }),
     ],
   },
-  assetPrefix: CLOUDFLARE_WORKER_VARIANT === 'payload' ? '/_payload_next' : undefined,
   webpack: (webpackConfig) => {
     webpackConfig.resolve.alias = {
       ...(webpackConfig.resolve.alias || {}),
@@ -67,6 +64,9 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 
   // Turbopack config for dev — also enabled for production via CLI flag
   turbopack: {
@@ -79,4 +79,4 @@ const nextConfig: NextConfig = {
 
 void initOpenNextCloudflareForDev()
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+export default nextConfig

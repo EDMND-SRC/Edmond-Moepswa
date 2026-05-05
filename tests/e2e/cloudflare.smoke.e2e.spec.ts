@@ -1,219 +1,120 @@
-import fs from 'node:fs'
-import path from 'node:path'
-
-import { expect, test, type Page } from '@playwright/test'
-
-import { resolveAdminUser, shouldUseSmokeUser } from '../helpers/adminUser'
-import { login } from '../helpers/login'
-import { cleanupTestUser, seedTestUser } from '../helpers/seedUser'
+import { expect, test } from '@playwright/test'
 
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:3000'
-const fixturePath = path.join(process.cwd(), 'public', 'favicon', 'favicon-32x32.png')
-const artifactPath = path.join(process.cwd(), 'test-outputs', 'cloudflare-smoke-artifacts.json')
-const smokePrefix = 'cf-smoke-'
-
-type SmokeArtifacts = {
-  mediaIds: string[]
-  pageIds: string[]
-}
-
-let page: Page
-const smokeArtifacts: SmokeArtifacts = {
-  mediaIds: [],
-  pageIds: [],
-}
-const useSmokeUser = shouldUseSmokeUser()
-
-function writeArtifacts() {
-  fs.mkdirSync(path.dirname(artifactPath), { recursive: true })
-  fs.writeFileSync(artifactPath, `${JSON.stringify(smokeArtifacts, null, 2)}\n`)
-}
-
-function getCookieHeader(cookies: Array<{ name: string; value: string }>) {
-  return cookies.map((cookie) => `${cookie.name}=${cookie.value}`).join('; ')
-}
-
-async function getAuthenticatedHeaders() {
-  const cookies = await page.context().cookies(baseURL)
-  const cookieHeader = getCookieHeader(cookies)
-
-  return {
-    cookie: cookieHeader,
-  }
-}
-
-async function deleteArtifacts() {
-  const headers = await getAuthenticatedHeaders()
-
-  for (const pageId of [...smokeArtifacts.pageIds]) {
-    await fetch(`${baseURL}/api/pages/${pageId}`, {
-      headers,
-      method: 'DELETE',
-    })
-  }
-
-  for (const mediaId of [...smokeArtifacts.mediaIds]) {
-    await fetch(`${baseURL}/api/media/${mediaId}`, {
-      headers,
-      method: 'DELETE',
-    })
-  }
-
-  smokeArtifacts.pageIds.length = 0
-  smokeArtifacts.mediaIds.length = 0
-  writeArtifacts()
-}
-
-async function waitForPublicPage(slug: string) {
-  const pathname = `/${slug}`
-  const deadline = Date.now() + 30000
-
-  while (Date.now() < deadline) {
-    const response = await fetch(`${baseURL}${pathname}`)
-
-    if (response.ok) {
-      return
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-  }
-
-  throw new Error(`Timed out waiting for ${pathname} to return a public 200`)
-}
 
 test.describe('Cloudflare smoke', () => {
-  test.describe.configure({ mode: 'serial', timeout: 180_000 })
+  test.describe.configure({ mode: 'serial', timeout: 120_000 })
   test.skip(({ browserName }) => browserName !== 'chromium', 'Cloudflare smoke checks run once in Chromium')
 
-  test.beforeAll(async ({ browser }) => {
-    if (!useSmokeUser) {
-      await seedTestUser()
+  test('public APIs return launch content', async () => {
+    const [pagesResponse, servicesResponse, testimonialsResponse, faqsResponse, projectsResponse] =
+      await Promise.all([
+        fetch(`${baseURL}/api/pages?limit=5`),
+        fetch(`${baseURL}/api/services`),
+        fetch(`${baseURL}/api/testimonials`),
+        fetch(`${baseURL}/api/faqs`),
+        fetch(`${baseURL}/api/projects?limit=3`),
+      ])
+
+    expect(pagesResponse.status).toBe(200)
+    expect(servicesResponse.status).toBe(200)
+    expect(testimonialsResponse.status).toBe(200)
+    expect(faqsResponse.status).toBe(200)
+    expect(projectsResponse.status).toBe(200)
+
+    const pagesBody = (await pagesResponse.json()) as { docs: unknown[]; limit: number }
+    const servicesBody = (await servicesResponse.json()) as {
+      services: Array<{ id: string; pricingTiers: unknown[]; title: string }>
+    }
+    const testimonialsBody = (await testimonialsResponse.json()) as {
+      testimonials: Array<{ clientName: string; rating: number }>
+    }
+    const faqsBody = (await faqsResponse.json()) as {
+      faqs: Array<{ answer: string; question: string }>
+    }
+    const projectsBody = (await projectsResponse.json()) as {
+      docs: Array<{ id: number; title: string }>
     }
 
-    const context = await browser.newContext()
-    page = await context.newPage()
-    await login({ page, user: resolveAdminUser() })
-    writeArtifacts()
-  })
-
-  test.afterAll(async () => {
-    await deleteArtifacts()
-    if (!useSmokeUser) {
-      await cleanupTestUser()
-    }
-    await page.context()?.close()
-  })
-
-  test('payload REST auth failure is not a 500', async () => {
-    const response = await fetch(`${baseURL}/api/users/me`)
-
-    if (response.status === 200) {
-      const body = (await response.json()) as { user: null | unknown }
-
-      expect(body.user).toBeNull()
-      return
-    }
-
-    expect([401, 403]).toContain(response.status)
-  })
-
-  test('graphql GET is blocked and POST succeeds', async () => {
-    const getResponse = await fetch(`${baseURL}/api/graphql`)
-
-    expect(getResponse.status).toBe(405)
-
-    const postResponse = await fetch(`${baseURL}/api/graphql`, {
-      body: JSON.stringify({
-        query: 'query CloudflareSmoke { __schema { queryType { name } } }',
-      }),
-      headers: {
-        'content-type': 'application/json',
-      },
-      method: 'POST',
+    expect(Array.isArray(pagesBody.docs)).toBe(true)
+    expect(pagesBody.limit).toBe(5)
+    expect(servicesBody.services.length).toBeGreaterThan(0)
+    expect(servicesBody.services[0]).toMatchObject({
+      id: expect.any(String),
+      title: expect.any(String),
     })
-
-    expect(postResponse.status).toBe(200)
-  })
-
-  test('can upload media and fetch a transformed image', async () => {
-    const headers = await getAuthenticatedHeaders()
-    const fixtureBytes = fs.readFileSync(fixturePath)
-    const smokeId = `${smokePrefix}${Date.now()}`
-    const formData = new FormData()
-
-    formData.set('_payload', JSON.stringify({ alt: smokeId }))
-    formData.set('file', new File([fixtureBytes], `${smokeId}.png`, { type: 'image/png' }))
-
-    const response = await fetch(`${baseURL}/api/media`, {
-      body: formData,
-      headers,
-      method: 'POST',
+    expect(Array.isArray(servicesBody.services[0]?.pricingTiers)).toBe(true)
+    expect(testimonialsBody.testimonials.length).toBeGreaterThan(0)
+    expect(testimonialsBody.testimonials[0]).toMatchObject({
+      clientName: expect.any(String),
+      rating: expect.any(Number),
     })
-
-    expect([200, 201]).toContain(response.status)
-
-    const mediaResponse = (await response.json()) as {
-      doc?: { id: string | number; url?: string }
-      id?: string | number
-      url?: string
-    }
-    const mediaRecord = mediaResponse.doc ?? mediaResponse
-
-    expect(mediaRecord.id).toBeTruthy()
-    expect(mediaRecord.url).toBeTruthy()
-
-    smokeArtifacts.mediaIds.push(String(mediaRecord.id))
-    writeArtifacts()
-
-    const sourceURL = new URL(mediaRecord.url!, baseURL)
-    const originalResponse = await fetch(sourceURL)
-    const transformedResponse = await fetch(
-      `${baseURL}/api/media/transform?src=${encodeURIComponent(sourceURL.pathname)}&w=32&h=32&q=80`,
-    )
-
-    expect(originalResponse.status).toBe(200)
-    expect(transformedResponse.status).toBe(200)
+    expect(faqsBody.faqs.length).toBeGreaterThan(0)
+    expect(faqsBody.faqs[0]).toMatchObject({
+      answer: expect.any(String),
+      question: expect.any(String),
+    })
+    expect(projectsBody.docs.length).toBeGreaterThan(0)
+    expect(projectsBody.docs[0]).toMatchObject({
+      id: expect.any(Number),
+      title: expect.any(String),
+    })
   })
 
-  test('can create a published page and fetch it publicly', async () => {
-    const headers = await getAuthenticatedHeaders()
-    const slug = `${smokePrefix}${Date.now()}`
-    const title = `Cloudflare Smoke ${Date.now()}`
-    const response = await fetch(`${baseURL}/api/pages`, {
+  test('preview routes stay disabled for the launch build', async () => {
+    const [previewResponse, exitPreviewResponse] = await Promise.all([
+      fetch(`${baseURL}/next/preview`),
+      fetch(`${baseURL}/next/exit-preview`),
+    ])
+
+    expect(previewResponse.status).toBe(404)
+    expect(await previewResponse.text()).toContain('disabled for this launch build')
+    expect(exitPreviewResponse.status).toBe(404)
+    expect(await exitPreviewResponse.text()).toContain('disabled for this launch build')
+  })
+
+  test('quote PDF returns a branded PDF payload', async () => {
+    const response = await fetch(`${baseURL}/api/quote-pdf`, {
       body: JSON.stringify({
-        _status: 'published',
-        hero: {
-          type: 'lowImpact',
+        client: {
+          email: 'hello@example.com',
+          name: 'Launch Client',
         },
-        layout: [
-          {
-            blockType: 'content',
-            columns: [],
-          },
-        ],
-        slug,
-        title,
+        notes: 'Need launch support and copy feedback.',
+        scopeTags: ['existing-redesign'],
+        selections: {
+          addons: [],
+          addonsSubtotalBWP: 0,
+          currency: 'BWP',
+          delivery: 'priority',
+          deliveryCostBWP: 1400,
+          deliveryLabel: 'Priority',
+          deliveryMultiplier: 0.2,
+          estimatedTotalBWP: 7900,
+          formattedBase: 'P5,800',
+          formattedTotal: 'P7,900',
+          service: 'web-design',
+          serviceLabel: 'Web Design',
+          staticDiscount: true,
+          staticDiscountBWP: 500,
+          tier: 'growth',
+          tierLabel: 'Growth',
+          tierPriceBWP: 5800,
+        },
       }),
       headers: {
-        ...headers,
         'content-type': 'application/json',
       },
       method: 'POST',
     })
 
-    expect([200, 201]).toContain(response.status)
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toContain('application/pdf')
+    expect(response.headers.get('content-disposition')).toContain('edmond-quote-web-design-growth.pdf')
 
-    const pageResponse = (await response.json()) as {
-      doc?: { id: string | number }
-      id?: string | number
-    }
-    const pageRecord = pageResponse.doc ?? pageResponse
+    const pdfBytes = new Uint8Array(await response.arrayBuffer())
 
-    expect(pageRecord.id).toBeTruthy()
-
-    smokeArtifacts.pageIds.push(String(pageRecord.id))
-    writeArtifacts()
-
-    await waitForPublicPage(slug)
+    expect(pdfBytes.byteLength).toBeGreaterThan(1000)
+    expect(Buffer.from(pdfBytes.subarray(0, 4)).toString('ascii')).toBe('%PDF')
   })
 })

@@ -1,19 +1,10 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
+import { launchRedirects } from '@/content/launchSnapshot'
 import { unstable_cache } from 'next/cache.js'
 
 export async function getRedirects(depth = 1) {
-  const payload = await getPayload({ config: configPromise })
+  void depth
 
-  const { docs: redirects } = await payload.find({
-    collection: 'redirects',
-    depth,
-    limit: 0,
-    pagination: false,
-    overrideAccess: false,
-  })
-
-  return redirects
+  return launchRedirects
 }
 
 /**

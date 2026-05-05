@@ -6,7 +6,6 @@ import { cloudflarePaths } from './config.mjs'
 const appDir = path.join(cloudflarePaths.rootDir, 'src', 'app')
 const publicFrontendDir = path.join(appDir, '(frontend)')
 const publicRootApiDir = path.join(appDir, 'api')
-const payloadDir = path.join(appDir, '(payload)')
 const httpMethodExportPattern =
   /\bexport\s+(?:async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b|\bexport\s+const\s+(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\b/g
 
@@ -73,16 +72,12 @@ function getRouteMethods(routeFilePath) {
 export function createRouteManifest() {
   const frontendRouteFiles = collectRouteFiles(publicFrontendDir)
   const publicRootApiRouteFiles = collectRouteFiles(publicRootApiDir)
-  const payloadRouteFiles = collectRouteFiles(payloadDir)
 
   const publicFrontendRoutes = frontendRouteFiles.map((routeFile) =>
     toUrlPathFromRouteFile(routeFile, publicFrontendDir),
   )
   const publicRootApiRoutes = publicRootApiRouteFiles.map((routeFile) =>
     toUrlPathFromRouteFile(routeFile, appDir),
-  )
-  const payloadRoutes = payloadRouteFiles.map((routeFile) =>
-    toUrlPathFromRouteFile(routeFile, payloadDir),
   )
   const publicRouteMethods = Object.fromEntries(
     [...frontendRouteFiles, ...publicRootApiRouteFiles].map((routeFile) => [
@@ -95,7 +90,6 @@ export function createRouteManifest() {
     publicExactRoutes: [...new Set([...publicFrontendRoutes, ...publicRootApiRoutes])].sort(),
     publicRootApiRoutes: [...new Set(publicRootApiRoutes)].sort(),
     publicRouteMethods,
-    payloadRoutes: [...new Set(payloadRoutes)].sort(),
     schemaVersion: routeManifestSchemaVersion,
   }
 }

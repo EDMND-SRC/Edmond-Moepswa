@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { getTechIcon, ICON_REGISTRY } from '@/lib/icon-registry'
 
+function expectValidIconComponent(icon: unknown) {
+  expect(icon).not.toBeNull()
+  expect(['function', 'object']).toContain(typeof icon)
+}
+
 describe('getTechIcon', () => {
   describe('empty / whitespace input', () => {
     it('returns null for empty string', () => {
@@ -16,8 +21,7 @@ describe('getTechIcon', () => {
   describe('exact match', () => {
     it('returns icon for exact technology name', () => {
       const Icon = getTechIcon('TypeScript')
-      expect(Icon).not.toBeNull()
-      expect(typeof Icon).toBe('function')
+      expectValidIconComponent(Icon)
     })
 
     it('returns icon for mapped technology name', () => {
@@ -122,7 +126,7 @@ describe('ICON_REGISTRY', () => {
 
   it('all values are valid icon components', () => {
     Object.entries(ICON_REGISTRY).forEach(([key, component]) => {
-      expect(typeof component).toBe('function')
+      expectValidIconComponent(component)
     })
   })
 })

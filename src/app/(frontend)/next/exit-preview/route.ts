@@ -1,7 +1,3 @@
-import { draftMode } from 'next/headers'
-
 export async function GET(): Promise<Response> {
-  const draft = await draftMode()
-  draft.disable()
-  return new Response('Draft mode is disabled')
+  return new Response('Live preview is disabled for this launch build', { status: 404 })
 }

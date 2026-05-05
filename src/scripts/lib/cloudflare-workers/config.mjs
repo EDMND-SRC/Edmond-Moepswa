@@ -1,22 +1,14 @@
 import path from 'node:path'
 
 const rootDir = process.cwd()
-const productionPublicWorkerName = 'edmond-moepswa'
-const productionPayloadWorkerName = 'edmond-moepswa-payload'
-const workersDevSuffix = 'edmnd-src.workers.dev'
-
-export const payloadAssetPrefix = '/_payload_next'
-export const smokeArtifactPrefix = 'cf-smoke-'
-export const smokeArtifactFile = path.join(rootDir, 'test-outputs', 'cloudflare-smoke-artifacts.json')
-export const smokeFixtureFile = path.join(rootDir, 'public', 'favicon', 'favicon-32x32.png')
+const productionPublicWorkerName = 'edmond'
+const workersDevSuffix = 'bridgearc.workers.dev'
 
 export const cloudflarePaths = {
   rootDir,
   buildWranglerConfig: path.join(rootDir, 'wrangler.toml'),
   publicWranglerConfig: path.join(rootDir, 'wrangler.public.toml'),
-  payloadWranglerConfig: path.join(rootDir, 'wrangler.payload.toml'),
   outputDir: path.join(rootDir, '.open-next'),
-  payloadOutputDir: path.join(rootDir, '.open-next', 'payload'),
   publicOutputDir: path.join(rootDir, '.open-next', 'public'),
   routeManifestFile: path.join(rootDir, 'cloudflare', 'route-manifest.json'),
   scratchDir: path.join(rootDir, 'scratch', 'cloudflare-workers'),
@@ -25,19 +17,16 @@ export const cloudflarePaths = {
 export const workerTargets = {
   local: {
     buildPublicURL: 'http://127.0.0.1:8787',
-    payloadWorkerName: productionPayloadWorkerName,
     publicWorkerName: productionPublicWorkerName,
     wranglerEnv: null,
   },
   production: {
     buildPublicURL: `https://${productionPublicWorkerName}.${workersDevSuffix}`,
-    payloadWorkerName: productionPayloadWorkerName,
     publicWorkerName: productionPublicWorkerName,
     wranglerEnv: null,
   },
   staging: {
     buildPublicURL: `https://${productionPublicWorkerName}-staging.${workersDevSuffix}`,
-    payloadWorkerName: `${productionPayloadWorkerName}-staging`,
     publicWorkerName: `${productionPublicWorkerName}-staging`,
     wranglerEnv: 'staging',
   },
@@ -70,6 +59,7 @@ export const runtimeSecretKeys = [
   'MAKE_WEBHOOK_CALCULATOR_QUOTE',
   'MAKE_WEBHOOK_DODO_PAYMENTS',
   'MAKE_WEBHOOK_LEAD_CAPTURE',
+  'MAKE_WEBHOOK_RESOURCE_DOWNLOAD',
   'NEXT_PUBLIC_GA_MEASUREMENT_ID',
   'NEXT_PUBLIC_INSTAGRAM_URL',
   'NEXT_PUBLIC_LINKEDIN_URL',
@@ -79,7 +69,6 @@ export const runtimeSecretKeys = [
   'NEXT_PUBLIC_SUBSTACK_URL',
   'NEXT_PUBLIC_THREADS_URL',
   'NEXT_PUBLIC_X_URL',
-  'PAYLOAD_SECRET',
   'PREVIEW_SECRET',
   'R2_ACCESS_KEY_ID',
   'R2_BUCKET',
@@ -87,8 +76,6 @@ export const runtimeSecretKeys = [
   'R2_PUBLIC_URL',
   'R2_REGION',
   'R2_SECRET_ACCESS_KEY',
-  'SMOKE_ADMIN_EMAIL',
-  'SMOKE_ADMIN_PASSWORD',
   'SUBSTACK_FEED_URL',
 ]
 

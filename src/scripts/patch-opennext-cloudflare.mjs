@@ -2,197 +2,140 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 
 const isPostbuild = process.argv.includes('--postbuild')
-const workerVariant = process.env.CLOUDFLARE_WORKER_VARIANT ?? 'unknown'
-
 const pnpmDir = path.resolve('node_modules/.pnpm')
-const packageDirName = readdirSync(pnpmDir).find((entry) =>
-  entry.startsWith('@opennextjs+cloudflare@'),
-)
 
-if (!packageDirName) {
-  throw new Error('Unable to locate @opennextjs/cloudflare in node_modules/.pnpm')
+function requirePackageDir(prefix) {
+  const packageDirName = readdirSync(pnpmDir).find((entry) => entry.startsWith(prefix))
+
+  if (!packageDirName) {
+    throw new Error(`Unable to locate ${prefix} in node_modules/.pnpm`)
+  }
+
+  return path.join(pnpmDir, packageDirName)
 }
 
-const patchFile = path.join(
-  pnpmDir,
-  packageDirName,
-  'node_modules/@opennextjs/cloudflare/dist/cli/build/patches/ast/patch-vercel-og-library.js',
-)
-
-const source = readFileSync(patchFile, 'utf8')
-const defaultRouteGuard = `const routeFilePathForDefault = traceInfoPath.replace(appBuildOutputPath, packagePath).replace(".nft.json", "");
+function patchOgLibrary() {
+  const packageRoot = requirePackageDir('@opennextjs+cloudflare@')
+  const patchFile = path.join(
+    packageRoot,
+    'node_modules/@opennextjs/cloudflare/dist/cli/build/patches/ast/patch-vercel-og-library.js',
+  )
+  const source = readFileSync(patchFile, 'utf8')
+  const defaultRouteGuard = `const routeFilePathForDefault = traceInfoPath.replace(appBuildOutputPath, packagePath).replace(".nft.json", "");
         if (!existsSync(routeFilePathForDefault)) {
             continue;
         }
         useOg = true;`
-
-const routeGuard = `if (!existsSync(routeFilePath)) {
+  const routeGuard = `if (!existsSync(routeFilePath)) {
                 continue;
             }`
 
-let nextSource = source
+  let nextSource = source
 
-if (!nextSource.includes(defaultRouteGuard)) {
-  const originalUseOg = `useOg = true;
+  if (!nextSource.includes(defaultRouteGuard)) {
+    const originalUseOg = `useOg = true;
         const outputDir = getOutputDir({ functionsPath, packagePath });`
 
-  if (!nextSource.includes(originalUseOg)) {
-    throw new Error('Unexpected @opennextjs/cloudflare useOg block contents')
+    if (!nextSource.includes(originalUseOg)) {
+      throw new Error('Unexpected @opennextjs/cloudflare useOg block contents')
+    }
+
+    nextSource = nextSource.replace(
+      originalUseOg,
+      `${defaultRouteGuard}
+        const outputDir = getOutputDir({ functionsPath, packagePath });`,
+    )
   }
 
-  nextSource = nextSource.replace(
-    originalUseOg,
-    `${defaultRouteGuard}
-        const outputDir = getOutputDir({ functionsPath, packagePath });`,
-  )
-}
-
-const original = `const ast = parseFile(routeFilePath);
+  if (!nextSource.includes(routeGuard)) {
+    const original = `const ast = parseFile(routeFilePath);
             const { edits } = patchVercelOgImport(ast);
             writeFileSync(routeFilePath, ast.commitEdits(edits));`
 
-if (!nextSource.includes(routeGuard)) {
-  if (!nextSource.includes(original)) {
-    throw new Error('Unexpected @opennextjs/cloudflare patch-vercel-og-library.js contents')
-  }
+    if (!nextSource.includes(original)) {
+      throw new Error('Unexpected @opennextjs/cloudflare patch-vercel-og-library.js contents')
+    }
 
-  nextSource = nextSource.replace(
-    original,
-    `${routeGuard}
+    nextSource = nextSource.replace(
+      original,
+      `${routeGuard}
             const ast = parseFile(routeFilePath);
             const { edits } = patchVercelOgImport(ast);
             writeFileSync(routeFilePath, ast.commitEdits(edits));`,
-  )
-}
-
-if (nextSource !== source) {
-  if (!nextSource.includes(routeGuard) || !nextSource.includes(defaultRouteGuard)) {
-    throw new Error('Unexpected @opennextjs/cloudflare patch-vercel-og-library.js contents')
+    )
   }
 
-  writeFileSync(
-    patchFile,
-    nextSource,
-  )
+  if (nextSource !== source) {
+    writeFileSync(patchFile, nextSource)
+  }
+
+  return packageRoot
 }
 
-const workerTemplateFile = path.join(
-  pnpmDir,
-  packageDirName,
-  'node_modules/@opennextjs/cloudflare/dist/cli/templates/worker.js',
-)
-
-const workerHandlerImport = `// @ts-expect-error: resolved by wrangler build
+function normalizeWorkerSource(source) {
+  const workerRoutingHelpersPattern =
+    /const openNextFunctionMatchersPromise = import\("\.\/server-functions\/default\/open-next\.config\.mjs"\)[\s\S]*?export default \{/
+  const workerHandlerImport = `// @ts-expect-error: resolved by wrangler build
             const { handler } = await import("./server-functions/default/handler.mjs");
             return handler(reqOrResp, env, ctx, request.signal);`
-const workerHandlerIndexImport = `// @ts-expect-error: resolved by wrangler build
+  const workerHandlerIndexImport = `// @ts-expect-error: resolved by wrangler build
             const { handler } = await import("./server-functions/default/index.mjs");
             return handler(reqOrResp, env, ctx, request.signal);`
-const removedWorkerCases = `        case "publicApi":
+  const removedWorkerCases = `        case "publicApi":
             return (await import("./server-functions/publicApi/index.mjs")).handler;
         case "ogImage":
             return (await import("./server-functions/ogImage/index.mjs")).handler;
 `
-const workerRoutingHelpersPattern =
-  /const openNextFunctionMatchersPromise = import\("\.\/server-functions\/default\/open-next\.config\.mjs"\)[\s\S]*?export default \{/
 
-function normalizeWorkerSource(source) {
-  let nextSource = source
-
-  nextSource = nextSource.replace(workerRoutingHelpersPattern, 'export default {')
-
-  nextSource = nextSource.replace(
-    'const handler = await resolveHandler(reqOrResp.rawPath ?? url.pathname);\n' +
-      '            return handler(reqOrResp, env, ctx, request.signal);',
-    workerHandlerImport,
-  )
-
-  nextSource = nextSource.replace(workerHandlerIndexImport, workerHandlerImport)
-
-  if (nextSource.includes(removedWorkerCases)) {
-    nextSource = nextSource.replace(removedWorkerCases, '')
-  }
-
-  return nextSource
+  return source
+    .replace(workerRoutingHelpersPattern, 'export default {')
+    .replace(
+      'const handler = await resolveHandler(reqOrResp.rawPath ?? url.pathname);\n' +
+        '            return handler(reqOrResp, env, ctx, request.signal);',
+      workerHandlerImport,
+    )
+    .replace(workerHandlerIndexImport, workerHandlerImport)
+    .replace(removedWorkerCases, '')
 }
 
 function normalizeInitSource(source) {
-  let nextSource = source
-  const internalFetchHelpers = `const debugWorkerVariant = ${JSON.stringify(workerVariant)};
-function matchesWorkerHostname(url, workerName, workersDevSuffix) {
+  const runtimeHelpers = `function matchesWorkerHostname(url, workerName, workersDevSuffix) {
     if (!workerName) {
         return false;
     }
     return url.hostname === \`\${workerName}.internal\` || workersDevSuffix != null && url.hostname === \`\${workerName}.\${workersDevSuffix}\`;
 }
-function resolveNamedWorkerBinding(env, workerName, targetUrl) {
-    if (!env || !matchesWorkerHostname(targetUrl, workerName, env.WORKERS_DEV_SUFFIX)) {
-        return null;
-    }
-    if (workerName === env.PAYLOAD_WORKER_NAME) {
-        return debugWorkerVariant === "payload"
-            ? { binding: env.WORKER_SELF_REFERENCE ?? env.PAYLOAD_WORKER ?? null, decision: "self" }
-            : { binding: env.PAYLOAD_WORKER ?? null, decision: "payload" };
-    }
-    if (workerName === env.PUBLIC_WORKER_NAME) {
-        return debugWorkerVariant === "public"
-            ? { binding: env.WORKER_SELF_REFERENCE ?? env.PUBLIC_WORKER ?? null, decision: "self" }
-            : { binding: env.PUBLIC_WORKER ?? null, decision: "public" };
-    }
-    return null;
-}
-function resolveFetchRouting(cloudflareContext, request) {
+function resolveFetchBinding(cloudflareContext, request) {
     const targetUrl = new URL(request.url);
     const env = cloudflareContext?.env ?? globalThis.__openNextCloudflareEnv ?? null;
     const activeRequestURL = cloudflareContext?.requestURL ?? globalThis.__openNextCloudflareRequestURL ?? null;
     const activeUrl = activeRequestURL ? new URL(activeRequestURL) : null;
     if (activeUrl && env?.WORKER_SELF_REFERENCE && targetUrl.origin === activeUrl.origin) {
-        return {
-            activeUrl,
-            binding: env.WORKER_SELF_REFERENCE,
-            decision: "self",
-            targetUrl
-        };
+        return env.WORKER_SELF_REFERENCE;
     }
-    const payloadBinding = resolveNamedWorkerBinding(env, env?.PAYLOAD_WORKER_NAME, targetUrl);
-    if (payloadBinding) {
-        return {
-            activeUrl,
-            binding: payloadBinding.binding,
-            decision: payloadBinding.decision,
-            targetUrl
-        };
+    if (env?.PUBLIC_WORKER && matchesWorkerHostname(targetUrl, env.PUBLIC_WORKER_NAME, env.WORKERS_DEV_SUFFIX)) {
+        return env.PUBLIC_WORKER;
     }
-    const publicBinding = resolveNamedWorkerBinding(env, env?.PUBLIC_WORKER_NAME, targetUrl);
-    if (publicBinding) {
-        return {
-            activeUrl,
-            binding: publicBinding.binding,
-            decision: publicBinding.decision,
-            targetUrl
-        };
-    }
-    return {
-        activeUrl,
-        binding: null,
-        decision: "edge",
-        targetUrl
-    };
+    return null;
 }
 function initRuntime() {\n`
 
-  nextSource = nextSource.replace(
+  let nextSource = source.replace(
     '    return cloudflareContextALS.run({ env, ctx, cf: request.cf }, handler);\n',
     '    globalThis.__openNextCloudflareEnv = env;\n    globalThis.__openNextCloudflareRequestURL = request.url;\n    return cloudflareContextALS.run({ env, ctx, cf: request.cf, requestURL: request.url }, handler);\n',
   )
 
-  nextSource = nextSource.replace(
-    /(?:const debugWorkerVariant = [^\n]+\n)*function matchesWorkerHostname\(url, workerName, workersDevSuffix\) \{[\s\S]*?function initRuntime\(\) \{\n/g,
-    internalFetchHelpers,
-  )
+  const legacyRoutingBlockPattern =
+    /const debugWorkerVariant = "public";[\s\S]*?function initRuntime\(\) \{\n/
+  const runtimeHelpersPattern =
+    /function matchesWorkerHostname\(url, workerName, workersDevSuffix\) \{[\s\S]*?function initRuntime\(\) \{\n/
 
-  if (!nextSource.includes('function matchesWorkerHostname(url, workerName, workersDevSuffix) {')) {
-    nextSource = nextSource.replace('function initRuntime() {\n', internalFetchHelpers)
+  if (legacyRoutingBlockPattern.test(nextSource)) {
+    nextSource = nextSource.replace(legacyRoutingBlockPattern, runtimeHelpers)
+  } else if (runtimeHelpersPattern.test(nextSource)) {
+    nextSource = nextSource.replace(runtimeHelpersPattern, runtimeHelpers)
+  } else {
+    nextSource = nextSource.replace('function initRuntime() {\n', runtimeHelpers)
   }
 
   nextSource = nextSource.replace(
@@ -204,8 +147,8 @@ function initRuntime() {\n`
         }
         const cloudflareContext = cloudflareContextALS.getStore();
         const normalizedRequest = input instanceof Request && init === undefined ? input : new Request(input, init);
-        const routing = resolveFetchRouting(cloudflareContext, normalizedRequest);
-        return routing.binding ? routing.binding.fetch(normalizedRequest) : __original_fetch(normalizedRequest);
+        const binding = resolveFetchBinding(cloudflareContext, normalizedRequest);
+        return binding ? binding.fetch(normalizedRequest) : __original_fetch(normalizedRequest);
     };`,
   )
 
@@ -275,108 +218,66 @@ function normalizeServerHandlerSource(source, openNextDir) {
   return inlineMiddlewareManifest(
     injectNodeRequireShim(
       source.replaceAll(
-      /\(await Promise\.resolve\(\)\.then\(function\(\)\{var (?<errorName>[A-Za-z0-9_$]+)=Error\("Cannot find module 'cloudflare:sockets'"\);throw \k<errorName>\.code="MODULE_NOT_FOUND",\k<errorName>\}\)\)\.connect/g,
-      '(await import("cloudflare:sockets")).connect',
-    ),
+        /\(await Promise\.resolve\(\)\.then\(function\(\)\{var (?<errorName>[A-Za-z0-9_$]+)=Error\("Cannot find module 'cloudflare:sockets'"\);throw \k<errorName>\.code="MODULE_NOT_FOUND",\k<errorName>\}\)\)\.connect/g,
+        '(await import("cloudflare:sockets")).connect',
+      ),
     ),
     openNextDir,
   )
 }
 
-const workerTemplateSource = readFileSync(workerTemplateFile, 'utf8')
-const nextWorkerTemplateSource = normalizeWorkerSource(workerTemplateSource)
-
-if (nextWorkerTemplateSource !== workerTemplateSource) {
-  writeFileSync(workerTemplateFile, nextWorkerTemplateSource)
-}
-
-const initTemplateFile = path.join(
-  pnpmDir,
-  packageDirName,
-  'node_modules/@opennextjs/cloudflare/dist/cli/templates/init.js',
-)
-
-const initTemplateSource = readFileSync(initTemplateFile, 'utf8')
-const nextInitTemplateSource = normalizeInitSource(initTemplateSource)
-
-if (nextInitTemplateSource !== initTemplateSource) {
-  writeFileSync(initTemplateFile, nextInitTemplateSource)
-}
-
-const pgCloudflareDirName = readdirSync(pnpmDir).find((entry) =>
-  entry.startsWith('pg-cloudflare@'),
-)
-
-if (!pgCloudflareDirName) {
-  throw new Error('Unable to locate pg-cloudflare in node_modules/.pnpm')
-}
-
-const pgCloudflarePackageFile = path.join(
-  pnpmDir,
-  pgCloudflareDirName,
-  'node_modules/pg-cloudflare/package.json',
-)
-
-const pgCloudflarePackageSource = readFileSync(pgCloudflarePackageFile, 'utf8')
-const pgCloudflarePackage = JSON.parse(pgCloudflarePackageSource)
-
-if (pgCloudflarePackage.exports?.['.']?.default !== './dist/index.js') {
-  pgCloudflarePackage.exports['.'].default = './dist/index.js'
-
-  writeFileSync(
-    pgCloudflarePackageFile,
-    `${JSON.stringify(pgCloudflarePackage, null, 2)}\n`,
+function patchWorkerTemplates(packageRoot) {
+  const workerTemplateFile = path.join(
+    packageRoot,
+    'node_modules/@opennextjs/cloudflare/dist/cli/templates/worker.js',
   )
-}
-
-const payloadNextDirNames = readdirSync(pnpmDir).filter((entry) =>
-  entry.startsWith('@payloadcms+next@'),
-)
-
-for (const payloadNextDirName of payloadNextDirNames) {
-  const payloadAdminBarFile = path.join(
-    pnpmDir,
-    payloadNextDirName,
-    'node_modules/@payloadcms/next/dist/views/Document/Default/index.js',
+  const initTemplateFile = path.join(
+    packageRoot,
+    'node_modules/@opennextjs/cloudflare/dist/cli/templates/init.js',
   )
 
-  if (!existsSync(payloadAdminBarFile)) {
-    continue
+  const workerTemplateSource = readFileSync(workerTemplateFile, 'utf8')
+  const nextWorkerTemplateSource = normalizeWorkerSource(workerTemplateSource)
+
+  if (nextWorkerTemplateSource !== workerTemplateSource) {
+    writeFileSync(workerTemplateFile, nextWorkerTemplateSource)
   }
 
-  const payloadAdminBarSource = readFileSync(payloadAdminBarFile, 'utf8')
-  const payloadAdminBarImport = `import { AdminBar } from '@payloadcms/ui/elements/AdminBar';`
-  const replacementAdminBarImport = `const AdminBar = () => null;`
-  const viewVersionPredicate = `if (versionCount > 0) {`
-  const safeViewVersionPredicate = `if (versionCount > 0 && !process.env.CLOUDFLARE_WORKER_VARIANT) {`
+  const initTemplateSource = readFileSync(initTemplateFile, 'utf8')
+  const nextInitTemplateSource = normalizeInitSource(initTemplateSource)
 
-  let nextPayloadAdminBarSource = payloadAdminBarSource
-
-  if (nextPayloadAdminBarSource.includes(payloadAdminBarImport)) {
-    nextPayloadAdminBarSource = nextPayloadAdminBarSource.replace(
-      payloadAdminBarImport,
-      replacementAdminBarImport,
-    )
-  }
-
-  if (nextPayloadAdminBarSource.includes(viewVersionPredicate)) {
-    nextPayloadAdminBarSource = nextPayloadAdminBarSource.replace(
-      viewVersionPredicate,
-      safeViewVersionPredicate,
-    )
-  }
-
-  if (nextPayloadAdminBarSource !== payloadAdminBarSource) {
-    writeFileSync(payloadAdminBarFile, nextPayloadAdminBarSource)
+  if (nextInitTemplateSource !== initTemplateSource) {
+    writeFileSync(initTemplateFile, nextInitTemplateSource)
   }
 }
 
-if (isPostbuild) {
+function patchPgCloudflarePackage() {
+  const packageRoot = requirePackageDir('pg-cloudflare@')
+  const packageFile = path.join(packageRoot, 'node_modules/pg-cloudflare/package.json')
+  const packageSource = readFileSync(packageFile, 'utf8')
+  const packageJSON = JSON.parse(packageSource)
+
+  if (packageJSON.exports?.['.']?.default !== './dist/index.js') {
+    packageJSON.exports['.'].default = './dist/index.js'
+    writeFileSync(packageFile, `${JSON.stringify(packageJSON, null, 2)}\n`)
+  }
+}
+
+function patchBuiltHandlers() {
   const openNextDir = path.resolve('.open-next')
-  const serverFunctionDirs = readdirSync(path.join(openNextDir, 'server-functions'))
 
-  for (const functionName of serverFunctionDirs) {
-    const handlerFile = path.join(openNextDir, 'server-functions', functionName, 'handler.mjs')
+  if (!existsSync(openNextDir)) {
+    return
+  }
+
+  const serverFunctionsDir = path.join(openNextDir, 'server-functions')
+
+  if (!existsSync(serverFunctionsDir)) {
+    return
+  }
+
+  for (const functionName of readdirSync(serverFunctionsDir)) {
+    const handlerFile = path.join(serverFunctionsDir, functionName, 'handler.mjs')
 
     if (!existsSync(handlerFile)) {
       continue
@@ -389,4 +290,12 @@ if (isPostbuild) {
       writeFileSync(handlerFile, nextHandlerSource)
     }
   }
+}
+
+const opennextCloudflareRoot = patchOgLibrary()
+patchWorkerTemplates(opennextCloudflareRoot)
+patchPgCloudflarePackage()
+
+if (isPostbuild) {
+  patchBuiltHandlers()
 }

@@ -30,7 +30,7 @@ const dryRun = process.argv.includes('--dry-run')
 const targetFlagIndex = process.argv.findIndex((arg) => arg === '--env' || arg === '--target')
 const targetName = targetFlagIndex >= 0 ? process.argv[targetFlagIndex + 1] : 'production'
 const target = getTargetConfig(targetName)
-const workerConfigs = [cloudflarePaths.publicWranglerConfig, cloudflarePaths.payloadWranglerConfig]
+const workerConfigs = [cloudflarePaths.publicWranglerConfig]
 const secretSyncAttempts = 3
 
 console.log(

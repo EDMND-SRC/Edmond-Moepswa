@@ -6,28 +6,15 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { ResourceCards } from '@/components/resources/ResourceCards'
-import { getPayload } from 'payload'
-import config from '@payload-config'
+import { launchProducts } from '@/content/launchSnapshot'
 
-export const dynamic = 'force-dynamic'
 export const revalidate = 60
 
 import { SUBSTACK_URL } from '@/lib/constants'
 
 export default async function ResourcesPage() {
-  const payload = await getPayload({ config })
-  
-  const { docs: products } = await payload.find({
-    collection: 'products',
-    depth: 1,
-    sort: '-createdAt',
-  })
-
-  // Safe cast since we know the shape from Payload
-  const typedProducts = products as any[]
-
-  const freeResources = typedProducts.filter(p => p.type === 'free')
-  const paidProducts = typedProducts.filter(p => p.type === 'paid')
+  const freeResources = launchProducts.filter((product) => product.type === 'free')
+  const paidProducts = launchProducts.filter((product) => product.type === 'paid')
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pt-32 pb-24 px-6 md:px-10">

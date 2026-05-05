@@ -1,31 +1,31 @@
-import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
+import { launchPages } from '@/content/launchSnapshot'
 
 export async function GET(req: NextRequest) {
   try {
-    const payload = await getPayload({ config: configPromise })
     const limitParam = req.nextUrl.searchParams.get('limit')
     const parsedLimit = limitParam ? parseInt(limitParam, 10) : 100
     const limit = Number.isNaN(parsedLimit) ? 100 : Math.max(1, Math.min(1000, parsedLimit))
+    const docs = launchPages.slice(0, limit).map((page) => ({
+      meta: page.meta ?? null,
+      publishedAt: page.publishedAt ?? null,
+      slug: page.slug ?? null,
+      title: page.title ?? null,
+      updatedAt: page.updatedAt ?? null,
+    }))
 
-    const result = await payload.find({
-      collection: 'pages',
-      depth: 0,
+    return NextResponse.json({
+      docs,
+      hasNextPage: false,
+      hasPrevPage: false,
       limit,
-      overrideAccess: false,
-      pagination: true,
-      sort: '-updatedAt',
-      select: {
-        meta: true,
-        publishedAt: true,
-        slug: true,
-        title: true,
-        updatedAt: true,
-      },
+      nextPage: null,
+      page: 1,
+      pagingCounter: docs.length > 0 ? 1 : 0,
+      prevPage: null,
+      totalDocs: docs.length,
+      totalPages: docs.length > 0 ? 1 : 0,
     })
-
-    return NextResponse.json(result)
   } catch (error) {
     console.error('Failed to fetch pages:', error)
     return NextResponse.json(
