@@ -42,7 +42,7 @@ export default function ServiceBlock({
   }, [isExpanded])
 
   // Subtle parallax for the text content
-  const y = useTransform(scrollYProgress, [0, 1], [18, -18])
+  const y = useTransform(scrollYProgress, [0, 1], [10, -10])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
 
   // Parse BWP numeric from price string and convert
@@ -106,7 +106,7 @@ export default function ServiceBlock({
   return (
     <div
       ref={ref}
-      className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start min-h-auto py-4 md:py-6"
+      className="grid min-h-auto grid-cols-1 items-start gap-6 py-3 md:gap-12 md:py-4 lg:grid-cols-12 lg:gap-14"
       style={{ position: 'relative' }}
     >
       <ServiceNumber id={service.id} />
@@ -114,7 +114,7 @@ export default function ServiceBlock({
       {/* Content */}
       <motion.div
         style={reducedMotion ? { opacity } : { y, opacity }}
-        className="lg:col-span-7 flex flex-col gap-6 md:gap-8 pt-2 md:pt-6"
+        className="flex flex-col gap-5 pt-1 md:gap-6 md:pt-4 lg:col-span-7"
       >
         {showPricing ? (
           <>

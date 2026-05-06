@@ -41,18 +41,42 @@ export default function HomePageChrome({ children }: { children: React.ReactNode
   }, [])
 
   useEffect(() => {
-    const footer = document.querySelector<HTMLElement>('[data-home-footer]')
-    if (!footer) return
+    let footerObserver: IntersectionObserver | null = null
+    let domObserver: MutationObserver | null = null
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setFooterInView(entry.isIntersecting)
-      },
-      { threshold: 0.1 },
-    )
+    const attachFooterObserver = () => {
+      const footer = document.querySelector<HTMLElement>('[data-home-footer]')
 
-    observer.observe(footer)
-    return () => observer.disconnect()
+      if (!footer) {
+        return false
+      }
+
+      footerObserver?.disconnect()
+      footerObserver = new IntersectionObserver(
+        ([entry]) => {
+          setFooterInView(entry.isIntersecting)
+        },
+        { rootMargin: '0px 0px -96px 0px', threshold: 0 },
+      )
+
+      footerObserver.observe(footer)
+      return true
+    }
+
+    if (!attachFooterObserver()) {
+      domObserver = new MutationObserver(() => {
+        if (attachFooterObserver()) {
+          domObserver?.disconnect()
+        }
+      })
+
+      domObserver.observe(document.body, { childList: true, subtree: true })
+    }
+
+    return () => {
+      footerObserver?.disconnect()
+      domObserver?.disconnect()
+    }
   }, [])
 
   const showFloatingButtons = isScrolled && !footerInView
@@ -89,7 +113,11 @@ export default function HomePageChrome({ children }: { children: React.ReactNode
               transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
               className="fixed bottom-8 right-8 z-50 flex items-center gap-3 drop-shadow-2xl"
             >
-              <Link href="/contact#booking-panel" className="ed-button-primary px-6 py-4 shadow-lg shadow-[#FF4D2E]/30">
+              <Link
+                href="/contact#booking-panel"
+                data-testid="floating-book-call"
+                className="ed-button-primary px-6 py-4 shadow-lg shadow-[#FF4D2E]/30"
+              >
                 <Calendar className="h-5 w-5" aria-hidden="true" />
                 Book Call
               </Link>

@@ -63,14 +63,8 @@ function normalizeProjectLink(link: string | null | undefined) {
   }
 
   try {
-    const url = new URL(trimmed)
-    if (url.hostname === 'github.com') {
-      const pathParts = url.pathname.split('/').filter(Boolean)
-      if (pathParts.length <= 1) {
-        return null
-      }
-    }
-    return url.toString()
+    new URL(trimmed)
+    return null
   } catch {
     return null
   }

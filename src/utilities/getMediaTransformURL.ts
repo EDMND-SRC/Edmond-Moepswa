@@ -1,4 +1,4 @@
-import { getServerSideURL } from './getURL'
+import { getClientSideURL, getServerSideURL } from './getURL'
 
 type MediaTransformFit = 'contain' | 'cover' | 'scale-down'
 
@@ -36,7 +36,7 @@ export const canTransformMediaURL = (sourceURL: string): boolean => {
 }
 
 export const getMediaTransformURL = ({
-  baseURL = getServerSideURL(),
+  baseURL = getClientSideURL() || getServerSideURL(),
   cacheTag,
   fit = 'scale-down',
   height,

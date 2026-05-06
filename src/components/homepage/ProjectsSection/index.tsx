@@ -1,6 +1,5 @@
-import Link from 'next/link'
 import { ImageMedia } from '@/components/Media/ImageMedia'
-import { getProjects } from '@/lib/server/projects'
+import { HOMEPAGE_PROJECT_HIGHLIGHTS, type HomepageProjectHighlight } from '@/content/homepageProjectHighlights'
 
 const CATEGORY_LABELS: Record<string, string> = {
   applications: 'Web Applications',
@@ -13,11 +12,11 @@ function ProjectCard({
   project,
   priority,
 }: {
-  project: Awaited<ReturnType<typeof getProjects>>[number]
+  project: HomepageProjectHighlight
   priority: boolean
 }) {
-  const cardBody = (
-    <div className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] transition-colors duration-200 hover:border-white/20">
+  return (
+    <article className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] transition-colors duration-200 hover:border-white/20">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#171717]">
         {project.thumbnail ? (
           <ImageMedia
@@ -26,7 +25,7 @@ function ProjectCard({
             priority={priority}
             loading={priority ? 'eager' : 'lazy'}
             pictureClassName="block h-full w-full"
-            imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            imgClassName="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.015]"
             size="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           />
         ) : (
@@ -53,28 +52,12 @@ function ProjectCard({
           </p>
         </div>
       </div>
-    </div>
+    </article>
   )
-
-  if (!project.link) {
-    return <div>{cardBody}</div>
-  }
-
-  const isExternal = project.link.startsWith('http://') || project.link.startsWith('https://')
-
-  if (isExternal) {
-    return (
-      <a href={project.link} target="_blank" rel="noopener noreferrer">
-        {cardBody}
-      </a>
-    )
-  }
-
-  return <Link href={project.link}>{cardBody}</Link>
 }
 
 export default async function ProjectsSection() {
-  const projects = await getProjects({ limit: 15 })
+  const projects = HOMEPAGE_PROJECT_HIGHLIGHTS
 
   if (projects.length === 0) {
     return (
@@ -83,11 +66,8 @@ export default async function ProjectsSection() {
           <span className="ed-eyebrow">// Selected Projects</span>
           <h2 className="ed-section-title mt-6">Selected work is on the way</h2>
           <p className="ed-lead mt-4">
-            I&apos;m preparing a cleaner highlight reel here. In the meantime, feel free to{' '}
-            <Link href="/contact" className="text-[#FF4D2E] hover:underline">
-              get in touch
-            </Link>{' '}
-            to talk through relevant work.
+            I&apos;m preparing the case-study highlights for this section. In the meantime, get in
+            touch and I&apos;ll walk you through the most relevant work directly.
           </p>
         </div>
       </section>
@@ -99,10 +79,10 @@ export default async function ProjectsSection() {
       <div className="ed-wide-container">
         <div className="mb-14 max-w-3xl">
           <span className="ed-eyebrow">// Selected Projects</span>
-          <h2 className="ed-section-title mt-6">A finite set of highlights, not an endless feed.</h2>
+          <h2 className="ed-section-title mt-6">A finite set of highlights, kept intentionally front and center.</h2>
           <p className="ed-lead mt-6 max-w-2xl">
-            These are the projects I want on the homepage: a tighter visual snapshot of the kind of
-            systems, interfaces, and digital products I build.
+            These are the core project highlights I want on the homepage: a tighter visual snapshot
+            of the systems, interfaces, and digital products I build.
           </p>
         </div>
 

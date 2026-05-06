@@ -21,10 +21,14 @@ export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false)
   const [isEnabled, setIsEnabled] = useState(false)
 
-  // Determine touch device AFTER all hooks — avoids Rules of Hooks violation
   const isTouchDevice = useMemo(
     () =>
       typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0),
+    [],
+  )
+
+  const supportsFinePointer = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches,
     [],
   )
 
@@ -39,7 +43,7 @@ export default function CustomCursor() {
   }, [])
 
   useEffect(() => {
-    if (reducedMotion || !isEnabled) return
+    if (reducedMotion || !isEnabled || isTouchDevice || !supportsFinePointer) return
 
     const updatePosition = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY })
@@ -75,9 +79,9 @@ export default function CustomCursor() {
       window.removeEventListener('mouseenter', handleMouseEnter)
       window.removeEventListener('mouseover', handleMouseOver)
     }
-  }, [reducedMotion, isEnabled])
+  }, [reducedMotion, isEnabled, isTouchDevice, supportsFinePointer])
 
-  if (reducedMotion || !isEnabled || !isVisible || isTouchDevice) return null
+  if (reducedMotion || !isEnabled || !isVisible || isTouchDevice || !supportsFinePointer) return null
 
   const cursorSizes = {
     default: { width: 12, height: 12, scale: 1 },

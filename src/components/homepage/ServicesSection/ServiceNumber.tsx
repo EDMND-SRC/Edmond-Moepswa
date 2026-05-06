@@ -19,7 +19,7 @@ export default function ServiceNumber({ id }: ServiceNumberProps) {
     if (isInView && !reducedMotion) {
       const timer = setTimeout(() => {
         setStardustActive(true)
-      }, 420)
+      }, 160)
       return () => clearTimeout(timer)
     } else if (isInView && reducedMotion) {
       setStardustActive(true)
@@ -43,13 +43,13 @@ export default function ServiceNumber({ id }: ServiceNumberProps) {
               reducedMotion
                 ? { rotateX: 0, opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }
                 : isInView
-                  ? { rotateX: [-720, -360, 0], opacity: [0, 1, 1], scale: [0.5, 0.8, 1], y: [-200, 50, 0], filter: ['blur(10px)', 'blur(5px)', 'blur(0px)'] }
+                  ? { rotateX: [-540, -180, 0], opacity: [0, 1, 1], scale: [0.62, 0.86, 1], y: [-120, 24, 0], filter: ['blur(8px)', 'blur(3px)', 'blur(0px)'] }
                   : { rotateX: -720, opacity: 0, scale: 0.5, y: -200, filter: 'blur(10px)' }
             }
             transition={
               reducedMotion
                 ? { duration: 0 }
-                : { duration: 0.78, ease: 'easeOut', times: [0, 0.58, 1] }
+                : { duration: 0.42, ease: 'easeOut', times: [0, 0.54, 1] }
             }
             className="text-[150px] md:text-[250px] lg:text-[320px] leading-none font-light tracking-tighter slashed-zero inline-block origin-center"
             style={{

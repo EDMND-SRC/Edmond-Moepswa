@@ -13,6 +13,9 @@ if (process.env.SENTRY_PERSONAL_TOKEN && !process.env.SENTRY_AUTH_TOKEN) {
 }
 
 const NEXT_PUBLIC_SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
+const IMAGE_REMOTE_BASE_URLS = Array.from(
+  new Set([NEXT_PUBLIC_SERVER_URL, 'http://localhost:3000', 'http://127.0.0.1:3000']),
+)
 
 const nextConfig: NextConfig = {
   // Disable source maps in production — saves 5-10s on build output
@@ -28,7 +31,7 @@ const nextConfig: NextConfig = {
     // Generate 2 quality variants instead of just full-size — saves 3-8s
     qualities: [75, 100],
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
+      ...IMAGE_REMOTE_BASE_URLS.map((item) => {
         const url = new URL(item)
 
         return {
