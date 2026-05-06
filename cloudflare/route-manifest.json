@@ -11,7 +11,6 @@
     "/api/projects",
     "/api/quote-pdf",
     "/api/services",
-    "/api/substack",
     "/api/testimonials",
     "/api/webhooks/dodo",
     "/next/exit-preview",
@@ -25,7 +24,6 @@
     "/api/dodo-products",
     "/api/geo",
     "/api/media/transform",
-    "/api/substack",
     "/api/webhooks/dodo"
   ],
   "publicRouteMethods": {
@@ -86,10 +84,6 @@
       "HEAD"
     ],
     "/api/media/transform": [
-      "GET",
-      "HEAD"
-    ],
-    "/api/substack": [
       "GET",
       "HEAD"
     ],

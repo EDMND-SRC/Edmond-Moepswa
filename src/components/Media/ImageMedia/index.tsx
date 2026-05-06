@@ -24,7 +24,7 @@ const placeholderBlur =
  * in next.config.js — no custom `loader` needed.
  *
  * Flow:
- *   1. Resource URL from Payload: `/media/image-123.jpg`
+ *   1. App media resource URL: `/media/image-123.jpg`
  *   2. getMediaUrl() adds base URL: `https://yourdomain.com/media/image-123.jpg`
  *   3. Next.js Image optimizes via remotePatterns: `/_next/image?url=...&w=1200&q=75`
  *
