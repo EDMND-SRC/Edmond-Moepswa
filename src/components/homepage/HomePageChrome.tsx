@@ -41,31 +41,41 @@ export default function HomePageChrome({ children }: { children: React.ReactNode
   }, [])
 
   useEffect(() => {
-    let footerObserver: IntersectionObserver | null = null
+    let frame = 0
+    let footer: HTMLElement | null = null
     let domObserver: MutationObserver | null = null
 
-    const attachFooterObserver = () => {
-      const footer = document.querySelector<HTMLElement>('[data-home-footer]')
+    const updateFooterVisibility = () => {
+      if (!footer) {
+        return
+      }
+
+      const footerTop = footer.getBoundingClientRect().top
+      setFooterInView(footerTop <= window.innerHeight - 120)
+    }
+
+    const queueUpdate = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(updateFooterVisibility)
+    }
+
+    const attachFooter = () => {
+      footer = document.querySelector<HTMLElement>('[data-home-footer]')
 
       if (!footer) {
         return false
       }
 
-      footerObserver?.disconnect()
-      footerObserver = new IntersectionObserver(
-        ([entry]) => {
-          setFooterInView(entry.isIntersecting)
-        },
-        { rootMargin: '0px 0px -96px 0px', threshold: 0 },
-      )
-
-      footerObserver.observe(footer)
+      queueUpdate()
       return true
     }
 
-    if (!attachFooterObserver()) {
+    window.addEventListener('scroll', queueUpdate, { passive: true })
+    window.addEventListener('resize', queueUpdate)
+
+    if (!attachFooter()) {
       domObserver = new MutationObserver(() => {
-        if (attachFooterObserver()) {
+        if (attachFooter()) {
           domObserver?.disconnect()
         }
       })
@@ -74,7 +84,9 @@ export default function HomePageChrome({ children }: { children: React.ReactNode
     }
 
     return () => {
-      footerObserver?.disconnect()
+      cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', queueUpdate)
+      window.removeEventListener('resize', queueUpdate)
       domObserver?.disconnect()
     }
   }, [])

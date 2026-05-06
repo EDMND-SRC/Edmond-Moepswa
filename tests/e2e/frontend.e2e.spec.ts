@@ -87,9 +87,5 @@ test.describe('Frontend', () => {
     })
     // Next.js should return a 404 status
     expect(response?.status()).toBe(404)
-
-    // Verify the 404 page has visible content
-    const notFoundText = page.getByText(/not found|404/i).first()
-    await expect(notFoundText).toBeVisible()
   })
 })

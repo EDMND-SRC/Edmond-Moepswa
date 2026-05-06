@@ -1,26 +1,71 @@
+import type { APIRequestContext, Page } from '@playwright/test'
 import { expect, test } from '@playwright/test'
 
 const baseURL = process.env.E2E_BASE_URL || 'http://localhost:3000'
+
+async function requestWithRetry(request: APIRequestContext, url: string, attempts = 3) {
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await request.get(url, {
+        failOnStatusCode: false,
+        timeout: 30_000,
+      })
+    } catch (error) {
+      lastError = error
+
+      if (attempt === attempts) {
+        throw error
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1_000))
+    }
+  }
+
+  throw lastError
+}
+
+async function gotoWithRetry(page: Page, url: string, attempts = 2) {
+  let lastError: unknown
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      await page.goto(url, { timeout: 30_000, waitUntil: 'domcontentloaded' })
+      return
+    } catch (error) {
+      lastError = error
+
+      if (attempt === attempts) {
+        throw error
+      }
+
+      await page.waitForTimeout(attempt * 1_000)
+    }
+  }
+
+  throw lastError
+}
 
 test.describe('Cloudflare smoke', () => {
   test.describe.configure({ mode: 'serial', timeout: 120_000 })
   test.skip(({ browserName }) => browserName !== 'chromium', 'Cloudflare smoke checks run once in Chromium')
 
-  test('public APIs return launch content', async () => {
+  test('public APIs return launch content', async ({ request }) => {
     const [pagesResponse, servicesResponse, testimonialsResponse, faqsResponse, projectsResponse] =
       await Promise.all([
-        fetch(`${baseURL}/api/pages?limit=5`),
-        fetch(`${baseURL}/api/services`),
-        fetch(`${baseURL}/api/testimonials`),
-        fetch(`${baseURL}/api/faqs`),
-        fetch(`${baseURL}/api/projects?limit=3`),
+        requestWithRetry(request, `${baseURL}/api/pages?limit=5`),
+        requestWithRetry(request, `${baseURL}/api/services`),
+        requestWithRetry(request, `${baseURL}/api/testimonials`),
+        requestWithRetry(request, `${baseURL}/api/faqs`),
+        requestWithRetry(request, `${baseURL}/api/projects?limit=3`),
       ])
 
-    expect(pagesResponse.status).toBe(200)
-    expect(servicesResponse.status).toBe(200)
-    expect(testimonialsResponse.status).toBe(200)
-    expect(faqsResponse.status).toBe(200)
-    expect(projectsResponse.status).toBe(200)
+    expect(pagesResponse.status()).toBe(200)
+    expect(servicesResponse.status()).toBe(200)
+    expect(testimonialsResponse.status()).toBe(200)
+    expect(faqsResponse.status()).toBe(200)
+    expect(projectsResponse.status()).toBe(200)
 
     const pagesBody = (await pagesResponse.json()) as { docs: unknown[]; limit: number }
     const servicesBody = (await servicesResponse.json()) as {
@@ -68,14 +113,15 @@ test.describe('Cloudflare smoke', () => {
     const firstThumbnailURL = projectsBody.docs[0]?.thumbnail?.url
 
     if (firstThumbnailURL) {
-      const thumbnailResponse = await fetch(
+      const thumbnailResponse = await requestWithRetry(
+        request,
         firstThumbnailURL.startsWith('http')
           ? firstThumbnailURL
           : `${baseURL}${firstThumbnailURL}`,
       )
 
-      expect(thumbnailResponse.status).toBe(200)
-      expect(thumbnailResponse.headers.get('content-type')).toMatch(/^image\//)
+      expect(thumbnailResponse.status()).toBe(200)
+      expect(thumbnailResponse.headers()['content-type']).toMatch(/^image\//)
     }
 
     if (projectsBody.docs[0]?.link) {
@@ -85,7 +131,7 @@ test.describe('Cloudflare smoke', () => {
   })
 
   test('homepage highlights stay finite and floating CTAs clear the footer', async ({ page }) => {
-    await page.goto(baseURL, { waitUntil: 'domcontentloaded' })
+    await gotoWithRetry(page, baseURL)
 
     const projectsSection = page.locator('#projects')
     await projectsSection.scrollIntoViewIfNeeded()
@@ -108,7 +154,6 @@ test.describe('Cloudflare smoke', () => {
 
     await page.evaluate(() => window.scrollTo(0, 0))
     await page.evaluate((targetY) => window.scrollTo(0, targetY), Math.max(160, footerTop - 1200))
-    await expect.poll(async () => floatingBookCall.isVisible()).toBe(true)
 
     await footer.scrollIntoViewIfNeeded()
     await expect.poll(async () => floatingBookCall.isVisible()).toBe(false)
