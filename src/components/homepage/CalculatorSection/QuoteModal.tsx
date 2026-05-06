@@ -170,8 +170,6 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
             tier: selections.tier,
             tierLabel: selections.tierLabel,
             tierPriceBWP: selections.tierPriceBWP,
-            addons: selections.addons,
-            addonsSubtotalBWP: selections.addonsSubtotalBWP,
             delivery: selections.delivery,
             deliveryLabel: selections.deliveryLabel,
             deliveryCostBWP: selections.deliveryCostBWP,
@@ -200,11 +198,6 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  // Format currency for summary display
-  const formatCurrencyValue = (bwp: number) => {
-    return `P${bwp.toLocaleString()}`
   }
 
   if (!isOpen) return null
@@ -263,37 +256,17 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
               <span className="text-white tabular-nums">{selections.formattedBase}</span>
             </div>
 
-            {selections.addons.length > 0 && (
-              <div className="flex flex-col gap-1 pt-2 border-t border-white/5">
-                {selections.addons.map((addon) => (
-                  <div key={addon.id} className="flex justify-between items-center text-xs">
-                    <span className="text-[#b0b0b0]">
-                      {addon.name}
-                      {addon.qty > 1 ? ` × ${addon.qty}` : ''}
-                    </span>
-                    <span className="text-white tabular-nums">
-                      {formatCurrencyValue(addon.priceBWP * addon.qty)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-
             {selections.deliveryMultiplier > 0 && (
               <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5 mt-1">
                 <span className="text-[#b0b0b0]">Delivery: {selections.deliveryLabel}</span>
-                <span className="text-white tabular-nums">
-                  {selections.formattedDeliveryCost ?? formatCurrencyValue(selections.deliveryCostBWP)}
-                </span>
+                <span className="text-white tabular-nums">{selections.formattedDeliveryCost}</span>
               </div>
             )}
 
             {selections.staticDiscount && (
               <div className="flex justify-between items-center text-xs mt-1">
                 <span className="text-green-400">Static website discount</span>
-                <span className="text-green-400 tabular-nums">
-                  −{selections.formattedStaticDiscount ?? formatCurrencyValue(selections.staticDiscountBWP)}
-                </span>
+                <span className="text-green-400 tabular-nums">−{selections.formattedStaticDiscount}</span>
               </div>
             )}
 

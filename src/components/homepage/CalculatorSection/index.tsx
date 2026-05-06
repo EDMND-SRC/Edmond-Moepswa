@@ -10,7 +10,6 @@ import {
   detectCurrencyFromCountry,
   convertBWP,
   formatCurrency,
-  getCurrencySymbol,
 } from '@/lib/currency'
 import { getTechIcon } from '@/lib/icon-registry'
 import { SERVICE_CATEGORIES } from './data'
@@ -133,7 +132,6 @@ export default function CalculatorSection() {
     return currentService.tiers.find((t) => t.name === selectedTier) || null
   }, [currentService, selectedTier])
 
-  const symbol = getCurrencySymbol(selectedCurrency)
   const rate = rates[selectedCurrency]
   const ratesAreStale = rate === undefined || rate === 0
   const ratesAreOld = ratesFetchedAt > 0 && Date.now() - ratesFetchedAt > RATES_FRESHNESS_MS
@@ -184,7 +182,7 @@ export default function CalculatorSection() {
 
 Service: ${currentService?.label ?? 'Not selected'}
 Tier: ${selectedTierData?.name ?? 'Not selected'} (${formattedBase})
-Delivery: ${DELIVERY_OPTIONS.find((d) => d.value === deliveryOption)?.label ?? 'Standard'}${staticDiscount ? '\nSimplified-site discount: –P500' : ''}
+Delivery: ${DELIVERY_OPTIONS.find((d) => d.value === deliveryOption)?.label ?? 'Standard'}${staticDiscount ? `\nSimplified-site discount: -${formattedStaticDiscount}` : ''}
 Estimated Total: ${formattedTotal}
 
 I'd like to discuss this. Are you available for a discovery call?`
@@ -201,8 +199,6 @@ I'd like to discuss this. Are you available for a discovery call?`
       tier: selectedTier ?? '',
       tierLabel: selectedTierData?.name ?? '',
       tierPriceBWP: basePrice,
-      addons: [],
-      addonsSubtotalBWP: 0,
       deliveryCostBWP: deliveryCost,
       formattedDeliveryCost,
       delivery: deliveryOption,

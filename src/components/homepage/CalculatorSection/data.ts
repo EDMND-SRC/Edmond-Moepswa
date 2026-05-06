@@ -5,21 +5,11 @@ export interface PricingTier {
   features: string[]
 }
 
-export interface AddonOption {
-  id: string
-  name: string
-  priceBWP: number
-  perUnit?: boolean // if true, price is per unit (e.g., per page, per language)
-  unitLabel?: string // e.g., "page", "language", "integration"
-  maxQty?: number // max quantity for stepper
-}
-
 export interface ServiceCategory {
   id: string
   label: string
   shortDesc?: string
   tiers: PricingTier[]
-  addons?: AddonOption[]
 }
 
 export const SERVICE_CATEGORIES: ServiceCategory[] = [
@@ -76,36 +66,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
         ],
       },
     ],
-    addons: [
-      {
-        id: 'extra-pages',
-        name: 'Additional pages',
-        priceBWP: 1800,
-        perUnit: true,
-        unitLabel: 'page',
-        maxQty: 10,
-      },
-      { id: 'blog-module', name: 'Blog/news module', priceBWP: 3500 },
-      { id: 'portfolio-module', name: 'Portfolio/case study module', priceBWP: 2000 },
-      { id: 'team-directory', name: 'Team directory', priceBWP: 2000 },
-      { id: 'scroll-animations', name: 'Scroll animations & micro-interactions', priceBWP: 3000 },
-      { id: 'custom-illustrations', name: 'Custom illustration / icon set', priceBWP: 3500 },
-      { id: 'brand-design-system', name: 'Brand design system', priceBWP: 3500 },
-      { id: 'copywriting', name: 'Professional copywriting', priceBWP: 2500 },
-      { id: 'booking-integration', name: 'Booking / scheduling integration', priceBWP: 2500 },
-      { id: 'ecommerce', name: 'E-commerce / payment integration', priceBWP: 9000 },
-      { id: 'member-area', name: 'Member area / gated content', priceBWP: 5000 },
-      {
-        id: 'multilingual',
-        name: 'Multilingual setup',
-        priceBWP: 3500,
-        perUnit: true,
-        unitLabel: 'language',
-        maxQty: 3,
-      },
-      { id: 'cookie-consent', name: 'Cookie consent & compliance', priceBWP: 1500 },
-      { id: 'uptime-monitoring', name: 'Uptime & performance monitoring', priceBWP: 1500 },
-    ],
   },
   {
     id: 'web-apps',
@@ -149,18 +109,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
           'Advanced security',
           'Scalable infrastructure',
         ],
-      },
-    ],
-    addons: [
-      { id: 'realtime-features', name: 'Real-time features (WebSockets/SSE)', priceBWP: 8000 },
-      { id: 'security-hardening', name: 'Advanced security hardening', priceBWP: 5000 },
-      {
-        id: 'api-integrations',
-        name: 'Third-party API integrations',
-        priceBWP: 5000,
-        perUnit: true,
-        unitLabel: 'integration',
-        maxQty: 5,
       },
     ],
   },
@@ -207,11 +155,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
         ],
       },
     ],
-    addons: [
-      { id: 'multi-step', name: 'Multi-step expansion', priceBWP: 3500 },
-      { id: 'custom-api', name: 'Custom API / webhook integration', priceBWP: 5000 },
-      { id: 'dashboard-reporting', name: 'Dashboard & reporting', priceBWP: 4000 },
-    ],
   },
   {
     id: 'seo',
@@ -257,10 +200,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
         ],
       },
     ],
-    addons: [
-      { id: 'content-recommendations', name: 'Content creation recommendations', priceBWP: 2000 },
-      { id: 'competitor-deep-dive', name: 'Competitor deep-dive analysis', priceBWP: 3000 },
-    ],
   },
   {
     id: 'retainers',
@@ -289,16 +228,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
           'Billed monthly in blocks',
           'Flexible use - any task',
         ],
-      },
-    ],
-    addons: [
-      {
-        id: 'extra-hours',
-        name: 'Additional hour blocks',
-        priceBWP: 1500,
-        perUnit: true,
-        unitLabel: 'hour',
-        maxQty: 10,
       },
     ],
   },
@@ -343,10 +272,6 @@ export const SERVICE_CATEGORIES: ServiceCategory[] = [
           'Urgent consultations available',
         ],
       },
-    ],
-    addons: [
-      { id: 'written-report', name: 'Written report & documentation', priceBWP: 2000 },
-      { id: 'follow-up-session', name: 'Follow-up working session', priceBWP: 2500 },
     ],
   },
 ]

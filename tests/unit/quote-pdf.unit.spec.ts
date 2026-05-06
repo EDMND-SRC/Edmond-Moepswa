@@ -4,8 +4,6 @@ import { describe, expect, it } from 'vitest'
 import { POST } from '@/app/(frontend)/api/quote-pdf/route'
 
 const validSelections = {
-  addons: [{ id: 'copywriting', name: 'Copywriting support', priceBWP: 1200, qty: 1 }],
-  addonsSubtotalBWP: 1200,
   currency: 'BWP',
   delivery: 'priority',
   deliveryCostBWP: 1400,
@@ -13,6 +11,8 @@ const validSelections = {
   deliveryMultiplier: 0.2,
   estimatedTotalBWP: 7900,
   formattedBase: 'P5,800',
+  formattedDeliveryCost: 'P1,400',
+  formattedStaticDiscount: 'P500',
   formattedTotal: 'P7,900',
   service: 'web-design',
   serviceLabel: 'Web Design',
@@ -62,5 +62,27 @@ describe('quote-pdf route', () => {
     const response = await POST(request)
 
     expect(response.status).toBe(400)
+  })
+
+  it('accepts non-BWP display formatting for quote exports', async () => {
+    const request = new NextRequest('http://localhost/api/quote-pdf', {
+      body: JSON.stringify({
+        selections: {
+          ...validSelections,
+          currency: 'USD',
+          formattedBase: '$580',
+          formattedDeliveryCost: '$140',
+          formattedStaticDiscount: '$50',
+          formattedTotal: '$790',
+        },
+      }),
+      headers: { 'content-type': 'application/json' },
+      method: 'POST',
+    })
+
+    const response = await POST(request)
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('content-type')).toBe('application/pdf')
   })
 })

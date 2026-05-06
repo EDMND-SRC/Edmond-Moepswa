@@ -1,4 +1,4 @@
-import type { CalculatorAddon, CalculatorSelections, QuotePdfRequestBody } from '@/components/homepage/CalculatorSection/types'
+import type { CalculatorSelections, QuotePdfRequestBody } from '@/components/homepage/CalculatorSection/types'
 import { EMAIL, LOCATION, PHONE_DISPLAY } from '@/lib/constants'
 import { NextRequest } from 'next/server'
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
@@ -44,27 +44,10 @@ type QuotePdfPayload = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
-function isAddon(value: unknown): value is CalculatorAddon {
-  if (!isRecord(value)) {
-    return false
-  }
-
-  return (
-    typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
-    typeof value.qty === 'number' &&
-    Number.isFinite(value.qty) &&
-    typeof value.priceBWP === 'number' &&
-    Number.isFinite(value.priceBWP)
-  )
-}
-
 function parseSelections(value: unknown): CalculatorSelections | null {
   if (!isRecord(value)) {
     return null
   }
-
-  const addons = Array.isArray(value.addons) ? value.addons.filter(isAddon) : null
 
   if (
     typeof value.service !== 'string' ||
@@ -72,7 +55,6 @@ function parseSelections(value: unknown): CalculatorSelections | null {
     typeof value.tier !== 'string' ||
     typeof value.tierLabel !== 'string' ||
     typeof value.tierPriceBWP !== 'number' ||
-    typeof value.addonsSubtotalBWP !== 'number' ||
     typeof value.delivery !== 'string' ||
     typeof value.deliveryLabel !== 'string' ||
     typeof value.deliveryCostBWP !== 'number' ||
@@ -82,15 +64,12 @@ function parseSelections(value: unknown): CalculatorSelections | null {
     typeof value.estimatedTotalBWP !== 'number' ||
     typeof value.formattedTotal !== 'string' ||
     typeof value.formattedBase !== 'string' ||
-    typeof value.currency !== 'string' ||
-    addons === null
+    typeof value.currency !== 'string'
   ) {
     return null
   }
 
   return {
-    addons,
-    addonsSubtotalBWP: value.addonsSubtotalBWP,
     currency: value.currency,
     delivery: value.delivery,
     deliveryCostBWP: value.deliveryCostBWP,
@@ -98,6 +77,10 @@ function parseSelections(value: unknown): CalculatorSelections | null {
     deliveryMultiplier: value.deliveryMultiplier,
     estimatedTotalBWP: value.estimatedTotalBWP,
     formattedBase: value.formattedBase,
+    formattedDeliveryCost:
+      typeof value.formattedDeliveryCost === 'string' ? value.formattedDeliveryCost : undefined,
+    formattedStaticDiscount:
+      typeof value.formattedStaticDiscount === 'string' ? value.formattedStaticDiscount : undefined,
     formattedTotal: value.formattedTotal,
     service: value.service,
     serviceLabel: value.serviceLabel,
@@ -189,6 +172,10 @@ function formatDate(date: Date) {
 
 function formatBwp(value: number) {
   return `P${Math.round(value).toLocaleString('en-BW')}`
+}
+
+function formatDisplayAmount(formatted: string | undefined, fallbackBwp: number) {
+  return formatted?.trim() || formatBwp(fallbackBwp)
 }
 
 function slugify(value: string) {
@@ -457,23 +444,17 @@ export async function POST(request: NextRequest): Promise<Response> {
   )
 
   drawSectionLabel(ctx, 'Pricing breakdown')
-  drawLineItem(ctx, `${selections.serviceLabel} — ${selections.tierLabel}`, formatBwp(selections.tierPriceBWP))
-
-  for (const addon of selections.addons) {
-    const quantity = addon.qty > 1 ? `Qty ${addon.qty}` : 'Qty 1'
-    drawLineItem(
-      ctx,
-      addon.name,
-      formatBwp(addon.priceBWP * addon.qty),
-      `${quantity} • Billed in Botswana Pula (BWP)`,
-    )
-  }
+  drawLineItem(
+    ctx,
+    `${selections.serviceLabel} — ${selections.tierLabel}`,
+    formatDisplayAmount(selections.formattedBase, selections.tierPriceBWP),
+  )
 
   if (selections.deliveryCostBWP > 0) {
     drawLineItem(
       ctx,
       `Delivery adjustment — ${selections.deliveryLabel}`,
-      formatBwp(selections.deliveryCostBWP),
+      formatDisplayAmount(selections.formattedDeliveryCost, selections.deliveryCostBWP),
       `Timeline surcharge of ${Math.round(selections.deliveryMultiplier * 100)}% applied to the base package.`,
     )
   }
@@ -482,7 +463,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     drawLineItem(
       ctx,
       'Static website discount',
-      `-${formatBwp(selections.staticDiscountBWP)}`,
+      `-${formatDisplayAmount(selections.formattedStaticDiscount, selections.staticDiscountBWP)}`,
       'Applied to simplified brochure-style builds with no custom app logic.',
       true,
     )

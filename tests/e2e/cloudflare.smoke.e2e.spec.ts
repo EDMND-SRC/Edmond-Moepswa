@@ -84,6 +84,36 @@ test.describe('Cloudflare smoke', () => {
     }
   })
 
+  test('homepage highlights stay finite and floating CTAs clear the footer', async ({ page }) => {
+    await page.goto(baseURL, { waitUntil: 'domcontentloaded' })
+
+    const projectsSection = page.locator('#projects')
+    await projectsSection.scrollIntoViewIfNeeded()
+
+    await expect(
+      projectsSection.getByRole('heading', {
+        name: /A finite set of highlights, kept intentionally front and center\./i,
+      }),
+    ).toBeVisible()
+    await expect(projectsSection.locator('article')).toHaveCount(8)
+    await expect(projectsSection.locator('a[href*="github.com"]')).toHaveCount(0)
+    await expect(projectsSection.locator('img')).toHaveCount(8)
+
+    const floatingBookCall = page.getByTestId('floating-book-call')
+    const footer = page.locator('[data-home-footer]')
+    const footerTop = await footer.evaluate((element) => {
+      const rect = element.getBoundingClientRect()
+      return rect.top + window.scrollY
+    })
+
+    await page.evaluate(() => window.scrollTo(0, 0))
+    await page.evaluate((targetY) => window.scrollTo(0, targetY), Math.max(160, footerTop - 1200))
+    await expect.poll(async () => floatingBookCall.isVisible()).toBe(true)
+
+    await footer.scrollIntoViewIfNeeded()
+    await expect.poll(async () => floatingBookCall.isVisible()).toBe(false)
+  })
+
   test('preview routes stay disabled for the launch build', async () => {
     const [previewResponse, exitPreviewResponse] = await Promise.all([
       fetch(`${baseURL}/next/preview`),
@@ -106,8 +136,6 @@ test.describe('Cloudflare smoke', () => {
         notes: 'Need launch support and copy feedback.',
         scopeTags: ['existing-redesign'],
         selections: {
-          addons: [],
-          addonsSubtotalBWP: 0,
           currency: 'BWP',
           delivery: 'priority',
           deliveryCostBWP: 1400,

@@ -16,8 +16,6 @@ const ALLOWED_CONTACT_FIELDS = new Set([
 ])
 
 const ALLOWED_CALCULATOR_FIELDS = new Set([
-  'addons',
-  'addonsSubtotalBWP',
   'currency',
   'delivery',
   'deliveryCostBWP',
@@ -57,8 +55,6 @@ type ContactLeadPayload = {
 }
 
 type CalculatorQuotePayload = {
-  addons?: unknown
-  addonsSubtotalBWP?: number
   currency?: string
   delivery?: string
   deliveryCostBWP?: number
@@ -165,8 +161,6 @@ function sanitizeCalculatorQuotePayload(data: Record<string, unknown>): Calculat
   }
 
   return {
-    addons: Array.isArray(sanitized.addons) ? sanitized.addons : undefined,
-    addonsSubtotalBWP: getOptionalNumber(sanitized.addonsSubtotalBWP),
     currency: getOptionalString(sanitized.currency),
     delivery: getOptionalString(sanitized.delivery),
     deliveryCostBWP: getOptionalNumber(sanitized.deliveryCostBWP),

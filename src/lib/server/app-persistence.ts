@@ -17,8 +17,6 @@ export type ContactLeadInput = {
 }
 
 export type CalculatorLeadInput = {
-  addons?: unknown
-  addonsSubtotalBWP?: number
   currency?: string
   delivery?: string
   deliveryCostBWP?: number
@@ -133,8 +131,6 @@ export async function persistCalculatorLead(input: CalculatorLeadInput) {
         normalizeEmail(input.email),
         normalizeMessage(input.notes),
         JSON.stringify({
-          addons: input.addons ?? [],
-          addonsSubtotalBWP: input.addonsSubtotalBWP ?? null,
           currency: normalizeOptionalText(input.currency),
           delivery: normalizeOptionalText(input.delivery),
           deliveryCostBWP: input.deliveryCostBWP ?? null,

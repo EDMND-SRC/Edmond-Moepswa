@@ -1,18 +1,9 @@
-export interface CalculatorAddon {
-  id: string
-  name: string
-  qty: number
-  priceBWP: number
-}
-
 export interface CalculatorSelections {
   service: string
   serviceLabel: string
   tier: string
   tierLabel: string
   tierPriceBWP: number
-  addons: CalculatorAddon[]
-  addonsSubtotalBWP: number
   delivery: string
   deliveryLabel: string
   deliveryCostBWP: number

@@ -25,18 +25,6 @@ function generateMarkdown(s: CalculatorSelections): string {
   lines.push(`- **Base Price:** ${s.formattedBase}`)
   lines.push('')
 
-  if (s.addons.length > 0) {
-    lines.push(`## Add-ons`)
-    lines.push('')
-    lines.push('| Add-on | Qty | Price (BWP) |')
-    lines.push('|--------|-----|-------------|')
-    s.addons.forEach((a) => {
-      lines.push(`| ${a.name} | ${a.qty} | P${(a.priceBWP * a.qty).toLocaleString()} |`)
-    })
-    lines.push(`| **Subtotal** | | **P${s.addonsSubtotalBWP.toLocaleString()}** |`)
-    lines.push('')
-  }
-
   lines.push(`## Delivery`)
   lines.push(`- **Option:** ${s.deliveryLabel}`)
   if (s.deliveryMultiplier > 0) {
@@ -77,17 +65,6 @@ function generatePlainText(s: CalculatorSelections): string {
   lines.push(`Base Price: ${s.formattedBase}`)
   lines.push('')
 
-  if (s.addons.length > 0) {
-    lines.push('Add-ons:')
-    lines.push('---------')
-    s.addons.forEach((a) => {
-      const qtyLabel = a.qty > 1 ? ` x${a.qty}` : ''
-      lines.push(`  - ${a.name}${qtyLabel} ... P${(a.priceBWP * a.qty).toLocaleString()}`)
-    })
-    lines.push(`  Subtotal: P${s.addonsSubtotalBWP.toLocaleString()}`)
-    lines.push('')
-  }
-
   lines.push('Delivery')
   lines.push('--------')
   lines.push(`  Option: ${s.deliveryLabel}`)
@@ -121,25 +98,24 @@ function generatePlainText(s: CalculatorSelections): string {
 
 function generateCSV(s: CalculatorSelections): string {
   const rows: string[] = []
-  rows.push('Section,Item,Quantity,Price BWP')
-  rows.push(`Service,${s.serviceLabel} - ${s.tierLabel},1,${s.tierPriceBWP}`)
-
-  if (s.addons.length > 0) {
-    s.addons.forEach((a) => {
-      rows.push(`Add-on,"${a.name}",${a.qty},${a.priceBWP * a.qty}`)
-    })
-    rows.push(`Add-on Subtotal,,,"${s.addonsSubtotalBWP}"`)
-  }
+  const discountDisplay =
+    s.formattedStaticDiscount ?? `P${s.staticDiscountBWP.toLocaleString()}`
+  rows.push('Section,Item,Quantity,Display Amount,Price Basis (BWP)')
+  rows.push(`Service,${s.serviceLabel} - ${s.tierLabel},1,"${s.formattedBase}",${s.tierPriceBWP}`)
 
   rows.push(
-    `Delivery,${s.deliveryLabel},1,${s.deliveryCostBWP > 0 ? Math.round(s.deliveryCostBWP) : 0}`,
+    `Delivery,${s.deliveryLabel},1,"${s.formattedDeliveryCost ?? 'Included'}",${
+      s.deliveryCostBWP > 0 ? Math.round(s.deliveryCostBWP) : 0
+    }`,
   )
 
   if (s.staticDiscount) {
-    rows.push(`Discount,Static website discount,1,-${s.staticDiscountBWP}`)
+    rows.push(
+      `Discount,Static website discount,1,"-${discountDisplay}",-${s.staticDiscountBWP}`,
+    )
   }
 
-  rows.push(`Total,Estimated Total,,${s.estimatedTotalBWP}`)
+  rows.push(`Total,Estimated Total,,"${s.formattedTotal}",${s.estimatedTotalBWP}`)
   rows.push('')
 
   return rows.join('\n')

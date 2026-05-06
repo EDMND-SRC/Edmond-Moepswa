@@ -186,7 +186,7 @@ describe('Public launch integration routes', () => {
         category: 'websites',
         description: 'Project summary',
         id: 7,
-        link: 'https://example.com/',
+        link: null,
         thumbnail: {
           alt: 'Preview image',
           height: 900,
@@ -219,8 +219,6 @@ describe('Public launch integration routes', () => {
           notes: 'Need launch support and copy feedback.',
           scopeTags: ['existing-redesign'],
           selections: {
-            addons: [],
-            addonsSubtotalBWP: 0,
             currency: 'BWP',
             delivery: 'priority',
             deliveryCostBWP: 1400,
