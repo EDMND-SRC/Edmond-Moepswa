@@ -1,14 +1,10 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
-
-
-// ─── PLACEHOLDER TESTIMONIALS ───
-// These are fictional testimonials based on seeded project data.
-// Replace with real client testimonials as they become available.
 
 interface Testimonial {
   id: number
@@ -68,42 +64,6 @@ const testimonials: Testimonial[] = [
   },
 ]
 
-/**
- * ColorRevealText — splits text into words and animates each word's color
- * from muted to active with staggered delays. Used for testimonial quotes.
- */
-function ColorRevealText({ text }: { text: string }) {
-  const reducedMotion = useReducedMotion()
-  const words = text.split(/(\s+)/)
-
-  if (reducedMotion) {
-    return <span className="text-[#b0b0b0]">&ldquo;{text}&rdquo;</span>
-  }
-
-  return (
-    <>
-      <span className="text-[#595959]">&ldquo;</span>
-      {words.map((word, i) => {
-        if (word.match(/^\s+$/)) {
-          return <span key={i}>{word}</span>
-        }
-        return (
-          <motion.span
-            key={i}
-            initial={{ color: '#595959' }}
-            animate={{ color: '#e5e5e5' }}
-            transition={{ duration: 0.3, delay: i * 0.03 }}
-            className="inline"
-          >
-            {word}
-          </motion.span>
-        )
-      })}
-      <span className="text-[#595959]">&rdquo;</span>
-    </>
-  )
-}
-
 export default function TestimonialsSection() {
   const reducedMotion = useReducedMotion()
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -142,9 +102,7 @@ export default function TestimonialsSection() {
     >
       <div className="max-w-4xl mx-auto px-6 md:px-10">
         {/* Section label */}
-        <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-          // Client Testimonials
-        </span>
+        <span className="ed-eyebrow">// Client Testimonials</span>
 
         <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter mt-6 mb-16">
           What they say about working with me
@@ -171,14 +129,14 @@ export default function TestimonialsSection() {
                   {avatarError ? (
                     <span className="text-lg font-medium text-[#b0b0b0]">{current.initials}</span>
                   ) : (
-                    <img
+                    <Image
                       src={current.avatarPath}
                       alt={`Portrait of ${current.name}`}
+                      className="object-cover w-full h-full"
                       width={64}
                       height={64}
-                      className="object-cover w-full h-full"
+                      sizes="64px"
                       onError={() => setAvatarError(true)}
-                      decoding="async"
                     />
                   )}
                 </div>
@@ -186,8 +144,8 @@ export default function TestimonialsSection() {
 
               {/* Content */}
               <div className="flex-1">
-                <blockquote className="text-base md:text-lg leading-relaxed mb-6">
-                  <ColorRevealText text={current.content} />
+                <blockquote className="mb-6 text-base leading-relaxed text-[#d8d8d8] md:text-lg">
+                  &ldquo;{current.content}&rdquo;
                 </blockquote>
 
                 <div>

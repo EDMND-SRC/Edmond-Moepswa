@@ -174,7 +174,7 @@ You are an expert Payload CMS 3 developer. When working with this codebase, you 
 - **Prevention of Infinite Hook Loops**: Use `context` flags to prevent operations inside hooks from triggering themselves.
 
 2. TYPESCRIPT & DATA INTEGRITY
-- Never use `any`. Always import types from `@/payload-types.ts`.
+- Never use `any`. Always import types from app-owned modules under `@/types` or the relevant domain module.
 - Run `pnpm generate:types` IMMEDIATELY after any schema change (collections, globals, or fields).
 - Run `tsc --noEmit` before committing code to ensure type correctness.
 - Always use `select` or `depth: 0/1` in queries to minimize payload size and improve performance.

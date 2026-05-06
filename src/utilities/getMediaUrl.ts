@@ -1,5 +1,6 @@
-import { Media } from '@/payload-types'
+import { Media } from '@/types/content'
 import { getClientSideURL } from '@/utilities/getURL'
+import { normalizeMediaPath } from '@/utilities/normalizeMediaPath'
 
 /**
  * Processes media resource URL or Media object to ensure proper formatting
@@ -23,6 +24,8 @@ export const getMediaUrl = (
   }
 
   if (!url) return ''
+
+  url = normalizeMediaPath(url)
 
   // Check if URL already has http/https protocol
   if (url.startsWith('http://') || url.startsWith('https://')) {

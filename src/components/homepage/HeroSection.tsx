@@ -1,13 +1,12 @@
 'use client'
 
-import { useState, useEffect, type MouseEvent } from 'react'
-
+import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Calendar } from 'lucide-react'
-import { motion, AnimatePresence, useScroll, useTransform, type MotionValue } from 'motion/react'
+import { motion } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import MobileNav from '@/components/ui/MobileNav'
-import MagneticButton from '@/components/ui/MagneticButton'
 import ThreadsIcon from '@/components/icons/ThreadsIcon'
 import SubstackIcon from '@/components/icons/SubstackIcon'
 import { LinkedinIcon, InstagramIcon, TwitterIcon } from '@/components/icons/BrandIcons'
@@ -19,58 +18,33 @@ import {
   INSTAGRAM_URL,
   THREADS_URL,
   SUBSTACK_URL,
-  CAL_USERNAME,
-  CAL_NAMESPACE,
 } from '@/lib/constants'
 
+const NAV_ITEMS = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/services', label: 'Services' },
+  { href: '/contact', label: 'Contact' },
+  { href: '/resources', label: 'Resources' },
+]
 
-interface HeroSectionProps {
-  isScrolled: boolean
-}
-
-/** Extracted to call useTransform at top level — avoids Rules of Hooks violation in .map() */
-
-
-export default function HeroSection({ isScrolled }: HeroSectionProps) {
+export default function HeroSection() {
   const reducedMotion = useReducedMotion()
-  const [cursorOffset, setCursorOffset] = useState({ x: 0, y: 0 })
   const [portraitError, setPortraitError] = useState(false)
-
-  useEffect(() => {
-    const handleResize = () => setCursorOffset({ x: 0, y: 0 })
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  const { scrollY } = useScroll()
-  const saturationValue = useTransform(scrollY, [0, 300], [1, 0], { clamp: true })
-  const rustOpacityValue = useTransform(scrollY, [200, 600], [0, 0.35], { clamp: true })
-  const filterStyle = useTransform(saturationValue, (s: number) => `saturate(${s})`)
-
   const portraitSrc = '/edmond-portrait-hero.webp'
 
-  const handleHeroMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (reducedMotion) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 8
-    setCursorOffset({ x, y })
-  }
-
   return (
-    <div
-      className="relative min-h-screen bg-[#e5e5e5] text-[#1a1a1a] overflow-hidden flex flex-col justify-between p-6 md:p-10"
-      onMouseMove={handleHeroMouseMove}
-    >
+    <div className="relative flex min-h-screen flex-col justify-between overflow-hidden bg-[#e5e5e5] p-6 text-[#1a1a1a] md:p-10">
       {/* Background Portrait */}
       <div className="absolute inset-0 z-0">
         {!portraitError && (
-          <img
+          <Image
             src={portraitSrc}
             alt="Edmond Moepswa Portrait"
-            className="object-cover pointer-events-none absolute inset-0 w-full h-full"
-            loading="eager"
-            decoding="async"
+            className="pointer-events-none object-cover"
+            fill
+            priority
+            sizes="100vw"
             onError={() => setPortraitError(true)}
           />
         )}
@@ -112,53 +86,22 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
 
         {/* Desktop: Full Nav */}
         <nav className="hidden md:flex w-full max-w-5xl items-center justify-between text-sm md:text-base font-medium text-white p-3 px-4 md:px-6 rounded-full backdrop-blur-xl bg-[#1a1a1a]/40 border border-white/10 shadow-2xl gap-1 md:gap-2">
-          <MagneticButton
-            as="a"
-            href="/"
-            className="px-3 md:px-4 py-2 rounded-full border border-transparent hover:border-white/20 hover:bg-white/10 hover:backdrop-blur-md transition-all duration-300 font-bold hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          >
-            Home
-          </MagneticButton>
-          <MagneticButton
-            as="a"
-            href="/about"
-            className="px-3 md:px-4 py-2 rounded-full border border-transparent hover:border-white/20 hover:bg-white/10 hover:backdrop-blur-md transition-all duration-300 hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          >
-            About
-          </MagneticButton>
-          <MagneticButton
-            as="a"
-            href="/services"
-            className="px-3 md:px-4 py-2 rounded-full border border-transparent hover:border-white/20 hover:bg-white/10 hover:backdrop-blur-md transition-all duration-300 hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          >
-            Services
-          </MagneticButton>
-          <MagneticButton
-            as="a"
-            href="/contact"
-            className="px-3 md:px-4 py-2 rounded-full border border-transparent hover:border-white/20 hover:bg-white/10 hover:backdrop-blur-md transition-all duration-300 hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          >
-            Contact
-          </MagneticButton>
-          <MagneticButton
-            as="a"
-            href="/resources"
-            className="px-3 md:px-4 py-2 rounded-full border border-transparent hover:border-white/20 hover:bg-white/10 hover:backdrop-blur-md transition-all duration-300 hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-          >
-            Resources
-          </MagneticButton>
-          {!isScrolled && (
-            <MagneticButton
-              as="button"
-              data-cal-namespace={CAL_NAMESPACE}
-              data-cal-link={`${CAL_USERNAME}/${CAL_NAMESPACE}`}
-              data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-              className="px-5 py-2.5 md:px-6 md:py-3 bg-white text-black rounded-full font-medium text-sm md:text-base hover:bg-gray-200 transition-colors flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="rounded-full border border-transparent px-3 py-2 transition-colors duration-200 hover:border-white/20 hover:bg-white/10 hover:text-[#FF4D2E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent md:px-4"
             >
-              <Calendar className="w-4 h-4 md:w-5 md:h-5" aria-hidden="true" />
-              Book Call
-            </MagneticButton>
-          )}
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href="/contact#booking-panel"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition-colors duration-200 hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-transparent md:px-6 md:py-3 md:text-base"
+          >
+            <Calendar className="h-4 w-4 md:h-5 md:w-5" aria-hidden="true" />
+            Book Call
+          </Link>
         </nav>
       </div>
 
@@ -237,7 +180,7 @@ export default function HeroSection({ isScrolled }: HeroSectionProps) {
             <br />
             &amp; Builder
           </h1>
-          <p className="text-base md:text-lg lg:text-xl text-[#1a1a1a] mt-3 md:mt-4 max-w-md md:max-w-lg ml-auto leading-relaxed font-medium">
+          <p className="mt-3 ml-auto max-w-md text-base font-medium leading-relaxed text-[#1a1a1a] md:mt-4 md:max-w-lg md:text-lg lg:text-xl">
             Web design, development &amp; workflow automation — built for handover.
           </p>
         </div>

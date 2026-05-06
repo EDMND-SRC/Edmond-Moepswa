@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { persistCalculatorLead, persistContactLead } from '@/lib/server/app-persistence'
+import { reportServerError } from '@/lib/server/report-server-error'
 
 const rateLimit = new Map<string, { count: number; reset: number }>()
 
@@ -19,24 +20,30 @@ const ALLOWED_CALCULATOR_FIELDS = new Set([
   'addonsSubtotalBWP',
   'currency',
   'delivery',
+  'deliveryCostBWP',
+  'deliveryLabel',
   'deliveryMultiplier',
   'email',
   'estimatedTotalBWP',
+  'formattedBase',
+  'formattedDeliveryCost',
+  'formattedStaticDiscount',
+  'formattedTotal',
   'name',
   'notes',
   'phone',
   'scopeTags',
   'service',
+  'serviceLabel',
   'staticDiscount',
   'staticDiscountBWP',
   'tier',
+  'tierLabel',
   'tierPriceBWP',
   'timestamp',
 ])
 
-const ALLOWED_RESOURCE_FIELDS = new Set(['resource', 'timestamp'])
-
-type WorkflowName = 'calculator-quote' | 'lead-capture' | 'resource-download'
+type WorkflowName = 'calculator-quote' | 'lead-capture'
 
 type ContactLeadPayload = {
   budgetRange?: string
@@ -54,30 +61,32 @@ type CalculatorQuotePayload = {
   addonsSubtotalBWP?: number
   currency?: string
   delivery?: string
+  deliveryCostBWP?: number
+  deliveryLabel?: string
   deliveryMultiplier?: number
   email: string
   estimatedTotalBWP?: number
+  formattedBase?: string
+  formattedDeliveryCost?: string
+  formattedStaticDiscount?: string
+  formattedTotal?: string
   name?: string
   notes?: string
   phone?: string
   scopeTags?: string[]
   service?: string
+  serviceLabel?: string
   staticDiscount?: boolean
   staticDiscountBWP?: number
   tier?: string
+  tierLabel?: string
   tierPriceBWP?: number
-  timestamp?: string
-}
-
-type ResourceDownloadPayload = {
-  resource?: string
   timestamp?: string
 }
 
 type MakeWebhookBody =
   | { data: CalculatorQuotePayload; workflow: 'calculator-quote' }
   | { data: ContactLeadPayload; workflow: 'lead-capture' }
-  | { data: ResourceDownloadPayload; workflow: 'resource-download' }
 
 function checkRateLimit(ip: string, max: number, windowMs: number) {
   const now = Date.now()
@@ -160,9 +169,15 @@ function sanitizeCalculatorQuotePayload(data: Record<string, unknown>): Calculat
     addonsSubtotalBWP: getOptionalNumber(sanitized.addonsSubtotalBWP),
     currency: getOptionalString(sanitized.currency),
     delivery: getOptionalString(sanitized.delivery),
+    deliveryCostBWP: getOptionalNumber(sanitized.deliveryCostBWP),
+    deliveryLabel: getOptionalString(sanitized.deliveryLabel),
     deliveryMultiplier: getOptionalNumber(sanitized.deliveryMultiplier),
     email,
     estimatedTotalBWP: getOptionalNumber(sanitized.estimatedTotalBWP),
+    formattedBase: getOptionalString(sanitized.formattedBase),
+    formattedDeliveryCost: getOptionalString(sanitized.formattedDeliveryCost),
+    formattedStaticDiscount: getOptionalString(sanitized.formattedStaticDiscount),
+    formattedTotal: getOptionalString(sanitized.formattedTotal),
     name: getOptionalString(sanitized.name),
     notes: getOptionalString(sanitized.notes),
     phone: getOptionalString(sanitized.phone),
@@ -170,19 +185,12 @@ function sanitizeCalculatorQuotePayload(data: Record<string, unknown>): Calculat
       ? sanitized.scopeTags.filter((value): value is string => typeof value === 'string')
       : undefined,
     service: getOptionalString(sanitized.service),
+    serviceLabel: getOptionalString(sanitized.serviceLabel),
     staticDiscount: getOptionalBoolean(sanitized.staticDiscount),
     staticDiscountBWP: getOptionalNumber(sanitized.staticDiscountBWP),
     tier: getOptionalString(sanitized.tier),
+    tierLabel: getOptionalString(sanitized.tierLabel),
     tierPriceBWP: getOptionalNumber(sanitized.tierPriceBWP),
-    timestamp: getOptionalString(sanitized.timestamp),
-  }
-}
-
-function sanitizeResourceDownloadPayload(data: Record<string, unknown>): ResourceDownloadPayload {
-  const sanitized = sanitizeAllowedFields(data, ALLOWED_RESOURCE_FIELDS)
-
-  return {
-    resource: getOptionalString(sanitized.resource),
     timestamp: getOptionalString(sanitized.timestamp),
   }
 }
@@ -201,11 +209,6 @@ function parseMakeWebhookBody(value: unknown): MakeWebhookBody | null {
       const data = sanitizeCalculatorQuotePayload(value.data)
       return data ? { data, workflow: value.workflow } : null
     }
-    case 'resource-download':
-      return {
-        data: sanitizeResourceDownloadPayload(value.data),
-        workflow: value.workflow,
-      }
     default:
       return null
   }
@@ -228,8 +231,6 @@ async function persistWorkflow(body: MakeWebhookBody) {
     case 'calculator-quote':
       await persistCalculatorLead(body.data)
       return
-    case 'resource-download':
-      return
   }
 }
 
@@ -237,9 +238,15 @@ async function forwardWorkflow(body: MakeWebhookBody) {
   const webhookUrl =
     body.workflow === 'lead-capture'
       ? process.env.MAKE_WEBHOOK_LEAD_CAPTURE
-      : body.workflow === 'calculator-quote'
-        ? process.env.MAKE_WEBHOOK_CALCULATOR_QUOTE
-        : process.env.MAKE_WEBHOOK_RESOURCE_DOWNLOAD
+      : process.env.MAKE_WEBHOOK_CALCULATOR_QUOTE
+
+  const payload =
+    body.workflow === 'calculator-quote'
+      ? {
+          ...body.data,
+          estimatedBWP: body.data.estimatedTotalBWP,
+        }
+      : body.data
 
   if (!webhookUrl) {
     throw new Error(`Missing Make webhook URL for ${body.workflow}`)
@@ -248,7 +255,7 @@ async function forwardWorkflow(body: MakeWebhookBody) {
   const response = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body.data),
+    body: JSON.stringify(payload),
   })
 
   if (!response.ok) {
@@ -277,6 +284,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Make webhook proxy failed:', error)
+    reportServerError(error, { feature: 'make-webhook' })
     return NextResponse.json({ error: 'Webhook failed' }, { status: 500 })
   }
 }

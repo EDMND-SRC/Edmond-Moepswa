@@ -37,7 +37,6 @@ describe('Automation routes', () => {
     process.env.MAKE_WEBHOOK_CALCULATOR_QUOTE = 'https://hook.make.com/calculator'
     process.env.MAKE_WEBHOOK_DODO_PAYMENTS = 'https://hook.make.com/dodo'
     process.env.MAKE_WEBHOOK_LEAD_CAPTURE = 'https://hook.make.com/lead'
-    process.env.MAKE_WEBHOOK_RESOURCE_DOWNLOAD = 'https://hook.make.com/resource'
   })
 
   it('accepts and persists public contact leads', async () => {
@@ -123,33 +122,6 @@ describe('Automation routes', () => {
     )
   })
 
-  it('accepts resource download tracking and forwards it to Make', async () => {
-    const response = await postMakeWebhook(
-      new NextRequest('http://localhost/api/make-webhook', {
-        body: JSON.stringify({
-          workflow: 'resource-download',
-          data: {
-            resource: 'Website Launch Checklist',
-            timestamp: '2026-05-05T10:10:00.000Z',
-          },
-        }),
-        headers: {
-          'content-type': 'application/json',
-          'x-forwarded-for': '1.1.1.3',
-        },
-        method: 'POST',
-      }),
-    )
-
-    expect(response.status).toBe(200)
-    expect(persistenceMocks.persistContactLead).not.toHaveBeenCalled()
-    expect(persistenceMocks.persistCalculatorLead).not.toHaveBeenCalled()
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://hook.make.com/resource',
-      expect.objectContaining({ method: 'POST' }),
-    )
-  })
-
   it('forwards cal.com bookings through the server-side route', async () => {
     const response = await postCalWebhook(
       new NextRequest('http://localhost/api/cal-webhook', {
@@ -162,7 +134,7 @@ describe('Automation routes', () => {
         headers: {
           authorization: 'Bearer launch-secret',
           'content-type': 'application/json',
-          'x-forwarded-for': '1.1.1.4',
+          'x-forwarded-for': '1.1.1.3',
         },
         method: 'POST',
       }),

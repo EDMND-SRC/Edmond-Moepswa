@@ -78,8 +78,10 @@ pnpm cf:build:workers
 For remote verification:
 
 ```bash
+pnpm cf:sync-secrets --env staging
 pnpm cf:deploy:staging
 pnpm cf:verify:staging
+pnpm cf:sync-secrets --env production
 pnpm cf:deploy:prod
 pnpm cf:verify:prod
 ```
@@ -104,7 +106,6 @@ The repo now cares about these groups:
 - Make.com:
   - `MAKE_WEBHOOK_LEAD_CAPTURE`
   - `MAKE_WEBHOOK_CALCULATOR_QUOTE`
-  - `MAKE_WEBHOOK_RESOURCE_DOWNLOAD`
   - `MAKE_WEBHOOK_DODO_PAYMENTS`
 - Cal.com:
   - `CAL_WEBHOOK_URL`
@@ -118,9 +119,15 @@ The repo now cares about these groups:
   - `R2_ENDPOINT`
   - `R2_PUBLIC_URL`
 - Analytics / social:
+  - `BETTER_STACK_API_KEY`
   - `NEXT_PUBLIC_POSTHOG_API_HOST`
   - `NEXT_PUBLIC_POSTHOG_API_KEY`
   - `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+  - `NEXT_PUBLIC_SENTRY_DSN`
+  - `SENTRY_PERSONAL_TOKEN`
+  - `SENTRY_SECURITY_TOKEN`
+  - `SENTRY_ORG`
+  - `SENTRY_PROJECT`
   - `NEXT_PUBLIC_INSTAGRAM_URL`
   - `NEXT_PUBLIC_LINKEDIN_URL`
   - `NEXT_PUBLIC_SUBSTACK_URL`
@@ -133,9 +140,11 @@ The repo now cares about these groups:
 - `/api/make-webhook` accepts:
   - `lead-capture`
   - `calculator-quote`
-  - `resource-download`
 - `/api/cal-webhook` stays server-side only.
 - `/api/webhooks/dodo` verifies the Dodo signature, persists orders and mirrored leads through direct Postgres, and optionally forwards the event to `MAKE_WEBHOOK_DODO_PAYMENTS`.
+- Historical payload rollout notes live under `docs/.archive/payload-rollout/` and are not part of the current operating model.
+- `pnpm make:sync` verifies or creates the kept Make.com scenarios from the current local env.
+- `pnpm betterstack:ensure` keeps the production Better Stack uptime monitor aligned to the live site URL.
 
 ## Operational truth
 
@@ -146,4 +155,3 @@ The repo now cares about these groups:
 - APIs: `docs/api-contracts.md`
 - Data model: `docs/data-models.md`
 - Current project context: `_bmad-output/project-context.md`
-- Rollout / handover log: `_bmad-output/cloudflare-migration-handover-2026-04-30-rollout.md`

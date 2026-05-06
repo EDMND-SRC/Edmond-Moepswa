@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getSubstackPosts } from '@/lib/server/substack'
 
 // ── Rate limiter ──────────────────────────────────────────────────────────────
 
@@ -16,8 +17,6 @@ function checkRateLimit(ip: string, max: number, windowMs: number): boolean {
   return true
 }
 
-const SUBSTACK_FEED_URL = process.env.SUBSTACK_FEED_URL || 'https://edmnd.substack.com/feed'
-
 export async function GET(request: Request) {
   // Rate limiting (5 requests per minute per IP for substack)
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
@@ -33,22 +32,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await fetch(SUBSTACK_FEED_URL)
-    if (!response.ok) throw new Error('Failed to fetch feed')
-    const xml = await response.text()
-
-    // Simple XML extraction for Substack RSS items
-    const items = xml.split('<item>').slice(1)
-    const posts = items.slice(0, 3).map((item) => {
-      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1] || item.match(/<title>(.*?)<\/title>/)?.[1] || ''
-      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || ''
-      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || ''
-      const contentSnippet = (item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1] || item.match(/<description>(.*?)<\/description>/)?.[1] || '').replace(/<[^>]*>?/gm, '').slice(0, 150) + '...'
-      
-      return { title, link, pubDate, contentSnippet }
-    })
-
-    return NextResponse.json(posts)
+    return NextResponse.json(await getSubstackPosts(3))
   } catch (error) {
     console.error('Error fetching Substack feed:', error)
     return NextResponse.json([], { status: 500 })

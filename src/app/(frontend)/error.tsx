@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { Home, RefreshCw } from 'lucide-react'
@@ -13,6 +14,7 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error('Application error:', error)
+    Sentry.captureException(error)
   }, [error])
 
   return (

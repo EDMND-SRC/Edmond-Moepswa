@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import {
@@ -15,20 +16,18 @@ import {
 
 import {
   LinkedinIcon,
-  TwitterIcon,
   XLight,
   InstagramIcon,
   ThreadsLight,
 } from '@/components/icons/BrandIcons'
 import SubstackIcon from '@/components/icons/SubstackIcon'
 
-
 export default function HomePageFooter() {
   const reducedMotion = useReducedMotion()
   const [portraitError, setPortraitError] = useState(false)
 
   return (
-    <footer className="relative bg-[#e5e5e5] text-[#1a1a1a]">
+    <footer className="relative bg-[#e5e5e5] text-[#1a1a1a]" data-home-footer>
       {/* ── Visual Area: Portrait + Scroll Text (full screen) ── */}
       <div className="relative min-h-screen overflow-hidden flex items-center justify-center">
         {/* Background Portrait (Flipped horizontally) */}
@@ -36,13 +35,14 @@ export default function HomePageFooter() {
           {portraitError ? (
             <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]" />
           ) : (
-            <img
+            <Image
               src="/edmond-portrait-hero.webp"
               alt="Edmond Moepswa Portrait"
-              className="object-cover pointer-events-none absolute inset-0 w-full h-full"
+              className="pointer-events-none object-cover"
               style={{ transform: 'scaleX(-1)' }}
               onError={() => setPortraitError(true)}
-              decoding="async"
+              fill
+              sizes="100vw"
             />
           )}
         </div>
@@ -150,7 +150,6 @@ export default function HomePageFooter() {
               { href: THREADS_URL, icon: ThreadsLight, label: 'Threads' },
               { href: SUBSTACK_URL, icon: SubstackIcon, label: 'Substack' },
             ].map((social) => (
-
               <a
                 key={social.label}
                 href={social.href || '#'}
@@ -160,7 +159,6 @@ export default function HomePageFooter() {
                 aria-label={`Edmond Moepswa on ${social.label}`}
               >
                 <social.icon className="w-5 h-5 flex-shrink-0" />
-
               </a>
             ))}
           </div>

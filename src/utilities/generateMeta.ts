@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Config } from '../payload-types'
+import type { Config, Media, Page } from '../types/content'
 
 import { canTransformMediaURL, getMediaTransformURL } from './getMediaTransformURL'
 import { getMediaUrl } from './getMediaUrl'

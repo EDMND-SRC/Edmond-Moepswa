@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  Calendar,
   BookOpen,
   Award,
   Code2,
@@ -9,8 +8,7 @@ import {
   TrendingUp,
   Shield,
 } from 'lucide-react'
-import { CAL_USERNAME, CAL_NAMESPACE } from '@/lib/constants'
-import CalEmbed from '@/components/cal/CalEmbed'
+import LazyCalBooking from '@/components/cal/LazyCalBooking'
 import TechStackSection from '@/components/about/TechStackSection'
 import ScrollTextReveal from '@/components/ui/ScrollTextReveal'
 import CommitmentsSection from '@/components/homepage/CommitmentsSection'
@@ -19,15 +17,13 @@ export default function AboutPage() {
   return (
     <main id="main-content" className="bg-[#0a0a0a] text-white">
       {/* Hero Banner */}
-      <section className="relative min-h-[50vh] flex items-center justify-center border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 md:px-10 py-24 md:py-32 text-center">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-            // About Edmond
-          </span>
-          <ScrollTextReveal className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter mt-6 mb-6">
+      <section className="relative flex min-h-[50vh] items-center justify-center border-b border-white/10">
+        <div className="ed-container max-w-4xl px-6 py-24 text-center md:px-10 md:py-32">
+          <span className="ed-eyebrow">// About Edmond</span>
+          <ScrollTextReveal className="ed-page-title mt-6 mb-6">
             A systems thinker who understands P&Ls, risk, and production code.
           </ScrollTextReveal>
-          <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="ed-lead mx-auto">
             From Canberra hospitality to Botswana boardrooms, I now focus on building digital systems
             built for handover.
           </p>
@@ -284,19 +280,19 @@ export default function AboutPage() {
       <section className="py-24 md:py-32 px-6 md:px-10 border-t border-white/10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-              // Next Steps
-            </span>
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mt-4 mb-6">
+            <span className="ed-eyebrow">// Next Steps</span>
+            <h2 className="ed-section-title mt-4 mb-6">
               Schedule a discovery call
             </h2>
-            <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="ed-lead mx-auto">
               Book a free 30-minute discovery call to discuss your goals and challenges. No commitment is required, just an honest conversation about how I can help.
             </p>
           </div>
-          <div className="bg-[#111111] rounded-3xl p-4 md:p-8 border border-white/10 overflow-hidden">
-            <CalEmbed />
-          </div>
+          <LazyCalBooking
+            title="Free 30-minute discovery call"
+            description="Use the inline calendar only when you’re ready. If you’d rather reach out directly, email and WhatsApp are available immediately."
+            panelId="about-booking-panel"
+          />
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
+import { reportServerError } from '@/lib/server/report-server-error'
 import { getDodoEnvironment } from '@/utilities/getDodoEnvironment'
 export const revalidate = 60 // Revalidate every 60 seconds
 
@@ -59,6 +60,7 @@ export async function GET() {
   } catch (error: unknown) {
     const err = error as { message?: string; status?: number }
     console.error('Failed to fetch products:', err)
+    reportServerError(err, { feature: 'dodo-products' })
     return NextResponse.json(
       { error: err.message || 'Failed to fetch products' },
       { status: err.status || 500 },

@@ -1,10 +1,7 @@
-'use client'
-
-
-
 import { cn } from '@/utilities/ui'
-
 import React from 'react'
+import Image from 'next/image'
+import type { StaticImageData } from 'next/image'
 
 import type { Props as MediaProps } from '../types'
 
@@ -62,7 +59,7 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let width: number | undefined
   let height: number | undefined
   let alt = altFromProps
-  let src: any | string | null = srcFromProps || null
+  let src: StaticImageData | string | null = srcFromProps ?? null
 
   if (!src && resource && typeof resource === 'object') {
     const { alt: altFromResource, height: fullHeight, mimeType, url, width: fullWidth } = resource
@@ -109,15 +106,19 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
 
   return (
     <picture className={cn(pictureClassName)}>
-      <img
+      <Image
         alt={alt || ''}
         className={cn(imgClassName)}
-        height={!fill ? height : undefined}
-        loading={loading === 'lazy' ? 'lazy' : 'eager'}
-        src={typeof src === 'string' ? src : (src as any).src}
-        width={!fill ? width : undefined}
-        style={fill ? { objectFit: 'cover', width: '100%', height: '100%' } : undefined}
-        decoding="async"
+        fill={fill}
+        height={!fill ? height ?? undefined : undefined}
+        loading={loading}
+        priority={priority}
+        placeholder="blur"
+        blurDataURL={placeholderBlur}
+        sizes={sizes}
+        src={src}
+        width={!fill ? width ?? undefined : undefined}
+        style={fill ? { objectFit: 'cover' } : undefined}
       />
     </picture>
   )

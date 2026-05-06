@@ -21,17 +21,25 @@ export type CalculatorLeadInput = {
   addonsSubtotalBWP?: number
   currency?: string
   delivery?: string
+  deliveryCostBWP?: number
+  deliveryLabel?: string
   deliveryMultiplier?: number
   email: string
   estimatedTotalBWP?: number
+  formattedBase?: string
+  formattedDeliveryCost?: string
+  formattedStaticDiscount?: string
+  formattedTotal?: string
   name?: string
   notes?: string
   phone?: string
   scopeTags?: string[]
   service?: string
+  serviceLabel?: string
   staticDiscount?: boolean
   staticDiscountBWP?: number
   tier?: string
+  tierLabel?: string
   tierPriceBWP?: number
   timestamp?: string
 }
@@ -129,12 +137,20 @@ export async function persistCalculatorLead(input: CalculatorLeadInput) {
           addonsSubtotalBWP: input.addonsSubtotalBWP ?? null,
           currency: normalizeOptionalText(input.currency),
           delivery: normalizeOptionalText(input.delivery),
+          deliveryCostBWP: input.deliveryCostBWP ?? null,
+          deliveryLabel: normalizeOptionalText(input.deliveryLabel),
           deliveryMultiplier: input.deliveryMultiplier ?? null,
           estimatedTotalBWP: input.estimatedTotalBWP ?? null,
+          formattedBase: normalizeOptionalText(input.formattedBase),
+          formattedDeliveryCost: normalizeOptionalText(input.formattedDeliveryCost),
+          formattedStaticDiscount: normalizeOptionalText(input.formattedStaticDiscount),
+          formattedTotal: normalizeOptionalText(input.formattedTotal),
           service: normalizeOptionalText(input.service),
+          serviceLabel: normalizeOptionalText(input.serviceLabel),
           staticDiscount: Boolean(input.staticDiscount),
           staticDiscountBWP: input.staticDiscountBWP ?? null,
           tier: normalizeOptionalText(input.tier),
+          tierLabel: normalizeOptionalText(input.tierLabel),
           tierPriceBWP: input.tierPriceBWP ?? null,
         }),
         normalizeOptionalText(input.phone),

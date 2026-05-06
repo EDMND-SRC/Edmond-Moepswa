@@ -1,4 +1,4 @@
-import type { Config } from '@/payload-types'
+import type { Config } from '@/types/content'
 
 import { launchFooter, launchHeader, launchSiteSettings } from '@/content/launchSnapshot'
 import { unstable_cache } from 'next/cache.js'

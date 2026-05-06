@@ -126,7 +126,6 @@ export const ICON_REGISTRY: Record<string, IconComponent> = {
   YouTube: Link,
   WordPress: Globe,
   GraphQL: Braces,
-  'Payload CMS': NotebookPen,
   Keystatic: NotebookPen,
   'Make.com': NotebookPen,
   n8n: NotebookPen,

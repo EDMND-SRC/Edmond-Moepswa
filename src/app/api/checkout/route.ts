@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import DodoPayments from 'dodopayments'
+import { reportServerError } from '@/lib/server/report-server-error'
 import { getDodoEnvironment } from '@/utilities/getDodoEnvironment'
 
 const client = new DodoPayments({
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
   } catch (error: unknown) {
     const err = error as { message?: string; status?: number }
     console.error('Checkout session creation failed:', err)
+    reportServerError(err, { feature: 'checkout-route' })
     return NextResponse.json(
       { error: err.message || 'Failed to create checkout session' },
       { status: err.status || 500 },

@@ -11,7 +11,7 @@ import {
   FileText,
   ListChecks,
 } from 'lucide-react'
-import type { Product } from '@/payload-types'
+import type { Product } from '@/types/content'
 import type { ComponentType, SVGProps } from 'react'
 
 const iconMap: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {

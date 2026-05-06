@@ -10,3 +10,5 @@ Current operational docs for the public-only `edmond` Cloudflare deployment.
 - [Data Models](./data-models.md)
 
 Everything else that previously described a split public/payload worker system has been removed because it no longer matches the shipped app.
+
+Historical Payload migration and rollout notes now live under `docs/.archive/payload-rollout/`.

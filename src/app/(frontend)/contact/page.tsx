@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  Calendar,
   Phone,
   Mail,
   MapPin,
@@ -25,25 +24,26 @@ import {
   THREADS_URL,
   SUBSTACK_URL,
 } from '@/lib/constants'
-import CalEmbed from '@/components/cal/CalEmbed'
+import LazyCalBooking from '@/components/cal/LazyCalBooking'
 import LeadCaptureForm from '@/components/forms/LeadCaptureForm'
 import FAQSection from '@/components/homepage/FAQSection'
 import SubstackIcon from '@/components/icons/SubstackIcon'
 import ThreadsIcon from '@/components/icons/ThreadsIcon'
+import { getFaqs } from '@/lib/server/faqs'
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const faqs = await getFaqs().catch(() => [])
+
   return (
     <main id="main-content" className="bg-[#0a0a0a] text-white">
       {/* Hero Banner */}
       <section className="border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 md:px-10 py-24 md:py-32">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-            // Get in Touch
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter mt-6 mb-6">
+        <div className="ed-container max-w-4xl px-6 py-24 md:px-10 md:py-32">
+          <span className="ed-eyebrow">// Get in Touch</span>
+          <h1 className="ed-page-title mt-6 mb-6">
             Tell me what you&apos;re building
           </h1>
-          <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl leading-relaxed">
+          <p className="ed-lead">
             Book a free 30-minute discovery call or reach out directly. I respond within 24 hours.
           </p>
         </div>
@@ -55,17 +55,16 @@ export default function ContactPage() {
           {/* Cal.com Embed — takes full width on left */}
           <div className="lg:col-span-8">
             <div className="flex flex-col gap-6 mb-8">
-              <h2 className="text-2xl md:text-3xl font-medium tracking-tighter">
-                Free 30-Minute Discovery Call
-              </h2>
-              <p className="text-[#b0b0b0] text-base leading-relaxed">
-                Pick a time that works for you. No commitment is required; just an honest conversation about
-                your goals and how I can help.
+              <h2 className="text-2xl font-medium tracking-tight md:text-3xl">Free 30-Minute Discovery Call</h2>
+              <p className="text-base leading-relaxed text-[#b0b0b0]">
+                Pick a time that works for you. No commitment is required; just an honest conversation about your goals and how I can help.
               </p>
             </div>
-            <div className="bg-[#111111] rounded-3xl p-4 md:p-6 border border-white/10 overflow-hidden">
-              <CalEmbed />
-            </div>
+            <LazyCalBooking
+              title="Choose a time that works for you"
+              description="The calendar loads only when you ask for it, so the page stays light while still giving you the full booking experience."
+              panelId="booking-panel"
+            />
           </div>
 
           {/* Contact Details — sidebar */}
@@ -278,7 +277,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <FAQSection />
+      <FAQSection initialFaqs={faqs} />
 
       {/* Response Time Expectations */}
       <section className="py-16 md:py-20 px-6 md:px-10 border-t border-white/10">

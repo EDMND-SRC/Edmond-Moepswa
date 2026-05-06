@@ -137,6 +137,108 @@
   }
 }
 
+@layer components {
+  .ed-shell {
+    @apply bg-[#0a0a0a] text-white;
+  }
+
+  .ed-page-section {
+    @apply px-6 md:px-10;
+  }
+
+  .ed-container {
+    @apply mx-auto max-w-6xl;
+  }
+
+  .ed-wide-container {
+    @apply mx-auto max-w-[1800px];
+  }
+
+  .ed-eyebrow {
+    @apply text-[#FF4D2E] text-xs font-semibold uppercase tracking-[0.2em] md:text-sm;
+  }
+
+  .ed-page-title {
+    @apply text-4xl font-medium tracking-tight leading-[0.95] md:text-5xl lg:text-6xl;
+  }
+
+  .ed-section-title {
+    @apply text-3xl font-medium tracking-tight leading-[1.02] md:text-4xl lg:text-5xl;
+  }
+
+  .ed-lead {
+    @apply max-w-2xl text-lg leading-relaxed text-[#b0b0b0] md:text-xl;
+  }
+
+  .ed-body {
+    @apply text-base leading-relaxed text-[#b0b0b0] md:text-lg;
+  }
+
+  .ed-caption {
+    @apply text-sm leading-relaxed text-[#8a8a8a];
+  }
+
+  .ed-card {
+    @apply rounded-3xl border border-white/10 bg-white/[0.03];
+  }
+
+  .ed-button-primary {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#FF4D2E] px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#e0442a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a];
+  }
+
+  .ed-button-secondary {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a];
+  }
+
+  .ed-prose {
+    @apply max-w-none;
+  }
+
+  .ed-prose h2,
+  .ed-prose h3,
+  .ed-prose h4 {
+    @apply font-medium tracking-tight text-white;
+  }
+
+  .ed-prose h2 {
+    @apply mt-12 text-2xl md:text-3xl;
+  }
+
+  .ed-prose h3 {
+    @apply mt-8 text-xl md:text-2xl;
+  }
+
+  .ed-prose p,
+  .ed-prose li {
+    @apply text-[#b0b0b0] leading-relaxed;
+  }
+
+  .ed-prose strong {
+    @apply text-white font-medium;
+  }
+
+  .ed-prose a {
+    @apply text-[#FF4D2E] no-underline transition-colors duration-200;
+  }
+
+  .ed-prose a:hover {
+    @apply underline;
+  }
+
+  .ed-prose ul,
+  .ed-prose ol {
+    @apply my-5 space-y-2 pl-5;
+  }
+
+  .ed-prose li::marker {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .ed-prose > * + * {
+    @apply mt-4;
+  }
+}
+
 /* Accessibility: Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -146,6 +248,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 

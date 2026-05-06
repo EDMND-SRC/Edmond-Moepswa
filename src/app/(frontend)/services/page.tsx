@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { Calendar, ExternalLink, AlertTriangle, CheckCircle2, Info } from 'lucide-react'
 import { getTechIcon } from '@/lib/icon-registry'
-import { CAL_USERNAME, CAL_NAMESPACE } from '@/lib/constants'
-import CalEmbed from '@/components/cal/CalEmbed'
+import LazyCalBooking from '@/components/cal/LazyCalBooking'
 import ProcessSection from '@/components/homepage/ProcessSection'
 import { services, extractTechFromFeature, type Service } from './data'
 
@@ -72,14 +71,12 @@ export default function ServicesPage() {
     <main id="main-content" className="bg-[#0a0a0a] text-white">
       {/* Hero Banner */}
       <section className="border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 md:px-10 py-24 md:py-32">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-            // Services & Pricing
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter mt-6 mb-6">
+        <div className="ed-container max-w-4xl px-6 py-24 md:px-10 md:py-32">
+          <span className="ed-eyebrow">// Services & Pricing</span>
+          <h1 className="ed-page-title mt-6 mb-6">
             Transparent pricing for every service
           </h1>
-          <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl leading-relaxed">
+          <p className="ed-lead">
             From landing pages to full-scale platforms, every engagement includes thorough documentation and a complete handover session.
           </p>
         </div>
@@ -520,26 +517,19 @@ export default function ServicesPage() {
       <section className="py-24 md:py-32 px-6 md:px-10 border-t border-white/10 bg-white/[0.01]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-              // Next Steps
-            </span>
-            <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mt-4 mb-6">
+            <span className="ed-eyebrow">// Next Steps</span>
+            <h2 className="ed-section-title mt-4 mb-6">
               Not sure which service you need?
             </h2>
-            <p className="text-[#b0b0b0] text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="ed-lead mx-auto">
               Book a free 30-minute discovery call to discuss your goals. I&apos;ll recommend the right approach, even if it&apos;s not one of my services.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button
-              data-cal-namespace={CAL_NAMESPACE}
-              data-cal-link={`${CAL_USERNAME}/${CAL_NAMESPACE}`}
-              data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
-            >
+            <Link href="#services-booking-panel" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]">
               <Calendar className="w-5 h-5" aria-hidden="true" />
               Book a Free Discovery Call
-            </button>
+            </Link>
             <Link
               href="/resources"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
@@ -548,9 +538,11 @@ export default function ServicesPage() {
               Browse Free Resources
             </Link>
           </div>
-          <div className="bg-[#111111] rounded-3xl p-4 md:p-8 border border-white/10 overflow-hidden">
-            <CalEmbed />
-          </div>
+          <LazyCalBooking
+            title="Book a discovery call"
+            description="Use the inline calendar if you want to choose a slot here, or jump out to the booking page if that’s faster."
+            panelId="services-booking-panel"
+          />
         </div>
       </section>
 

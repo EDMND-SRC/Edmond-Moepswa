@@ -1,5 +1,13 @@
 import type { CardPostData } from '@/components/Card'
-import type { Footer, Header, Page, Product, Redirect, SiteSetting, Testimonial } from '@/payload-types'
+import type {
+  Footer,
+  Header,
+  Page,
+  Product,
+  Redirect,
+  SiteSetting,
+  Testimonial,
+} from '@/types/content'
 import { services as typedServices, type Service } from '@/content/launchServices'
 
 export const launchSnapshotUpdatedAt = '2026-05-04T00:00:00.000Z'

@@ -20,7 +20,6 @@ export interface Service {
 export function extractTechFromFeature(feature: string): string | null {
   const lower = feature.toLowerCase()
 
-  if (/\bpayload cms\b/.test(lower) || /\bpayload\b/.test(lower)) return 'Payload CMS'
   if (/\bnext\.?js\b/.test(lower)) return 'Next.js'
   if (/\btailwind\b/.test(lower)) return 'Tailwind CSS'
   if (/\bposthog\b/.test(lower)) return 'PostHog'
@@ -70,7 +69,7 @@ export const services: Service[] = [
         timeline: '10–15 business days',
         features: [
           '4 pages (1 home + 3 inner), fully responsive',
-          'CMS integration (Payload CMS, Sanity, or Keystatic)',
+          'Client-managed content setup (Sanity or Keystatic)',
           'Advanced form with CRM routing (HubSpot free or Google Sheets)',
           'Advanced SEO on-page optimisation',
           'Analytics integration (GA4, PostHog)',
@@ -132,7 +131,7 @@ export const services: Service[] = [
         features: [
           'Industry-specific Growth-level builds with pre-integrated functionality',
           'Custom visual design and brand application',
-          'CMS for client-managed content (Keystatic or Payload CMS)',
+          'Client-managed content collections (Keystatic or Sanity)',
           'Technical SEO, analytics, email marketing, CRM routing',
           'WhatsApp click-to-chat integration',
           '2 rounds of revisions, full handover documentation',
@@ -144,7 +143,7 @@ export const services: Service[] = [
         price: 'From P48,000',
         timeline: '6–16 weeks, scoped per project',
         features: [
-          'Fully bespoke application built on a "Lean-Scale" architecture (Next.js, Payload CMS, Supabase)',
+          'Fully bespoke application built on a "Lean-Scale" architecture (Next.js, PostgreSQL, Cloudflare Workers)',
           'Complex business logic, multi-role access control, and third-party API orchestrations',
           'Example: Client portal with secure document exchange, status tracking, and automated notifications',
           'Example: Multi-staff booking platform with availability logic and automated billing via Dodo Payments',

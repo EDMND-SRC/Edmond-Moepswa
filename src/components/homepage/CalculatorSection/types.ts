@@ -16,9 +16,11 @@ export interface CalculatorSelections {
   delivery: string
   deliveryLabel: string
   deliveryCostBWP: number
+  formattedDeliveryCost?: string
   deliveryMultiplier: number
   staticDiscount: boolean
   staticDiscountBWP: number
+  formattedStaticDiscount?: string
   estimatedTotalBWP: number
   formattedTotal: string
   formattedBase: string

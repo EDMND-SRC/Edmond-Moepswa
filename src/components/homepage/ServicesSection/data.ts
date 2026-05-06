@@ -43,7 +43,7 @@ export const services: Service[] = [
         revisions: '2 rounds',
         features: [
           '4 pages (1 home + 3 inner)',
-          'CMS integration (Payload CMS, Sanity, or similar)',
+          'Client-managed content setup (Sanity, Keystatic, or similar)',
           'Advanced SEO on-page optimisation',
           'Analytics integration (GA4, PostHog, or similar)',
           'Blog/news section setup',
@@ -80,7 +80,7 @@ export const services: Service[] = [
     id: '02',
     title: 'Web Applications',
     description:
-      'Custom-built web applications — from storefronts and boilerplate SaaS products to full-scale platforms. Built with modern stacks: Next.js, React, Payload CMS, PostgreSQL, and more.',
+      'Custom-built web applications — from storefronts and boilerplate SaaS products to full-scale platforms. Built with modern stacks: Next.js, React, Cloudflare Workers, PostgreSQL, and more.',
     pricingTiers: [
       {
         name: 'Tier A — MVP',
@@ -294,7 +294,7 @@ export const services: Service[] = [
         name: 'Artisan & Craftmaker Portfolio',
         price: 'From P25,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -305,7 +305,7 @@ export const services: Service[] = [
         name: 'Professional Services Firm',
         price: 'From P28,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -316,7 +316,7 @@ export const services: Service[] = [
         name: 'Food & Hospitality',
         price: 'From P30,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -327,7 +327,7 @@ export const services: Service[] = [
         name: 'Health & Wellness',
         price: 'From P25,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -338,7 +338,7 @@ export const services: Service[] = [
         name: 'Events & Experiences',
         price: 'From P20,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -349,7 +349,7 @@ export const services: Service[] = [
         name: 'E-commerce',
         price: 'From P35,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -360,7 +360,7 @@ export const services: Service[] = [
         name: 'NGO / Non-Profit',
         price: 'From P22,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',
@@ -371,7 +371,7 @@ export const services: Service[] = [
         name: 'Financial Services',
         price: 'From P30,000',
         features: [
-          'Built with Next.js + Payload CMS',
+          'Built with Next.js + Cloudflare Workers',
           'Responsive design',
           'CMS integration',
           'Payment gateway ready',

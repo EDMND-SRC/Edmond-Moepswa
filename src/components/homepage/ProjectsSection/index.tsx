@@ -1,125 +1,117 @@
-'use client'
+import Link from 'next/link'
+import { ImageMedia } from '@/components/Media/ImageMedia'
+import { getProjects } from '@/lib/server/projects'
 
-import { useState, useEffect, useCallback } from 'react'
-import { ProjectsSectionClient } from './ProjectsSectionClient'
-import type { ProjectItem } from './types'
-
-function extractDescription(description: unknown): string {
-  if (!description) return ''
-  if (typeof description === 'string') return description
-  const root = (description as Record<string, unknown>)?.root as
-    | Record<string, unknown>
-    | undefined
-  const children = root?.children as
-    | Array<{ children?: Array<{ text?: string }> }>
-    | undefined
-  if (!children) return ''
-  return children.map((c) => c.children?.map((cc) => cc.text).join('')).join('')
+const CATEGORY_LABELS: Record<string, string> = {
+  applications: 'Web Applications',
+  automation: 'Automation & Systems',
+  products: 'Products & Boilerplates',
+  websites: 'Websites',
 }
 
-export default function ProjectsSection() {
-  const [projects, setProjects] = useState<ProjectItem[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
+function ProjectCard({
+  project,
+  priority,
+}: {
+  project: Awaited<ReturnType<typeof getProjects>>[number]
+  priority: boolean
+}) {
+  const cardBody = (
+    <div className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#111111] transition-colors duration-200 hover:border-white/20">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#171717]">
+        {project.thumbnail ? (
+          <ImageMedia
+            resource={project.thumbnail}
+            fill
+            priority={priority}
+            loading={priority ? 'eager' : 'lazy'}
+            pictureClassName="block h-full w-full"
+            imgClassName="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            size="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-4xl font-medium text-white/40">
+            {project.title.charAt(0)}
+          </div>
+        )}
+      </div>
 
-  const fetchProjects = useCallback((signal?: AbortSignal) => {
-    setError(false)
-    setIsLoading(true)
-    fetch('/api/projects?limit=100', { signal })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
-        return res.json() as Promise<{ docs?: Record<string, unknown>[] }>
-      })
-      .then((data) => {
-        const docs = data.docs || []
-        if (Array.isArray(docs) && docs.length > 0) {
-          const mapped: ProjectItem[] = docs.map((p: Record<string, unknown>) => ({
-            id: p.id as number,
-            year: (p.year as string) || 'N/A',
-            title: p.title as string,
-            description: extractDescription(p.description),
-            category: p.category as string,
-            thumbnail:
-              p.thumbnail && typeof p.thumbnail === 'object' ? (p.thumbnail as ProjectItem['thumbnail']) : null,
-            link: (p.link as string) || '#',
-          }))
-          setProjects(mapped)
-        } else {
-          setProjects([])
-        }
-      })
-      .catch((err) => {
-        if (err.name !== 'AbortError') setError(true)
-      })
-      .finally(() => setIsLoading(false))
-  }, [])
-
-  useEffect(() => {
-    const controller = new AbortController()
-    fetchProjects(controller.signal)
-    return () => controller.abort()
-  }, [fetchProjects])
-
-  if (isLoading) {
-    return (
-      <section
-        id="projects"
-        className="bg-[#0a0a0a] text-white border-t border-white/10 relative min-h-screen flex items-center justify-center"
-      >
-        <div
-          className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FF4D2E]"
-          role="status"
-          aria-label="Loading projects"
-        >
-          <span className="sr-only">Loading projects...</span>
+      <div className="flex flex-1 flex-col gap-4 p-6 md:p-7">
+        <div className="flex items-center justify-between gap-4 text-xs font-medium uppercase tracking-[0.18em] text-[#8a8a8a]">
+          <span>{project.year}</span>
+          <span className="text-[#FF4D2E]">
+            {CATEGORY_LABELS[project.category] ?? project.category}
+          </span>
         </div>
-      </section>
+
+        <div className="space-y-3">
+          <h3 className="text-2xl font-medium tracking-tight text-white md:text-[1.7rem]">
+            {project.title}
+          </h3>
+          <p className="text-sm leading-relaxed text-[#b0b0b0] md:text-base">
+            {project.description}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (!project.link) {
+    return <div>{cardBody}</div>
+  }
+
+  const isExternal = project.link.startsWith('http://') || project.link.startsWith('https://')
+
+  if (isExternal) {
+    return (
+      <a href={project.link} target="_blank" rel="noopener noreferrer">
+        {cardBody}
+      </a>
     )
   }
 
-  if (error) {
-    return (
-      <section
-        id="projects"
-        className="bg-[#0a0a0a] text-white border-t border-white/10 relative min-h-screen flex items-center justify-center"
-      >
-        <div className="text-center">
-          <p className="text-[#b0b0b0] mb-4">Unable to load projects.</p>
-          <button
-            onClick={() => fetchProjects()}
-            className="px-4 py-2 bg-[#FF4D2E] text-white rounded-full text-sm font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
-          >
-            Retry
-          </button>
-        </div>
-      </section>
-    )
-  }
+  return <Link href={project.link}>{cardBody}</Link>
+}
+
+export default async function ProjectsSection() {
+  const projects = await getProjects({ limit: 15 })
 
   if (projects.length === 0) {
     return (
-      <section
-        id="projects"
-        className="bg-[#0a0a0a] text-white border-t border-white/10 relative py-24 md:py-40"
-      >
-        <div className="max-w-[1800px] mx-auto px-6 md:px-10">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base">
-            // Selected Projects
-          </span>
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tighter mt-6 mb-4">
-            Case studies coming soon
-          </h2>
-          <p className="text-[#b0b0b0] text-lg md:text-xl max-w-2xl">
-            I'm currently preparing detailed project write-ups. In the meantime, feel free to
-            <a href="/contact" className="text-[#FF4D2E] hover:underline ml-1">
+      <section id="projects" className="ed-shell border-t border-white/10 px-6 py-24 md:px-10 md:py-32">
+        <div className="ed-wide-container">
+          <span className="ed-eyebrow">// Selected Projects</span>
+          <h2 className="ed-section-title mt-6">Selected work is on the way</h2>
+          <p className="ed-lead mt-4">
+            I&apos;m preparing a cleaner highlight reel here. In the meantime, feel free to{' '}
+            <Link href="/contact" className="text-[#FF4D2E] hover:underline">
               get in touch
-            </a>{' '}
-            to discuss your project.
+            </Link>{' '}
+            to talk through relevant work.
           </p>
         </div>
       </section>
     )
   }
 
-  return <ProjectsSectionClient projects={projects} />
+  return (
+    <section id="projects" className="ed-shell border-t border-white/10 px-6 py-24 md:px-10 md:py-32">
+      <div className="ed-wide-container">
+        <div className="mb-14 max-w-3xl">
+          <span className="ed-eyebrow">// Selected Projects</span>
+          <h2 className="ed-section-title mt-6">A finite set of highlights, not an endless feed.</h2>
+          <p className="ed-lead mt-6 max-w-2xl">
+            These are the projects I want on the homepage: a tighter visual snapshot of the kind of
+            systems, interfaces, and digital products I build.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 2xl:grid-cols-3">
+          {projects.map((project, index) => (
+            <ProjectCard key={project.id} project={project} priority={index < 3} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
 }

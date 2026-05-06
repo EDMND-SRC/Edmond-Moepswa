@@ -17,16 +17,14 @@ export default async function ResourcesPage() {
   const paidProducts = launchProducts.filter((product) => product.type === 'paid')
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white pt-32 pb-24 px-6 md:px-10">
-      <div className="max-w-6xl mx-auto">
+    <div className="ed-shell min-h-screen px-6 pb-24 pt-32 md:px-10">
+      <div className="ed-container">
         <div className="max-w-4xl mb-16">
-          <span className="text-[#FF4D2E] font-medium tracking-wider text-sm md:text-base uppercase">
-            // Resources
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tighter mt-6 mb-6">
+          <span className="ed-eyebrow">// Resources</span>
+          <h1 className="ed-page-title mt-6 mb-6">
             Digital assets to help you build faster
           </h1>
-          <p className="text-[#a3a3a3] text-lg md:text-xl max-w-2xl leading-relaxed">
+          <p className="ed-lead text-[#a3a3a3]">
             I build production-ready starter kits and share the planning documents I use with clients.
           </p>
         </div>

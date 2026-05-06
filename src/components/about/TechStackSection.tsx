@@ -21,11 +21,11 @@ const EXPANDED_CATEGORIES = [
   {
     title: 'Backend & Database',
     technologies: [
-      'Supabase',
+      'PostgreSQL',
       'Neon (Serverless PostgreSQL)',
       'Drizzle ORM',
-      'Payload CMS',
       'Keystatic',
+      'Cloudflare R2',
     ],
   },
   {

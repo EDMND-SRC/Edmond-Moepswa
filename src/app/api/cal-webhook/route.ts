@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { reportServerError } from '@/lib/server/report-server-error'
 
 // ── Rate limiter ──────────────────────────────────────────────────────────────
 
@@ -111,6 +112,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Cal.com webhook proxy error:', error)
+    reportServerError(error, { feature: 'cal-webhook' })
     return NextResponse.json({ error: 'Webhook forwarding failed' }, { status: 500 })
   }
 }

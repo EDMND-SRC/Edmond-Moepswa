@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { Calendar, Sparkles, TrendingUp } from 'lucide-react'
@@ -330,10 +331,8 @@ export default function ProcessSection() {
             Let&apos;s talk about what you&apos;re building.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <button
-              data-cal-namespace="30min"
-              data-cal-link="edmond-moepswa/30min"
-              data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+            <Link
+              href="/contact#booking-panel"
               className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
             >
               Book a Free Discovery Call
@@ -351,7 +350,7 @@ export default function ProcessSection() {
                   d="M17 8l4 4m0 0l-4 4m4-4H3"
                 />
               </svg>
-            </button>
+            </Link>
             <a
               href={WHATSAPP_URL}
               target="_blank"

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import Link from 'next/link'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { CAL_USERNAME, CAL_NAMESPACE, PHONE_E164 } from '@/lib/constants'
+import { PHONE_E164 } from '@/lib/constants'
 import {
   getExchangeRates,
   detectCurrencyFromCountry,
@@ -22,8 +23,8 @@ import { toast } from 'sonner'
 
 // Tech stack associated with each service category
 const SERVICE_TECH_STACK: Record<string, string[]> = {
-  'web-design': ['Next.js', 'React', 'Tailwind CSS', 'Cloudflare Workers', 'Payload CMS'],
-  'web-apps': ['Next.js', 'React', 'PostgreSQL', 'Supabase', 'Payload CMS'],
+  'web-design': ['Next.js', 'React', 'Tailwind CSS', 'Cloudflare Workers', 'PostHog'],
+  'web-apps': ['Next.js', 'React', 'PostgreSQL', 'Cloudflare Workers', 'Dodo Payments'],
   automation: ['Make.com', 'n8n', 'Node.js'],
   seo: ['Google Search Console', 'Google Analytics 4', 'Cloudflare'],
   advisory: ['Notion', 'Figma'],
@@ -53,6 +54,8 @@ const DELIVERY_MULTIPLIER: Record<DeliveryOption, number> = {
 
 export default function CalculatorSection() {
   const reducedMotion = useReducedMotion()
+  const sectionRef = useRef<HTMLElement>(null)
+  const [shouldInitRates, setShouldInitRates] = useState(false)
 
   // Core selection state
   const [selectedService, setSelectedService] = useState<string>('web-design')
@@ -70,8 +73,28 @@ export default function CalculatorSection() {
   const [showQuoteModal, setShowQuoteModal] = useState(false)
   const [showSummaryDownload, setShowSummaryDownload] = useState(false)
 
-  // Fetch exchange rates on mount and detect currency
   useEffect(() => {
+    const section = sectionRef.current
+    if (!section || shouldInitRates) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldInitRates(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '280px 0px' },
+    )
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [shouldInitRates])
+
+  // Fetch exchange rates only once the calculator is close to view
+  useEffect(() => {
+    if (!shouldInitRates) return
+
     async function init() {
       let fetchedRates: Record<string, number> = { BWP: 1 }
       try {
@@ -96,7 +119,7 @@ export default function CalculatorSection() {
       }
     }
     init()
-  }, [])
+  }, [shouldInitRates])
 
   // Reset tier when service changes
   useEffect(() => {
@@ -146,6 +169,14 @@ export default function CalculatorSection() {
     selectedCurrency === 'BWP'
       ? `P${basePrice.toLocaleString()}`
       : formatCurrency(convertBWP(basePrice, ratesAreStale ? 1 : rate), selectedCurrency)
+  const formattedDeliveryCost =
+    selectedCurrency === 'BWP'
+      ? `P${deliveryCost.toLocaleString()}`
+      : formatCurrency(convertBWP(deliveryCost, ratesAreStale ? 1 : rate), selectedCurrency)
+  const formattedStaticDiscount =
+    selectedCurrency === 'BWP'
+      ? `P${staticDiscountValue.toLocaleString()}`
+      : formatCurrency(convertBWP(staticDiscountValue, ratesAreStale ? 1 : rate), selectedCurrency)
 
   // ─── Handlers ────────────────────────────────────────────────────────────────
   const handleWhatsAppShare = () => {
@@ -173,11 +204,13 @@ I'd like to discuss this. Are you available for a discovery call?`
       addons: [],
       addonsSubtotalBWP: 0,
       deliveryCostBWP: deliveryCost,
+      formattedDeliveryCost,
       delivery: deliveryOption,
       deliveryLabel: DELIVERY_OPTIONS.find((d) => d.value === deliveryOption)?.label ?? '',
       deliveryMultiplier,
       staticDiscount,
       staticDiscountBWP: staticDiscountValue,
+      formattedStaticDiscount,
       estimatedTotalBWP: total,
       formattedTotal,
       formattedBase,
@@ -191,9 +224,11 @@ I'd like to discuss this. Are you available for a discovery call?`
     basePrice,
     deliveryOption,
     deliveryCost,
+    formattedDeliveryCost,
     deliveryMultiplier,
     staticDiscount,
     staticDiscountValue,
+    formattedStaticDiscount,
     total,
     formattedTotal,
     formattedBase,
@@ -216,6 +251,7 @@ I'd like to discuss this. Are you available for a discovery call?`
   return (
     <section
       id="calculator-section"
+      ref={sectionRef}
       className="bg-[#0a0a0a] border-t border-white/10 py-16 md:py-28 px-4 md:px-16 w-full"
     >
       <div className="max-w-[1800px] mx-auto">
@@ -283,18 +319,10 @@ I'd like to discuss this. Are you available for a discovery call?`
                 >
                   {currentService.tiers.map((tier: PricingTier, i: number) => {
                     const isSelected = selectedTier === tier.name
-                    const displayPrice =
-                      tier.priceBWP !== null && !ratesAreStale
-                        ? selectedCurrency === 'BWP'
-                          ? tier.priceBWP
-                          : convertBWP(tier.priceBWP, rate ?? 1)
-                        : tier.priceBWP
-                    const safePrice =
-                      typeof displayPrice === 'number' && !isNaN(displayPrice) ? displayPrice : 0
 
                     return (
                       <button
-                        key={`${currentService.id}-${tier.name}`}
+                        key={`${currentService.id}-${tier.name}-${i}`}
                         type="button"
                         onClick={() => setSelectedTier(tier.name)}
                         className={`flex flex-col text-left border rounded-2xl p-6 transition-all duration-200 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] ${
@@ -527,14 +555,12 @@ I'd like to discuss this. Are you available for a discovery call?`
 
               {/* CTA Buttons */}
               <div className="flex flex-col gap-3">
-                <button
-                  data-cal-namespace={CAL_NAMESPACE}
-                  data-cal-link={`${CAL_USERNAME}/${CAL_NAMESPACE}`}
-                  data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
-                  className="w-full py-3.5 px-6 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a1a]"
+                <Link
+                  href="/contact#booking-panel"
+                  className="w-full py-3.5 px-6 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a1a] inline-flex items-center justify-center"
                 >
                   Book a Free Discovery Call
-                </button>
+                </Link>
                 <button
                   onClick={() => {
                     if (!selectedTier) {

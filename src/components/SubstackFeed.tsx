@@ -1,89 +1,24 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import { motion } from 'motion/react'
 import { ExternalLink } from 'lucide-react'
 import { SUBSTACK_URL } from '@/lib/constants'
+import { getSubstackPosts } from '@/lib/server/substack'
 
-interface SubstackPost {
-  title: string
-  link: string
-  pubDate: string
-  contentSnippet: string
-}
+export async function SubstackFeed() {
+  let posts: Awaited<ReturnType<typeof getSubstackPosts>> = []
 
-function isSubstackPost(value: unknown): value is SubstackPost {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    return false
+  try {
+    posts = await getSubstackPosts(3)
+  } catch (error) {
+    console.error('Failed to fetch Substack posts:', error)
   }
 
-  const post = value as Record<string, unknown>
-
-  return (
-    typeof post.title === 'string' &&
-    typeof post.link === 'string' &&
-    typeof post.pubDate === 'string' &&
-    typeof post.contentSnippet === 'string'
-  )
-}
-
-export const SubstackFeed = () => {
-  const [posts, setPosts] = useState<SubstackPost[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch('/api/substack')
-        // NOTE: API route uses unstable_cache — client fetch respects Next.js caching.
-        if (!res.ok) {
-          setError(true)
-          return
-        }
-        const data = await res.json()
-        // Empty array means feed is disabled (URL set to '#')
-        if (!Array.isArray(data) || data.length === 0) {
-          setError(true)
-          return
-        }
-
-        const parsedPosts = data.filter(isSubstackPost)
-        if (parsedPosts.length === 0) {
-          setError(true)
-          return
-        }
-
-        setPosts(parsedPosts)
-      } catch (error) {
-        console.error('Failed to fetch posts:', error)
-        setError(true)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchPosts()
-  }, [])
-
-  if (loading)
+  if (posts.length === 0) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#FF4D2E]"></div>
-      </div>
-    )
-
-  // When feed is unavailable, show fallback with subscribe link
-  if (error) {
-    return (
-      <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 border-t border-white/5">
-        <div className="max-w-5xl mx-auto text-center md:text-left">
+      <section className="ed-shell border-t border-white/5 px-6 py-24 md:px-10">
+        <div className="ed-container max-w-5xl text-center md:text-left">
           <div className="mb-14">
-            <span className="text-[#FF4D2E] text-xs font-bold uppercase tracking-[0.2em]">
-              // Latest Writing
-            </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white mt-6 tracking-tight">
-              Writing on systems, code &amp; business
-            </h2>
-            <p className="text-[#b0b0b0] mt-6 max-w-xl text-lg leading-relaxed mx-auto md:mx-0">
+            <span className="ed-eyebrow">// Latest Writing</span>
+            <h2 className="ed-section-title mt-6">Writing on systems, code &amp; business</h2>
+            <p className="ed-lead mx-auto mt-6 md:mx-0">
               Insights on building technology that lasts, automation, and the Botswana tech scene —
               delivered via Substack.
             </p>
@@ -108,37 +43,26 @@ export const SubstackFeed = () => {
     )
   }
 
-  if (posts.length === 0) return null
-
   return (
-    <section className="bg-[#0a0a0a] py-24 px-6 md:px-10 border-t border-white/5">
-      <div className="max-w-5xl mx-auto text-center md:text-left">
+    <section className="ed-shell border-t border-white/5 px-6 py-24 md:px-10">
+      <div className="ed-container max-w-5xl text-center md:text-left">
         <div className="mb-14">
-          <span className="text-[#FF4D2E] text-xs font-bold uppercase tracking-[0.2em]">
-            // Latest Writing
-          </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-normal text-white mt-6 tracking-tight">
-            Writing on systems, code & business
-          </h2>
-          <p className="text-[#b0b0b0] mt-6 max-w-xl text-lg leading-relaxed mx-auto md:mx-0">
+          <span className="ed-eyebrow">// Latest Writing</span>
+          <h2 className="ed-section-title mt-6">Writing on systems, code &amp; business</h2>
+          <p className="ed-lead mx-auto mt-6 md:mx-0">
             Insights on building technology that lasts, automation, and the Botswana tech scene —
             delivered via Substack.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {posts.map((post, i) => (
-            <motion.a
+          {posts.map((post) => (
+            <a
               key={post.link}
               href={post.link}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
-              whileHover={{ y: -8 }}
-              className="bg-[#111111] rounded-2xl p-8 border border-white/5 hover:border-[#FF4D2E]/40 transition-all duration-300 group cursor-pointer flex flex-col shadow-2xl"
+              className="group flex flex-col rounded-2xl border border-white/5 bg-[#111111] p-8 shadow-2xl transition-all duration-200 hover:-translate-y-1 hover:border-[#FF4D2E]/40"
             >
               <div className="mb-4 text-xs text-[#666] font-medium uppercase tracking-widest">
                 {new Date(post.pubDate).toLocaleDateString('en-US', {
@@ -153,10 +77,10 @@ export const SubstackFeed = () => {
               <p className="text-[#b0b0b0] text-sm flex-1 leading-relaxed line-clamp-3">
                 {post.contentSnippet}
               </p>
-              <div className="mt-8 flex items-center gap-2 text-[#FF4D2E] text-sm font-bold group-hover:gap-3 transition-all">
+              <div className="mt-8 flex items-center gap-2 text-sm font-bold text-[#FF4D2E] transition-all group-hover:gap-3">
                 Read on Substack <span className="text-lg">→</span>
               </div>
-            </motion.a>
+            </a>
           ))}
         </div>
 

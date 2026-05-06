@@ -19,7 +19,7 @@ export default function ServiceNumber({ id }: ServiceNumberProps) {
     if (isInView && !reducedMotion) {
       const timer = setTimeout(() => {
         setStardustActive(true)
-      }, 1500) // Delay to let title finish
+      }, 420)
       return () => clearTimeout(timer)
     } else if (isInView && reducedMotion) {
       setStardustActive(true)
@@ -49,7 +49,7 @@ export default function ServiceNumber({ id }: ServiceNumberProps) {
             transition={
               reducedMotion
                 ? { duration: 0 }
-                : { duration: 1.8, ease: "easeOut", times: [0, 0.6, 1] }
+                : { duration: 0.78, ease: 'easeOut', times: [0, 0.58, 1] }
             }
             className="text-[150px] md:text-[250px] lg:text-[320px] leading-none font-light tracking-tighter slashed-zero inline-block origin-center"
             style={{

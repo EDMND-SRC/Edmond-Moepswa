@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate Payload import map
-        run: pnpm generate:importmap
-
       - name: Generate Cloudflare env types
         run: pnpm cf-typegen
 
@@ -39,7 +36,6 @@ jobs:
         run: pnpm run cf:build
         env:
           DATABASE_URL: postgresql://test:test@localhost/test
-          PAYLOAD_SECRET: test-secret-key-for-ci
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
   e2e:
@@ -59,9 +55,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Generate Payload import map
-        run: pnpm generate:importmap
-
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
@@ -69,7 +62,6 @@ jobs:
         run: pnpm test:e2e
         env:
           DATABASE_URL: postgresql://test:test@localhost/test
-          PAYLOAD_SECRET: test-secret-key-for-ci
           NEXT_PUBLIC_SERVER_URL: http://localhost:3000
 
       - name: Upload Playwright report

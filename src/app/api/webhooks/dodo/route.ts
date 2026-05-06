@@ -5,6 +5,7 @@ import {
   updateOrderStatusBySubscriptionId,
   upsertOrder,
 } from '@/lib/server/app-persistence'
+import { reportServerError } from '@/lib/server/report-server-error'
 
 type DodoCustomer = {
   email?: string
@@ -155,10 +156,31 @@ async function forwardToMake(event: ParsedDodoEvent) {
     return
   }
 
+  const customer = isRecord(event.data.customer)
+    ? {
+        email: typeof event.data.customer.email === 'string' ? event.data.customer.email : '',
+        name: typeof event.data.customer.name === 'string' ? event.data.customer.name : '',
+      }
+    : { email: '', name: '' }
+
+  const productName =
+    typeof event.data.product_name === 'string'
+      ? event.data.product_name
+      : typeof event.data.product_id === 'string'
+        ? event.data.product_id
+        : 'Digital resource'
+
+  const makePayload = {
+    customer,
+    eventType: event.type,
+    product_cart: [{ name: productName }],
+    rawEvent: event,
+  }
+
   const response = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(event),
+    body: JSON.stringify(makePayload),
   })
 
   if (!response.ok) {
@@ -309,6 +331,7 @@ export async function POST(request: Request) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Webhook handler failed'
     console.error('Webhook handler error:', error)
+    reportServerError(error, { feature: 'dodo-webhook' })
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
 import { Calendar, X } from 'lucide-react'
-import { CAL_USERNAME, CAL_NAMESPACE } from '@/lib/constants'
 
 const navItems = [
   { label: 'Home', href: '/' },
@@ -182,16 +181,14 @@ export default function MobileNav() {
                   transition={{ delay: navItems.length * 0.05 + 0.1 }}
                   className="mt-2 pt-4 border-t border-white/10"
                 >
-                  <button
+                  <Link
+                    href="/contact#booking-panel"
                     onClick={handleClose}
-                    data-cal-namespace={CAL_NAMESPACE}
-                    data-cal-link={`${CAL_USERNAME}/${CAL_NAMESPACE}`}
-                    data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
                     className="w-full flex items-center justify-center gap-2 min-h-[44px] px-6 py-3 bg-[#FF4D2E] text-white rounded-xl font-medium text-base hover:bg-[#e03a1f] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1a1a1a]"
                   >
                     <Calendar className="w-5 h-5" aria-hidden="true" />
                     Book a Free Discovery Call
-                  </button>
+                  </Link>
                 </motion.div>
               </nav>
             </motion.div>

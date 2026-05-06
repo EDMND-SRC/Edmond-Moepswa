@@ -1,17 +1,22 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { X, Loader2, Send } from 'lucide-react'
 import { toast } from 'sonner'
-import { formatCurrency, convertBWP } from '@/lib/currency'
 import type { CalculatorSelections } from './types'
 
 interface QuoteModalProps {
   isOpen: boolean
   onClose: () => void
   selections: CalculatorSelections
+}
+
+type FieldErrors = {
+  email?: string
+  name?: string
+  phone?: string
 }
 
 const SCOPE_OPTIONS = [
@@ -64,8 +69,20 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
   const [scopeTags, setScopeTags] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const modalRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
+
+  const validateName = (value: string) => (!value.trim() ? 'Name is required.' : undefined)
+  const validateEmail = (value: string) => {
+    if (!value.trim()) return 'Email is required.'
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Please enter a valid email.'
+    return undefined
+  }
+  const validatePhone = (value: string) => {
+    if (!value.trim()) return undefined
+    return /^[+\d][\d\s()-]{6,}$/.test(value) ? undefined : 'Please enter a valid phone number.'
+  }
 
   // Close on Escape
   useEffect(() => {
@@ -86,6 +103,7 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
       setNotes('')
       setScopeTags([])
       setError('')
+      setFieldErrors({})
       setIsSubmitting(false)
     }
   }, [isOpen])
@@ -119,20 +137,16 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name.trim()) {
-      setError('Name is required')
-      return
+    const nextFieldErrors: FieldErrors = {
+      email: validateEmail(email),
+      name: validateName(name),
+      phone: validatePhone(phone),
     }
-    if (!email.trim()) {
-      setError('Email is required')
-      return
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email')
-      return
-    }
-    if (selections.estimatedTotalBWP < 2000) {
-      setError('For projects under P2,000, a discovery call is the fastest way to get started.')
+
+    setFieldErrors(nextFieldErrors)
+
+    if (nextFieldErrors.name || nextFieldErrors.email || nextFieldErrors.phone) {
+      setError('Please correct the highlighted fields.')
       return
     }
 
@@ -152,15 +166,23 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
             scopeTags,
             notes: notes.trim(),
             service: selections.service,
+            serviceLabel: selections.serviceLabel,
             tier: selections.tier,
+            tierLabel: selections.tierLabel,
             tierPriceBWP: selections.tierPriceBWP,
             addons: selections.addons,
             addonsSubtotalBWP: selections.addonsSubtotalBWP,
             delivery: selections.delivery,
+            deliveryLabel: selections.deliveryLabel,
+            deliveryCostBWP: selections.deliveryCostBWP,
+            formattedDeliveryCost: selections.formattedDeliveryCost,
             deliveryMultiplier: selections.deliveryMultiplier,
             staticDiscount: selections.staticDiscount,
             staticDiscountBWP: selections.staticDiscountBWP,
+            formattedStaticDiscount: selections.formattedStaticDiscount,
             estimatedTotalBWP: selections.estimatedTotalBWP,
+            formattedBase: selections.formattedBase,
+            formattedTotal: selections.formattedTotal,
             currency: selections.currency,
             timestamp: new Date().toISOString(),
           },
@@ -182,8 +204,7 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
 
   // Format currency for summary display
   const formatCurrencyValue = (bwp: number) => {
-    if (selections.currency === 'BWP') return `P${bwp.toLocaleString()}`
-    return formatCurrency(convertBWP(bwp, 1), selections.currency)
+    return `P${bwp.toLocaleString()}`
   }
 
   if (!isOpen) return null
@@ -239,9 +260,7 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
                 <span className="text-white font-medium">{selections.serviceLabel}</span>
                 <span className="text-[#b0b0b0] block text-xs">{selections.tierLabel}</span>
               </div>
-              <span className="text-white tabular-nums">
-                {formatCurrencyValue(selections.tierPriceBWP)}
-              </span>
+              <span className="text-white tabular-nums">{selections.formattedBase}</span>
             </div>
 
             {selections.addons.length > 0 && (
@@ -264,7 +283,7 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
               <div className="flex justify-between items-center text-xs pt-2 border-t border-white/5 mt-1">
                 <span className="text-[#b0b0b0]">Delivery: {selections.deliveryLabel}</span>
                 <span className="text-white tabular-nums">
-                  {formatCurrencyValue(selections.deliveryCostBWP)}
+                  {selections.formattedDeliveryCost ?? formatCurrencyValue(selections.deliveryCostBWP)}
                 </span>
               </div>
             )}
@@ -273,7 +292,7 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
               <div className="flex justify-between items-center text-xs mt-1">
                 <span className="text-green-400">Static website discount</span>
                 <span className="text-green-400 tabular-nums">
-                  −{formatCurrencyValue(selections.staticDiscountBWP)}
+                  −{selections.formattedStaticDiscount ?? formatCurrencyValue(selections.staticDiscountBWP)}
                 </span>
               </div>
             )}
@@ -361,12 +380,21 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
                   onChange={(e) => {
                     setName(e.target.value)
                     setError('')
+                    if (fieldErrors.name) {
+                      setFieldErrors((current) => ({ ...current, name: validateName(e.target.value) }))
+                    }
                   }}
+                  onBlur={() =>
+                    setFieldErrors((current) => ({ ...current, name: validateName(name) }))
+                  }
                   placeholder="Your full name"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-base text-white placeholder:text-[#666] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full rounded-lg border bg-white/5 px-4 py-3 text-base text-white placeholder:text-[#666] transition-colors disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent ${
+                    fieldErrors.name ? 'border-red-400/60' : 'border-white/10'
+                  }`}
                   disabled={isSubmitting}
-                  aria-invalid={!!error}
+                  aria-invalid={Boolean(fieldErrors.name)}
                 />
+                {fieldErrors.name && <p className="text-xs text-red-400">{fieldErrors.name}</p>}
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -380,12 +408,24 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
                   onChange={(e) => {
                     setEmail(e.target.value)
                     setError('')
+                    if (fieldErrors.email) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        email: validateEmail(e.target.value),
+                      }))
+                    }
                   }}
+                  onBlur={() =>
+                    setFieldErrors((current) => ({ ...current, email: validateEmail(email) }))
+                  }
                   placeholder="you@example.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-base text-white placeholder:text-[#666] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full rounded-lg border bg-white/5 px-4 py-3 text-base text-white placeholder:text-[#666] transition-colors disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent ${
+                    fieldErrors.email ? 'border-red-400/60' : 'border-white/10'
+                  }`}
                   disabled={isSubmitting}
-                  aria-invalid={!!error}
+                  aria-invalid={Boolean(fieldErrors.email)}
                 />
+                {fieldErrors.email && <p className="text-xs text-red-400">{fieldErrors.email}</p>}
               </div>
 
               <div className="flex flex-col gap-1.5">
@@ -396,11 +436,25 @@ export default function QuoteModal({ isOpen, onClose, selections }: QuoteModalPr
                   id="quote-phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => {
+                    setPhone(e.target.value)
+                    if (fieldErrors.phone) {
+                      setFieldErrors((current) => ({
+                        ...current,
+                        phone: validatePhone(e.target.value),
+                      }))
+                    }
+                  }}
+                  onBlur={() =>
+                    setFieldErrors((current) => ({ ...current, phone: validatePhone(phone) }))
+                  }
                   placeholder="+267 ..."
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-base text-white placeholder:text-[#666] min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full rounded-lg border bg-white/5 px-4 py-3 text-base text-white placeholder:text-[#666] transition-colors disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:border-transparent ${
+                    fieldErrors.phone ? 'border-red-400/60' : 'border-white/10'
+                  }`}
                   disabled={isSubmitting}
                 />
+                {fieldErrors.phone && <p className="text-xs text-red-400">{fieldErrors.phone}</p>}
               </div>
             </div>
 

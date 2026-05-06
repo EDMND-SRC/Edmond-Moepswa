@@ -35,7 +35,6 @@ Accepted workflows:
 
 - `lead-capture`
 - `calculator-quote`
-- `resource-download`
 
 Behavior:
 

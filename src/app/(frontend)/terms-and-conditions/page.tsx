@@ -38,8 +38,8 @@ export default function TermsAndConditionsPage() {
           scoping, and technology stack recommendations.
         </li>
         <li>
-          <strong>Boilerplate Products:</strong> pre-built starter kits (Next.js + Payload CMS
-          + PostgreSQL) customised to client requirements for rapid MVP delivery.
+          <strong>Boilerplate Products:</strong> pre-built starter kits (Next.js + Cloudflare
+          Workers + PostgreSQL) customised to client requirements for rapid MVP delivery.
         </li>
       </ul>
 

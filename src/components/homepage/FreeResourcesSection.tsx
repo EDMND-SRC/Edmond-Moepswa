@@ -36,26 +36,7 @@ const freeResources: Resource[] = [
   },
 ]
 
-const handleResourceClick = (resourceTitle: string, url: string) => {
-  // Fire-and-forget tracking
-  const payload = JSON.stringify({
-    workflow: 'resource-download',
-    data: { resource: resourceTitle, timestamp: new Date().toISOString() },
-  })
-
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon('/api/make-webhook', payload)
-  } else {
-    // Fallback if sendBeacon not available
-    fetch('/api/make-webhook', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload,
-      keepalive: true,
-    }).catch(() => {})
-  }
-
-  // Navigate to Dodo checkout
+const handleResourceClick = (url: string) => {
   window.location.href = url
 }
 
@@ -80,7 +61,7 @@ export default function FreeResourcesSection() {
             return (
               <motion.button
                 key={item.title}
-                onClick={() => handleResourceClick(item.title, item.url)}
+                onClick={() => handleResourceClick(item.url)}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-50px' }}

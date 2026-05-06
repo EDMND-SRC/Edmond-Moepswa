@@ -28,7 +28,7 @@ export const VideoMedia: React.FC<MediaProps> = (props) => {
 
     if (!filename) return null
 
-    const sourceURL = getMediaUrl(url || `/api/media/file/${filename}`)
+    const sourceURL = getMediaUrl(url || `/media/${filename}`)
 
     return (
       <video

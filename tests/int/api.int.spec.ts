@@ -168,6 +168,7 @@ describe('Public launch integration routes', () => {
         thumbnail: {
           alt: string
           height: number
+          id: number
           mimeType: string
           updatedAt: string
           url: string
@@ -185,10 +186,11 @@ describe('Public launch integration routes', () => {
         category: 'websites',
         description: 'Project summary',
         id: 7,
-        link: 'https://example.com',
+        link: 'https://example.com/',
         thumbnail: {
           alt: 'Preview image',
           height: 900,
+          id: 19,
           mimeType: 'image/jpeg',
           updatedAt: '2026-05-04T00:00:00.000Z',
           url: '/media/preview.jpg',

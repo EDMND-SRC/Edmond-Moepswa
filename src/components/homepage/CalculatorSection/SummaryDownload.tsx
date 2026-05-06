@@ -35,17 +35,13 @@ function generateMarkdown(s: CalculatorSelections): string {
     })
     lines.push(`| **Subtotal** | | **P${s.addonsSubtotalBWP.toLocaleString()}** |`)
     lines.push('')
-  } else {
-    lines.push(`## Add-ons`)
-    lines.push('')
-    lines.push('None selected')
-    lines.push('')
   }
 
   lines.push(`## Delivery`)
   lines.push(`- **Option:** ${s.deliveryLabel}`)
   if (s.deliveryMultiplier > 0) {
     lines.push(`- **Surcharge:** +${Math.round(s.deliveryMultiplier * 100)}%`)
+    lines.push(`- **Cost:** ${s.formattedDeliveryCost ?? `P${s.deliveryCostBWP.toLocaleString()}`}`)
   } else {
     lines.push(`- **Surcharge:** None`)
   }
@@ -53,7 +49,9 @@ function generateMarkdown(s: CalculatorSelections): string {
 
   if (s.staticDiscount) {
     lines.push(`## Discount`)
-    lines.push(`- **Static website discount:** −P${s.staticDiscountBWP.toLocaleString()}`)
+    lines.push(
+      `- **Static website discount:** −${s.formattedStaticDiscount ?? `P${s.staticDiscountBWP.toLocaleString()}`}`,
+    )
     lines.push('')
   }
 
@@ -88,9 +86,6 @@ function generatePlainText(s: CalculatorSelections): string {
     })
     lines.push(`  Subtotal: P${s.addonsSubtotalBWP.toLocaleString()}`)
     lines.push('')
-  } else {
-    lines.push('Add-ons: None selected')
-    lines.push('')
   }
 
   lines.push('Delivery')
@@ -98,6 +93,7 @@ function generatePlainText(s: CalculatorSelections): string {
   lines.push(`  Option: ${s.deliveryLabel}`)
   if (s.deliveryMultiplier > 0) {
     lines.push(`  Surcharge: +${Math.round(s.deliveryMultiplier * 100)}%`)
+    lines.push(`  Cost: ${s.formattedDeliveryCost ?? `P${s.deliveryCostBWP.toLocaleString()}`}`)
   } else {
     lines.push(`  Surcharge: None`)
   }
@@ -106,7 +102,9 @@ function generatePlainText(s: CalculatorSelections): string {
   if (s.staticDiscount) {
     lines.push('Discount')
     lines.push('--------')
-    lines.push(`  Static website discount: -P${s.staticDiscountBWP.toLocaleString()}`)
+    lines.push(
+      `  Static website discount: -${s.formattedStaticDiscount ?? `P${s.staticDiscountBWP.toLocaleString()}`}`,
+    )
     lines.push('')
   }
 

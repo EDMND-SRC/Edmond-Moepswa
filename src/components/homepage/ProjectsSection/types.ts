@@ -1,4 +1,4 @@
-import type { Media } from '@/payload-types'
+import type { Media } from '@/types/content'
 
 export interface ProjectItem {
   id: number
@@ -7,5 +7,5 @@ export interface ProjectItem {
   description: string
   category: string
   thumbnail: Media | null
-  link: string
+  link: string | null
 }

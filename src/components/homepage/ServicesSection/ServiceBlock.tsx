@@ -42,7 +42,7 @@ export default function ServiceBlock({
   }, [isExpanded])
 
   // Subtle parallax for the text content
-  const y = useTransform(scrollYProgress, [0, 1], [40, -40])
+  const y = useTransform(scrollYProgress, [0, 1], [18, -18])
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
 
   // Parse BWP numeric from price string and convert
@@ -106,7 +106,7 @@ export default function ServiceBlock({
   return (
     <div
       ref={ref}
-      className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start min-h-auto py-8 md:py-12"
+      className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start min-h-auto py-4 md:py-6"
       style={{ position: 'relative' }}
     >
       <ServiceNumber id={service.id} />
@@ -114,7 +114,7 @@ export default function ServiceBlock({
       {/* Content */}
       <motion.div
         style={reducedMotion ? { opacity } : { y, opacity }}
-        className="lg:col-span-7 flex flex-col gap-8 md:gap-12 pt-4 md:pt-12"
+        className="lg:col-span-7 flex flex-col gap-6 md:gap-8 pt-2 md:pt-6"
       >
         {showPricing ? (
           <>
@@ -155,7 +155,7 @@ export default function ServiceBlock({
             </div>
           </>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5">
             <h3 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tighter">
               {service.title}
             </h3>
@@ -180,11 +180,11 @@ export default function ServiceBlock({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                transition={{ duration: 0.28, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
                 {/* Pricing Tiers */}
-                <div className="flex flex-col gap-8 pt-6">
+                <div className="flex flex-col gap-6 pt-4">
                   {service.pricingTiers.map((tier, tierIndex) => (
                     <div
                       key={tierIndex}
@@ -243,15 +243,13 @@ export default function ServiceBlock({
                   )}
 
                   {/* CTA */}
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                    <button
-                      data-cal-namespace="30min"
-                      data-cal-link="edmond-moepswa/30min"
-                      data-cal-config='{"layout":"month_view","useSlotsViewOnSmallScreen":"true"}'
+                  <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                    <Link
+                      href="/contact#booking-panel"
                       className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#FF4D2E] text-white rounded-full font-medium hover:bg-[#e03a1f] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
                     >
                       Book a Free Discovery Call
-                    </button>
+                    </Link>
                     <a
                       href="#calculator-section"
                       className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF4D2E] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"

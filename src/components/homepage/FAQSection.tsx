@@ -112,7 +112,7 @@ const defaultFAQs: FAQ[] = [
     id: 'default-9',
     question: 'What platforms and tools do you work with?',
     answer:
-      'I build with Next.js, React, TypeScript, and Tailwind CSS. For content management, I use Payload CMS. For databases, PostgreSQL and MongoDB. For automation, Make.com, n8n, and custom API integrations. I integrate with HubSpot CRM, Resend email, Cal.com scheduling, PostHog analytics, and many other platforms. If a tool has an API, I can integrate it.',
+      'I build with Next.js, React, TypeScript, Tailwind CSS, and Cloudflare Workers. For data and operational workflows, I use PostgreSQL, Make.com, n8n, and direct API integrations. I also work with Cal.com, Dodo Payments, Resend, PostHog, Better Stack, Google Analytics, and other tools when they fit the job. If a platform has a solid API or webhook surface, I can usually integrate it.',
     category: 'technical',
     order: 9,
     isActive: true,
@@ -137,14 +137,20 @@ const defaultFAQs: FAQ[] = [
   },
 ]
 
-export default function FAQSection() {
-  const [faqs, setFaqs] = useState<FAQ[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+interface FAQSectionProps {
+  initialFaqs?: FAQ[]
+}
+
+export default function FAQSection({ initialFaqs }: FAQSectionProps) {
+  const [faqs, setFaqs] = useState<FAQ[]>(initialFaqs ?? [])
+  const [isLoading, setIsLoading] = useState(!initialFaqs)
   const [expandedId, setExpandedId] = useState<string | number | null>(null)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const reducedMotion = useReducedMotion()
 
   useEffect(() => {
+    if (initialFaqs) return
+
     const fetchFAQs = async () => {
       try {
         const response = await fetch('/api/faqs', { cache: 'no-store' })
@@ -159,9 +165,9 @@ export default function FAQSection() {
     }
 
     fetchFAQs()
-  }, [])
+  }, [initialFaqs])
 
-  // Use CMS FAQs if available, otherwise fall back to defaults
+  // Use live FAQs if available, otherwise fall back to defaults
   const displayFAQs = faqs.length > 0 ? faqs : defaultFAQs
 
   // Group FAQs by category

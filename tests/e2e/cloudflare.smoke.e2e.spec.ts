@@ -33,7 +33,12 @@ test.describe('Cloudflare smoke', () => {
       faqs: Array<{ answer: string; question: string }>
     }
     const projectsBody = (await projectsResponse.json()) as {
-      docs: Array<{ id: number; title: string }>
+      docs: Array<{
+        id: number
+        link?: string | null
+        thumbnail?: { url?: string | null } | null
+        title: string
+      }>
     }
 
     expect(Array.isArray(pagesBody.docs)).toBe(true)
@@ -59,6 +64,24 @@ test.describe('Cloudflare smoke', () => {
       id: expect.any(Number),
       title: expect.any(String),
     })
+
+    const firstThumbnailURL = projectsBody.docs[0]?.thumbnail?.url
+
+    if (firstThumbnailURL) {
+      const thumbnailResponse = await fetch(
+        firstThumbnailURL.startsWith('http')
+          ? firstThumbnailURL
+          : `${baseURL}${firstThumbnailURL}`,
+      )
+
+      expect(thumbnailResponse.status).toBe(200)
+      expect(thumbnailResponse.headers.get('content-type')).toMatch(/^image\//)
+    }
+
+    if (projectsBody.docs[0]?.link) {
+      expect(projectsBody.docs[0].link).not.toBe('https://github.com/edmnd-src')
+      expect(projectsBody.docs[0].link).not.toBe('#')
+    }
   })
 
   test('preview routes stay disabled for the launch build', async () => {

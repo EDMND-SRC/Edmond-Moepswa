@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 
 import SkipToContent from '@/components/ui/SkipToContent'
 import PageTransition from '@/components/ui/PageTransition'
+import { Toaster } from '@/components/ui/sonner'
 import Script from 'next/script'
 import { ThemeProvider } from 'next-themes'
 import { Suspense } from 'react'
@@ -26,25 +27,25 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: [{ url: '/favicon/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
     other: [
       {
         rel: 'manifest',
-        url: '/favicon/site.webmanifest',
+        url: '/site.webmanifest',
       },
       {
         rel: 'icon',
-        url: '/favicon/android-chrome-192x192.png',
+        url: '/android-chrome-192x192.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
         rel: 'icon',
-        url: '/favicon/android-chrome-512x512.png',
+        url: '/android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png',
       },
@@ -60,7 +61,8 @@ export const metadata: Metadata = {
     'Botswana',
     'Edmond Moepswa',
     'Next.js',
-    'Payload CMS',
+    'Cloudflare Workers',
+    'PostgreSQL',
     'web applications',
     'SEO',
     'automation specialist',
@@ -107,6 +109,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: 'google75a7bf2c52475f25',
+  },
 }
 
 const jsonLd = {
@@ -151,7 +156,7 @@ const jsonLd = {
         'Web Development',
         'Workflow Automation',
         'SEO',
-        'Payload CMS',
+        'Cloudflare Workers',
         'Next.js',
       ],
     },
@@ -203,8 +208,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </Suspense>
           <SkipToContent />
           <PageTransition>
-            <div id="main-content">{children}</div>
+            {children}
           </PageTransition>
+          <Toaster position="bottom-right" richColors />
           <Script
             id="structured-data"
             type="application/ld+json"
